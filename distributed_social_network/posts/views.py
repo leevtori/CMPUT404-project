@@ -1,3 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponse
 
-# Create your views here.
+# placeholder view 
+def index(request):
+    return HttpResponse("Hello world")
