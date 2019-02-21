@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+HOSTNAME = "localhost:8000"  # FIXME: update to server's hostname
 
 # Application definition
 
