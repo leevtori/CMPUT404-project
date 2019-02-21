@@ -11,8 +11,8 @@ class Post (models.Model):
     
     title = models.CharField(max_length=255)
     content = models.TextField()
-    source = models.CharField(max_length=255)
-    origin = models.CharField(max_length=255)
+    source = models.URLField()
+    origin = models.URLField()
     description = models.CharField(max_length=255)
     
     content_type = models.CharField(choices=ContentType.get_choices(), max_length=3, default=ContentType.PLAIN)
@@ -48,6 +48,3 @@ class Comment (models.Model):
 
     content_type = models.CharField(choices=ContentType.get_choices(), max_length=3, default=ContentType.PLAIN)
 
-
-class Node(models.Model):
-    hostname = models.CharField(max_length=255)
