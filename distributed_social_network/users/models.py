@@ -20,6 +20,7 @@ class CustomUserManager(UserManager):
          
         return super().create_superuser(username, email, password, **extra_fields)             
 
+
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
