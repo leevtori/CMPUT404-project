@@ -1,14 +1,16 @@
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, logout, authenticate, get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect, HttpResponse
+
+User = get_user_model()
 
 # Create your views here.
 def index(request):
     return render(request, "login.html", {})
 
-def my_view(request):
-    username = request.POST['username']
-    password = request.POST['password']
+def login_view(request):
+    username = request.POST.get('username', False)
+    password = request.POST.get('password', False)
     user = authenticate(request, username=username, password=password)
     if user is not None:
         login(request, user)
@@ -16,6 +18,9 @@ def my_view(request):
     else:
         return render(request, "login.html", {})
 
+def logout_view(request):
+    logout(request)
+    return render(request, "login.html", {})
 
 def signup(request):
     if request.method == "POST":
