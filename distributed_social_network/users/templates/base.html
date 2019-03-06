@@ -9,9 +9,9 @@
       <h1>Social Network</h1>
       {% if user.is_authenticated %}
         User: {{ user.get_username }}
-        <a href="logout/">logout</a>
+        <a href="/users/logout">logout</a>
       {% else %}
-        <a href="login/">login</a> / <a href="signup/">signup</a>
+        <a href="/users/login">login</a> / <a href="/users/signup">signup</a>
       {% endif %}
       <hr>
     </header>
