@@ -11,12 +11,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelManagers(
-            name='user',
-            managers=[
-                ('objects', users.models.CustomUserManager()),
-            ],
-        ),
         migrations.RemoveField(
             model_name='user',
             name='url',
