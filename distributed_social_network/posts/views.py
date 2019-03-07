@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponse
+from django.views.generic import ListView
+from .models import Post
 
-# placeholder view 
-def index(request):
-    return HttpResponse("Hello world")
+class ProfileView(ListView):
+    model = Post
