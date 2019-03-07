@@ -1,10 +1,14 @@
 {# look up include, call include in for loop #}
-<h1>{{user.first_name}} {{user.last_name}}</h1>
-<h3>{{user.username}}</h3>
 
-{% for post in object_list %}
-    {# include "post.html" with _post=post??? %}#}
-    <h2>{{post.title}}</h2>
-    <p>{{post.content}}</p>
-    <br/>
-{% endfor %}
+{% extends "profile_base.html" %}
+
+{% block content %}
+    
+    <h1>{{user.first_name}} {{user.last_name}}</h1>
+    <h3>{{user.username}}</h3>
+
+    {% for post in object_list %}
+        {% include "post.html" %}
+    {% endfor %}
+
+{% endblock%}

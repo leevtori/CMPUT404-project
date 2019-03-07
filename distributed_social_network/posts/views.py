@@ -19,4 +19,5 @@ class ProfileView(ListView):
     
     #overwrite get_queryset() to filter for posts by that user
     def get_queryset(self):
-        return Post.objects.filter(author=self.kwargs['username'])
+        user = get_object_or_404(User,username=self.kwargs['username'])
+        return Post.objects.filter(author=user)
