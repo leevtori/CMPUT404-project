@@ -131,3 +131,7 @@ STATICFILES_DIRS = (
 TEMPLATE_DIRS = (
     Temp_Path +"/template",
 )
+
+# Redirect
+LOGIN_REDIRECT_URL = '/'
+
