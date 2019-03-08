@@ -3,12 +3,21 @@
 {% extends "profile_base.html" %}
 
 {% block content %}
-    
-    <h1>{{user.first_name}} {{user.last_name}}</h1>
-    <h3>{{user.username}}</h3>
+    <div class='banner'>
+        <h1>{{user.first_name}} {{user.last_name}}</h1>
+        <h3>{{user.username}}</h3>
+    </div>
+   
+    <div class='left_col'>
+        <div class='stats'>blah</div>
+        <div class='about'>blahblah</div>
+    </div>
 
-    {% for post in object_list %}
-        {% include "post.html" %}
-    {% endfor %}
+    <div class='right_col'>
+        {% for post in object_list %}
+            {% include "post.html" %}
+        {% endfor %}
+    </div>
+
 
 {% endblock%}
