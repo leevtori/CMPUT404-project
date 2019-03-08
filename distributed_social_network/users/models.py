@@ -11,7 +11,17 @@ class Node(models.Model):
     # TODO: Add node authentication info
 
 
+class CustomUserManager(UserManager):	
+
+    def create_superuser(self, username, email, password, **extra_fields):	
+        # host = Node.objects.get_or_create(hostname=settings.HOSTNAME)	
+        # extra_fields["host_id"] = host[0].id	
+        extra_fields["is_active"] = True	
+
+        return super().create_superuser(username, email, password, **extra_fields)
+
 class User(AbstractUser):
+    objects = CustomUserManager()
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
     display_name = models.CharField(max_length=255)
