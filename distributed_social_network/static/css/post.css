@@ -4,16 +4,19 @@ body,html{
 }
 
 
-
-div.left_col{
-    float:left;
-    width:30%;
+table.content{
+    padding-bottom: 2000px; 
+    width:100%;
 }
 
-div.right_col{
-    padding-bottom: 2000px;
+td.left_col{
+    width:30%;
+    vertical-align: top;
+}
+
+td.right_col{
     width: 70%;
-    float:left;
+    vertical-align: top;
 }
 
 div.post{
