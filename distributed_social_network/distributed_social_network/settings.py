@@ -58,7 +58,7 @@ ROOT_URLCONF = 'distributed_social_network.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['base/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
