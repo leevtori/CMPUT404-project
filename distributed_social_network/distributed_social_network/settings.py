@@ -34,7 +34,7 @@ HOSTNAME = "localhost:8000"  # FIXME: update to server's hostname
 
 INSTALLED_APPS = [
     'users.apps.UsersConfig',
-    'posts.apps.PostsConfig', 
+    'posts.apps.PostsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -131,3 +131,5 @@ STATICFILES_DIRS = (
 TEMPLATE_DIRS = (
     Temp_Path +"/template",
 )
+
+LOGIN_URL = "/users/login"
