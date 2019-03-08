@@ -1,12 +1,14 @@
 body,html{
     margin:0;
     padding:0;
+    font-family: Arial, Helvetica, sans-serif;
+    background-image: linear-gradient(to bottom,rgb(249, 235, 252), rgb(248, 234, 242));
 }
 
 .header{
     height: 50px;
+    background-color: #710974;
     box-shadow: 0 1px 0 rgba(12,13,14,0.1),0 4px 6px rgba(59,64,69,0.1);
-    background-image: linear-gradient(to right,rgba(87, 24, 69), rgba(206, 0, 72));
     z-index:10;
     position:sticky;
     top:0;
@@ -14,14 +16,88 @@ body,html{
 
 .feed_link{
     float: left;
+    width:100px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color:white;
+    text-decoration: none;
 }
 
-.user{
-    float:right;
+.feed_link:hover{
+    background-color: rgba(255, 255, 255, 0.5);
 }
+
+
+/* Dropdown Button */
+.dropbtn {
+    float:right;
+    width:100px;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.0);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+  
+  /* The container <div> - needed to position the dropdown content */
+  .dropdown {
+    position: relative;
+    display: inline-block;
+    float:right;
+  }
+  
+  /* Dropdown Content (Hidden by Default) */
+  .dropdown-content {
+    display: none;
+    position: relative;
+    background-color: white;
+    width: 250px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    top:50px;
+  }
+  
+  /* Links inside the dropdown */
+  .dropdown-content a {
+    color: black;
+    padding: 10px;
+    text-decoration: none;
+    display: block;
+  }
+  
+  /* Change color of dropdown links on hover */
+  .dropdown-content a:hover {background-color: #ddd;}
+  
+  /* Show the dropdown menu on hover */
+  .dropdown:hover .dropdown-content {display: block;}
+  
+  /* Change the background color of the dropdown button when the dropdown content is shown */
+  .dropdown:hover .dropbtn {background-color: rgba(255, 255, 255, 0.5);;}
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 div.post{
-    background-color:white;
+    background-color: rgba(255, 255, 255, 0.5);
     box-shadow: 0 1px 0 rgba(12,13,14,0.1),0 4px 6px rgba(59,64,69,0.1);
     padding: 10px;
     margin: 5px;
