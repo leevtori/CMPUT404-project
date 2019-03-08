@@ -1,11 +1,15 @@
-{# look up include, call include in for loop #}
 
-{% extends "profile_base.html" %}
+{% extends "base.html" %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/post.css' %}">
+{% endblock %}
 
 {% block content %}
     <div class='banner'>
         <h1>{{user.first_name}} {{user.last_name}}</h1>
-        <h3>{{user.username}}</h3>
+        <h3>@{{user.username}}</h3>
     </div>
    
     <table class='content'>
@@ -19,7 +23,5 @@
             {% endfor %}
         </td>
     </table>
-
-
 
 {% endblock%}

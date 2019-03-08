@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/feed.css' %}">
+{% endblock %}
+
+{% block content %}
+    <h3>Latest Posts</h3>
+    <div style="padding-bottom: 2000px;">
+        {% for post in latest_posts %}
+            {% include "post.html"%}
+        {% endfor %}
+    </div>
+  
+
+{% endblock%}

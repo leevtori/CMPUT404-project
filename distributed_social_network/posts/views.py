@@ -18,7 +18,7 @@ class ProfileView(ListView):
         #get user object based on username in url
         user = get_object_or_404(User,username=self.kwargs['username'])
         context['user'] = user
-        #pass user object to template
+        # pass user object to template
         return context
     
     #overwrite get_queryset() to filter for posts by that user
@@ -28,7 +28,7 @@ class ProfileView(ListView):
 
 
 class FeedView(TemplateView):
-    template_name = 'index.html'
+    template_name = 'feed.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

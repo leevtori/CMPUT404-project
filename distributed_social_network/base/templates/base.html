@@ -1,0 +1,21 @@
+{% load static %}
+
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
+        {% block styles %}
+        {% endblock %}
+
+    </head>
+    <body>
+        <div class="header">
+            
+                <a class="feed_link" href={%url 'feed' %}>Feed</a>
+            
+            <div class="user">first last</div>
+        </div>
+        {% block content %}
+        {% endblock %}
+    </body>
+
+</html>
