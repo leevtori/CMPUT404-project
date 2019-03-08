@@ -1,5 +1,42 @@
+body,html{
+    margin:0;
+    padding:0;
+}
+
+
+table.content{
+    padding-bottom: 2000px; 
+    width:100%;
+}
+
+td.left_col{
+    width:30%;
+    vertical-align: top;
+}
+
+td.right_col{
+    width: 70%;
+    vertical-align: top;
+}
+
 div.post{
     background-color: rgba(255, 234, 206, 0.486);
+    padding: 10px;
+    margin: 5px;
+    border-width: 0px;
+    border-radius: 10px;
+}
+
+div.stats{
+    background-color: rgba(206, 255, 255, 0.486);
+    padding: 10px;
+    margin: 5px;
+    border-width: 0px;
+    border-radius: 10px;
+}
+
+div.about{
+    background-color: rgba(227, 188, 253, 0.486);
     padding: 10px;
     margin: 5px;
     border-width: 0px;
@@ -14,5 +51,16 @@ div.post{
 .username{
     margin: 0px;
     font-size: small;
-    color: #ada9a9;
+    color: #ce6d12;
+}
+
+.banner{
+    position: sticky;
+    min-width: 100%;
+    height: auto;
+    box-shadow: 0 1px 0 rgba(12,13,14,0.1),0 4px 6px rgba(59,64,69,0.1);
+    background-color: white;
+    padding: 20px;
+    top: 0;
+    z-index: 5;
 }
