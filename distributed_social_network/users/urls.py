@@ -8,9 +8,10 @@ from . import views
 urlpatterns = [
     
     path("list", views.UserList.as_view()),
-    path("friends/add/<uuid: pk>", views.AddFriend.as_view()),
+    # path("friends/add/", views.AddFriend.as_view()),
+    url("friends/add/", views.addFriend),
     path("friends/delete/<uuid: pk>", views.DeleteFriend.as_view()),
-    path("friends", views.FriendList.as_view())
+    path("friends", views.FriendList.as_view()),
     path('logout/', auth_views.LogoutView.as_view(template_name="logout.html")),
     path('login/', auth_views.LoginView.as_view(template_name='login.html')),
     path('signup/', views.SignUp.as_view()),
