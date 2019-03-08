@@ -133,3 +133,6 @@ TEMPLATE_DIRS = (
 )
 
 LOGIN_URL = "/users/login"
+# Redirect
+LOGIN_REDIRECT_URL = '/'
+
