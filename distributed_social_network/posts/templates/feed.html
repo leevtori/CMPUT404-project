@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/feed.css' %}">
+{% endblock %}
+
+{% block content %}
+
+    <div>
+        {% for post in object_list %}
+            {% include "post.html" %}
+        {% endfor %}
+    </div>
+  
+
+{% endblock%}
