@@ -20,7 +20,8 @@ td.right_col{
 }
 
 div.post{
-    background-color: rgba(255, 234, 206, 0.486);
+    background-color:white;
+    box-shadow: 0 1px 0 rgba(12,13,14,0.1),0 4px 6px rgba(59,64,69,0.1);
     padding: 10px;
     margin: 5px;
     border-width: 0px;
@@ -28,7 +29,8 @@ div.post{
 }
 
 div.stats{
-    background-color: rgba(206, 255, 255, 0.486);
+    background-color: white;
+    box-shadow: 0 1px 0 rgba(12,13,14,0.1),0 4px 6px rgba(59,64,69,0.1);
     padding: 10px;
     margin: 5px;
     border-width: 0px;
@@ -36,7 +38,8 @@ div.stats{
 }
 
 div.about{
-    background-color: rgba(227, 188, 253, 0.486);
+    background-color: white;
+    box-shadow: 0 1px 0 rgba(12,13,14,0.1),0 4px 6px rgba(59,64,69,0.1);
     padding: 10px;
     margin: 5px;
     border-width: 0px;
@@ -51,7 +54,7 @@ div.about{
 .username{
     margin: 0px;
     font-size: small;
-    color: #ce6d12;
+    color: #FFB500;
 }
 
 .banner{
