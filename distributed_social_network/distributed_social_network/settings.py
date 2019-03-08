@@ -33,8 +33,10 @@ HOSTNAME = "localhost:8000"  # FIXME: update to server's hostname
 # Application definition
 
 INSTALLED_APPS = [
+    'rest_framework',
+    'api.apps.ApiConfig',
     'users.apps.UsersConfig',
-    'posts.apps.PostsConfig', 
+    'posts.apps.PostsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -135,3 +137,8 @@ TEMPLATE_DIRS = (
 # Redirect
 LOGIN_REDIRECT_URL = '/'
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
