@@ -1,5 +1,4 @@
 function addFriend(friendId){
-    alert("HELLLO");
     fetch("friends/add/", {
         method: 'post',
         headers: {
@@ -7,10 +6,15 @@ function addFriend(friendId){
         }, 
         body: JSON.stringify({'id':friendId})
     });
+};
+
+
+function deleteFriend(friendId){
+    fetch("friends/delete/", {
+        method: 'delete', 
+        headers: {
+            'X-CSRFToken': document.cookie.split("=")[1]
+        },
+        body: JSON.stringify({'id':friendId})
+    });
 }
-
-
-// funtion deleteFriend(friendId){
-//     alert("BYEBYE");
-//     fetch
-// }

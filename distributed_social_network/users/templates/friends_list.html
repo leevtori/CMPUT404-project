@@ -6,7 +6,7 @@
 
     <h1>Friends</h1>
 
-    {% for user in my_friends_list %}
+    {% for user in object_list %}
         <div>
             <h3>{{user}}</h3>
             {% csrf_token %}
