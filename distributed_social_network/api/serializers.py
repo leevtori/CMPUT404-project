@@ -7,6 +7,7 @@ from posts.models import Post, Comment
 
 User = get_user_model()
 
+# FIXME: The id and url are wrong.
 class AuthorSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
     firstName = serializers.CharField(source="first_name")
@@ -49,7 +50,7 @@ class CommentSerializer(serializers.ModelSerializer):
     def get_contentType(self, obj):
         return content_type_str[obj.content_type]
 
-
+# FIXME: missing size and next fields
 class PostSerializer(serializers.ModelSerializer):
     count = serializers.SerializerMethodField()
     # size = serializers.SerializerMethodField()
@@ -57,7 +58,7 @@ class PostSerializer(serializers.ModelSerializer):
     visibility = serializers.SerializerMethodField()
     author = AuthorSerializer()
     categories = serializers.StringRelatedField(many=True)
-    comments = CommentSerializer(many=True)
+    comments = CommentSerializer(many=True, source="comment_set")
     visibleTo = serializers.StringRelatedField(many=True, source="visible_to")
 
     class Meta:
@@ -81,7 +82,7 @@ class PostSerializer(serializers.ModelSerializer):
             )
 
     def get_count(self, obj):
-        return obj.comments.count()
+        return obj.comment_set.count()
 
     def get_visibility(self, obj):
         return visibility_str[obj.visibility]

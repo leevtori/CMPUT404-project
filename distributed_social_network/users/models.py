@@ -20,6 +20,7 @@ class CustomUserManager(UserManager):
 
         return super().create_superuser(username, email, password, **extra_fields)
 
+
 class User(AbstractUser):
     objects = CustomUserManager()
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
@@ -36,4 +37,5 @@ class User(AbstractUser):
     friends = models.ManyToManyField('self')
 
     def get_url(self):
-        return "%s/%s" % (self.host, self.id)
+        host = self.host or settings.HOSTNAME
+        return "%s/%s" % (host, self.id)
