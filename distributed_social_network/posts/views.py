@@ -35,18 +35,38 @@ class FeedView(TemplateView):
         return context
 
 
+
+
+
 def create(request):
     # creates a post and redirects back to main page
-    print(request.POST['content'])
-    print(request.POST['visibility'])
-    print(request.user.id)
-
     if request.method == "POST":
-        new_post = Post(author=request.user,
-                        title=request.POST['title'],
-                        content=request.POST['content'],
-                        description=request.POST['description'],
-                        content_type=request.POST['type'])
-        new_post.save()
+        # i dont know if i need to do this if statement yet, just gonna leave this here in case
+        if request.POST['type'] == 'text/plain':
+            new_post = Post(author=request.user,
+                            title=request.POST['title'],
+                            content=request.POST['content'],
+                            description=request.POST['description'],
+                            content_type=request.POST['type'])
+            new_post.save()
+        elif request.POST['type'] == 'image/jpeg' or request.POST['type'] == 'image/png':
+            picture_location = request.FILES['content']
+            picture = picture_location.read()
+            #saves the picture
+            new_post = Post(author=request.user,
+                            title=request.POST['title'],
+                            content=picture,
+                            description=request.POST['description'],
+                            content_type=request.POST['type'],
+                            unlisted=True)
+            new_post.save()
+
+            #the next 3 lines were meant as a test, assuming that the image uploaded is a jpg
+            #this will create a copy of it in the folder of this project
+            # just going to leave this here in case something breaks
+
+            #f=open('testimg.jpg','wb')
+            #f.write(picture)
+            #f.close()
 
     return HttpResponseRedirect('/')

@@ -3,11 +3,28 @@
 
 {% block styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/feed.css' %}">
+    <script>
+    function getimageformat() {
+        var  selected_picture  = document.getElementById('createPostButton').files[0];
+        //var content_button;
+        var invis_field;
+        if (selected_picture.type == 'image/jpeg') {
+            invis_field = document.getElementById("picture_type");
+            invis_field.value = 'image/jpeg';
+            //content_button = document.getElementById('createPostButton');
+            //content_button.value = selected_picture.files;
+        }
+    }
+
+
+
+
+    </script>
 {% endblock %}
 
 {% block content %}
     <h3>Add New Post</h3>
-    <div class="post_text">
+    <div id="textPost" class="newPost">
         <form id="createtextPost" method="post" action="/create/">{% csrf_token %}
             <input name="type" type="hidden" value="text/plain">
             Title:
@@ -28,6 +45,29 @@
             <input type="submit" value="Create">
         </form>
         Change to image implement later
+    </div>
+
+    <div id="picturePost" class="newPost">
+        <form id="createpicturePost" method="post" action="/create/" enctype="multipart/form-data">{% csrf_token %}
+            <input name="type" type="hidden" value="picture/png" id="picture_type">
+            Title:
+            <input name="title" type="text">
+            <br>
+            Description:
+            <input name="description" type="text">
+            <br>
+            <input name="content" type="file" id="createPostButton" accept="image/png, image/jpeg" onchange="getimageformat()">
+            <br><br>
+            Privacy:<br>
+            <select name="visibility">
+                <option value="PUBLIC">Public</option>
+                <option value="FRIENDS">Friends Only</option>
+                <option value="FOAF">Friends Of Friends Only</option>
+                <option value="SERVERONLY">Friends on this host only</option>
+                <option value="PRIVATE">Custom</option>
+            </select>
+            <input type="submit" value="Create">
+        </form>
     </div>
     <h3>Latest Posts</h3>
     <div style="padding-bottom: 2000px;">
