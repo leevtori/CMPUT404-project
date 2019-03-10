@@ -34,6 +34,9 @@ class User(AbstractUser):
     is_active = models.BooleanField(default=False)
 
     friends = models.ManyToManyField('self')
+    followers = models.ManyToManyField('self')
+    # followers = models.ForeignKey('self', default=None, on_delete=models.CASCADE)
+    # followers = models.ForeignKey('self', null=True, blank=True, on_delete=models.DO_NOTHING)
 
     def get_url(self):
         return "%s/%s" % (self.host, self.id)

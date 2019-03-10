@@ -24,7 +24,13 @@
 
                 <table class='stats'>
                     <tr style="height: 60px;">
-                        <td class='stats'>{{follower_count}}<br/>Followers</td>
+                        <td class='stats'>
+                            <a href={% url 'followers' %}>
+                            <div style="height:100%;width:100%">
+                                {{follower_count}}<br/>Followers
+                            </div>
+                            </a>
+                        </td>
                         <td class='stats'>
                             <a href={% url 'friends' %}>
                             <div style="height:100%;width:100%">
