@@ -7,8 +7,27 @@
 
 {% block content %}
     <h3>Add New Post</h3>
-    <div class="post">
-        add stuff here
+    <div class="post_text">
+        <form id="createtextPost" method="post" action="/create/">{% csrf_token %}
+            <input name="type" type="hidden" value="text/plain">
+            Title:
+            <input name="title" type="text">
+            <br>
+            Description:
+            <input name="description" type="text">
+            <br>
+            <textarea name="content" cols="50" rows="4">Enter text here.</textarea> <br><br>
+            Privacy:<br>
+            <select name="visibility">
+                <option value="PUBLIC">Public</option>
+                <option value="FRIENDS">Friends Only</option>
+                <option value="FOAF">Friends Of Friends Only</option>
+                <option value="SERVERONLY">Friends on this host only</option>
+                <option value="PRIVATE">Custom</option>
+            </select>
+            <input type="submit" value="Create">
+        </form>
+        Change to image implement later
     </div>
     <h3>Latest Posts</h3>
     <div style="padding-bottom: 2000px;">
