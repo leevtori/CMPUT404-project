@@ -34,3 +34,4 @@ class FeedView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['latest_posts'] = Post.objects.all()[:5]
         return context
+

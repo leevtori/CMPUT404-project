@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, render, HttpResponse
 from .models import User
 from .forms import CustomUserCreationForm
 from django.views.generic import ListView
+from django.views.generic.edit import UpdateView
 from django.views import View
 
 from django.views import generic
@@ -75,3 +76,12 @@ class DeleteFriend(LoginRequiredMixin, View):
         context = {'object_list': self.request.user.friends.all()}
 
         return render(request, 'friends_list.html', context)
+
+
+class AccountSettingsView(LoginRequiredMixin, UpdateView):
+    model = User
+    fields = ['first_name','last_name', 'display_name', 'github', 'bio', 'is_active']
+    template_name = 'account_settings.html'
+
+    def get_object(self):
+        return self.request.user
