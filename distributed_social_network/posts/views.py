@@ -16,8 +16,12 @@ class ProfileView(ListView):
         context = super().get_context_data(**kwargs)
         # get user object based on username in url
         user = get_object_or_404(User, username=self.kwargs['username'])
+        #put user object in context
         context['user'] = user
-        # pass user object to template
+        context['friend_count'] = self.request.user.friends.count
+        context['follower_count'] = '?'
+        
+        # pass context to template
         return context
 
     # overwrite get_queryset() to filter for posts by that user

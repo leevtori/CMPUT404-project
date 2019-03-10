@@ -134,6 +134,7 @@ TEMPLATE_DIRS = (
     Temp_Path +"/template",
 )
 
+LOGIN_URL = "/users/login"
 # Redirect
 LOGIN_REDIRECT_URL = '/'
 

@@ -1,0 +1,9 @@
+
+{%load static%}
+<div>
+    <h3>{{user}} </h3>
+    {% csrf_token %}
+    <button id='addFriend' type='submit' onclick="addFriend('{{user.id}}')">Add Friend</button>
+</div>
+
+

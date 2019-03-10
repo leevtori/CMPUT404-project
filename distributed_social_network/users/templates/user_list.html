@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{%load static%}
+
+
+{% block content %}
+
+    <h1>Users</h1>
+
+    {% for user in object_list %}
+        {% include "includes/user_list_item.html" with user=user %}
+    {% endfor %}
+
+    <script src=" {% static 'js/script.js' %}"></script>
+
+{% endblock %}
