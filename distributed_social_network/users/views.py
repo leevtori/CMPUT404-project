@@ -1,4 +1,4 @@
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.shortcuts import get_object_or_404, render, HttpResponse
 from .models import User
 from .forms import CustomUserCreationForm
@@ -85,3 +85,7 @@ class AccountSettingsView(LoginRequiredMixin, UpdateView):
 
     def get_object(self):
         return self.request.user
+
+    def get_success_url(self):
+        return reverse('profile', kwargs={'username':self.request.user.username})
+        
