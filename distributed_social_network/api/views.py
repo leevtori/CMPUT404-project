@@ -4,6 +4,10 @@ from django.shortcuts import get_object_or_404
 from posts.utils import Visibility
 from posts.models import Post, Comment
 
+from rest_framework.response import Response
+
+from rest_framework.decorators import action
+
 from . import serializers
 
 User = get_user_model()
@@ -15,23 +19,15 @@ class AuthorViewset (viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.filter(is_active=True, host=None)
     serializer_class = serializers.AuthorSerializer
 
+    @action(methods=["get"], detail=True)
+    def friends(self, request, pk=None):
+        author = self.get_object()
+        friends = author.friends.all()
+        serializer = serializers.AuthorSerializer(friends, context={'request': request}, many=True)
+        return Response(serializer.data)
+
 
 class PostViewSet (viewsets.ReadOnlyModelViewSet):
     """API endpoint for reading posts and lists of posts."""
     queryset = Post.objects.filter(visibility=Visibility.PUBLIC)
     serializer_class = serializers.PostSerializer
-
-
-# class CommentViewSet(viewsets.ModelViewSet):
-#     """API endpoints for getting and creating comments for specific posts"""
-#     serializer_class = serializers.CommentSerializer
-#     queryset = Comment.objects.all()
-
-#     def get_queryset(self, request):
-#         post_id = request.kwargs["postID"]
-#         post = get_object_or_404(Post, id=post_id)
-#         return post.comment_set.all()
-
-#     def create(self, request):
-#         post = get_object_or_404(Post, id=request.kwargs['postID'])
-#         # Lets serializer do the rest of it
