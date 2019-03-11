@@ -19,8 +19,8 @@ class UserList(LoginRequiredMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # user = get_object_or_404(User, username=self.kwargs['username'])
         context['login_user'] = self.request.user
+        context['friends'] = self.request.user.friends.all()
 
         return context
 
@@ -33,6 +33,11 @@ class FriendList(LoginRequiredMixin, ListView):
     """This view lists all friends of logged in user."""
     model = User
     template_name = "friends_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['followers'] = self.request.user.followers.all()
+        return context
     
     def get_queryset(self):
         return self.request.user.friends.all()

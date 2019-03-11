@@ -10,9 +10,13 @@
         <div>
             <h3>{{user}}</h3>
             {% csrf_token %}
-            <button id='confirmFriend' type='submit' onclick="confirmFriend('{{user.id}}')">Confirm Friend</button>
+            {% if user in followers %}
+                <button id='confirmFriend' type='submit' onclick="confirmFriend('{{user.id}}')">Confirm Friend</button>
+            {% endif %}
         </div>
     {% endfor %}
+
+  
 
     <script src=" {% static 'js/script.js' %}"></script>
 
