@@ -2,19 +2,24 @@ body,html{
     margin:0;
     padding:0;
     font-family: Arial, Helvetica, sans-serif;
-    background-image: linear-gradient(to bottom,rgb(249, 235, 252), rgb(248, 234, 242));
+    background-image: linear-gradient(to bottom,rgb(249, 235, 252), rgb(234, 201, 248));
+}
+
+a {
+    text-decoration: none;
 }
 
 .header{
     height: 50px;
-    background-color: #710974;
-    box-shadow: 0 1px 0 rgba(12,13,14,0.1),0 4px 6px rgba(59,64,69,0.1);
+    /* background-color: #710974; */
+    background-image: linear-gradient(to right,rgb(116, 12, 139), rgb(114, 43, 161));
+    box-shadow: 0 1px 0 rgba(32, 29, 36, 0.2),0 6px 6px rgba(65, 59, 69, 0.2);
     z-index:10;
     position:sticky;
     top:0;
 }
 
-.feed_link{
+.header_bar{
     float: left;
     width:100px;
     height: 100%;
@@ -25,9 +30,13 @@ body,html{
     text-decoration: none;
 }
 
-.feed_link:hover{
+.header_bar:hover{
     background-color: rgba(255, 255, 255, 0.5);
 }
+
+/* .user_link{
+
+} */
 
 
 /* Dropdown Button */
@@ -79,23 +88,6 @@ body,html{
   .dropdown:hover .dropbtn {background-color: rgba(255, 255, 255, 0.5);;}
   
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 div.post{
     background-color: rgba(255, 255, 255, 0.5);
     box-shadow: 0 1px 0 rgba(12,13,14,0.1),0 4px 6px rgba(59,64,69,0.1);
@@ -105,3 +97,13 @@ div.post{
     border-radius: 10px;
 }
 
+.fullname{
+    margin: 0px;
+    margin-top: 5px;
+}
+
+.username{
+    margin: 0px;
+    font-size: small;
+    color: #581f99;
+}

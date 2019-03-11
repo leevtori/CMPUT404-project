@@ -9,21 +9,22 @@
     </head>
     <body>
         <div class="header">
-            <a class="feed_link" href={% url 'feed' %}>Feed</a>
-            
+            <a class="header_bar" href={% url 'feed' %}>Feed</a>
+            <a class="header_bar" href={% url 'users' %}>Search Users</a>
             <div class="dropdown">
                 <a class="dropbtn" href={% url 'profile' username=request.user.username %}>
                     {{request.user.first_name}} {{request.user.last_name}}
                 </a>
                 <div class="dropdown-content">
                     <a href={% url 'logout' %}>Log Out</a>
-                    <a href="#">Account Settings</a>
+                    <a href={% url 'account_settings' %}>Account Settings</a>
                     <a href="#">Link 3</a>
                 </div>
             </div>
         </div>
         {% block content %}
         {% endblock %}
+    
     </body>
 
 </html>

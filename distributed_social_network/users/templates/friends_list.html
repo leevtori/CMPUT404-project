@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{%load static%}
+
+
+{% block content %}
+
+    <h1>Friends</h1>
+
+    {% for user in object_list %}
+        <div>
+            <h3>{{user}}</h3>
+            {% csrf_token %}
+            <button id='deleteFriend' type='submit' onclick="deleteFriend('{{user.id}}')">Delete Friend</button>
+        </div>
+    {% endfor %}
+
+    <script src=" {% static 'js/script.js' %}"></script>
+
+{% endblock %}
