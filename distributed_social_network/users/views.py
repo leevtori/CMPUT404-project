@@ -16,6 +16,13 @@ class UserList(LoginRequiredMixin, ListView):
     """Lists all users on the server."""
     model = User
     template_name = "user_list.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # user = get_object_or_404(User, username=self.kwargs['username'])
+        context['login_user'] = self.request.user
+
+        return context
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -41,17 +48,16 @@ class FollowerList(LoginRequiredMixin, ListView):
 class AddFriend(LoginRequiredMixin, View):
 
     def post(self, request):
-        # template = loader.get_template("user_list.html")
         body_unicode = self.request.body.decode('utf-8')
         body = json.loads(body_unicode)
         friend_id = body['id']
         friend = get_object_or_404(User, id=friend_id)
-        self.request.user.followers.add(friend)
-        self.request.user.save()
-        return HttpResponseRedirect('friends/add/')
-        # return render(request, 'user_list.html')
+        # self.request.user.followers.add(friend)
 
-        # return HttpResponse(template.render(request))
+        friend.followers.add(self.request.user)
+
+        return HttpResponseRedirect('friends/add/')
+
 
 class ConfirmFriend(LoginRequiredMixin, View):
 
