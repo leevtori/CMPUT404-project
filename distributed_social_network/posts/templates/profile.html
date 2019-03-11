@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block styles %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/post.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/profile.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -14,8 +14,36 @@
    
     <table class='content'>
         <td class='left_col'>
-            <div class='stats'>blah</div>
-            <div class='about'>blahblah</div>
+            <div class='about'>
+                <h3>About Me</h3>
+                <p>{{user.bio}}</p>
+                <a href={{user.github}}>Github</a>
+            </div>
+            <div class='stats'>
+                <h3>Stats</h3>
+
+                <table class='stats'>
+                    <tr style="height: 60px;">
+                        <td class='stats'>
+                            <a href={% url 'followers' %}>
+                            <div style="height:100%;width:100%">
+                                {{follower_count}}<br/>Followers
+                            </div>
+                            </a>
+                        </td>
+                        <td class='stats'>
+                            <a href={% url 'friends' %}>
+                            <div style="height:100%;width:100%">
+                                    {{friend_count}}<br/>Friends
+                            </div>
+                            </a>
+                        </td>
+                        <td class='stats'>{{object_list.count}}<br/>Posts</td>
+                    </tr>
+                </table>
+
+
+            </div>
         </td>
         <td class='right_col'>
             {% for post in object_list %}

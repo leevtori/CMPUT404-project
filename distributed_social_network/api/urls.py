@@ -5,6 +5,8 @@ from . import views
 routers = routers.DefaultRouter()
 routers.register('posts', views.PostViewSet)
 routers.register('author', views.AuthorViewset)
+# routers.register('comment', views.CommentViewSet)
+
 
 urlpatterns = [
     path('', include(routers.urls))

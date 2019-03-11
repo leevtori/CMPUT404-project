@@ -1,0 +1,15 @@
+
+{%load static%}
+<div>
+    <h3>{{user}} </h3>
+    {% csrf_token %}
+
+    {% if user in friends %}
+        friends &#x2713;
+    {% else %}
+        <button id='addFriend' type='submit' onclick="addFriend('{{user.id}}')">Add Friend</button>
+    {% endif %}
+
+</div>
+
+
