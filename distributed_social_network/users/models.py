@@ -34,7 +34,7 @@ class User(AbstractUser):
     is_active = models.BooleanField(default=False)
 
     friends = models.ManyToManyField('self')
-    followers = models.ManyToManyField('self')
+    followers = models.ManyToManyField('self', blank=True, symmetrical=False)
 
     def get_url(self):
         return "%s/%s" % (self.host, self.id)

@@ -52,8 +52,6 @@ class AddFriend(LoginRequiredMixin, View):
         body = json.loads(body_unicode)
         friend_id = body['id']
         friend = get_object_or_404(User, id=friend_id)
-        # self.request.user.followers.add(friend)
-
         friend.followers.add(self.request.user)
 
         return HttpResponseRedirect('friends/add/')
@@ -67,7 +65,7 @@ class ConfirmFriend(LoginRequiredMixin, View):
         friend_id = body['id']
         friend = get_object_or_404(User, id=friend_id)
         self.request.user.friends.add(friend)
-        self.request.user.save()
+        friend.followers.add(self.request.user)
         return HttpResponseRedirect('profile/'+self.request.username)
 
 class SignUp(generic.CreateView):
@@ -83,10 +81,10 @@ class DeleteFriend(LoginRequiredMixin, View):
         body_unicode = self.request.body.decode('utf-8')
         body = json.loads(body_unicode)
         friend_id = body['id']
-        print("ID ", friend_id)
-        get_object_or_404(User, id=friend_id)
+        friend = get_object_or_404(User, id=friend_id)
         self.request.user.friends.remove(friend_id)
         self.request.user.followers.remove(friend_id)
+        friend.followers.remove(self.request.user.id)
         context = {'object_list': self.request.user.friends.all()}
         return render(request, 'friends_list.html', context)
 
