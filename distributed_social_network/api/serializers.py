@@ -85,6 +85,12 @@ class PostSerializer(serializers.ModelSerializer):
     def get_count(self, obj):
         return obj.comment_set.count()
 
+    def get_contentType(self, obj):
+        return content_type_str[obj.content_type]
+
+    def get_visibility(self, obj):
+        return visibility_str[obj.visibility]
+
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
