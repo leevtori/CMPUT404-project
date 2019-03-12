@@ -33,6 +33,11 @@ class FriendList(LoginRequiredMixin, ListView):
     """This view lists all friends of logged in user."""
     model = User
     template_name = "friends_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['followers'] = self.request.user.followers.all()
+        return context
     
     def get_queryset(self):
         return self.request.user.friends.all()
@@ -42,15 +47,10 @@ class FollowerList(LoginRequiredMixin, ListView):
     model = User
     template_name = "followers_list.html"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['friends'] = self.request.user.friends.all()
-        return context
-
     def get_queryset(self):
         return self.request.user.followers.all()
 
-class SendFriendRequest(LoginRequiredMixin, View):
+class AddFriend(LoginRequiredMixin, View):
 
     def post(self, request):
         body_unicode = self.request.body.decode('utf-8')
@@ -62,7 +62,7 @@ class SendFriendRequest(LoginRequiredMixin, View):
         return HttpResponseRedirect('friends/add/')
 
 
-class ConfirmRequest(LoginRequiredMixin, View):
+class ConfirmFriend(LoginRequiredMixin, View):
 
     def post(self, requst):
         body_unicode = self.request.body.decode('utf-8')
