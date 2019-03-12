@@ -66,16 +66,24 @@ class PostViewSet (viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.PostSerializer
 
 
-class CommentViews():
-    """API endpoints for getting and creating comments for specific posts"""
+    @action(methods=["post", "get"], detail=True)
+    def comments(self, request, pk=None):
+        """ For getting and creating comments"""
+        post = self.get_object()
+
+        if request.method == "GET":
+            comments = post.comment_set.all()
+            serializer = serializers.CommentSerializer(comments, many=True, context={'request': request})
+
+            return Response(serializer.data)
+
+        if request.method == "POST":
+            return Response(status=501)
 
 
 class AreFriendsView(APIView):
     """/author/<author1_id>/friends/<author2_id>
-    For now only works with local server friends.
-
-    TODO: Check remote servers.
     """
 
     def get(self, request):
-        pass
+        return Response(status=501)
