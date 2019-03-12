@@ -25,9 +25,10 @@ div.stats{
 
 table.stats{
     text-align: center;
+    width:100%;
 }
 td.stats{
-    width:30%;
+    width:25%;
 }
 td.stats:hover{
     background-color: rgba(183, 125, 198, 0.2)
