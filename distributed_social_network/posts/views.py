@@ -19,7 +19,7 @@ class ProfileView(ListView):
         #put user object in context
         context['user'] = user
         context['friend_count'] = self.request.user.friends.count
-        context['follower_count'] = '?'
+        context['follower_count'] = self.request.user.followers.count
         
         # pass context to template
         return context

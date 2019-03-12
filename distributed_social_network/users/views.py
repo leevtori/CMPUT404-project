@@ -1,5 +1,5 @@
 from django.urls import reverse_lazy, reverse
-from django.shortcuts import get_object_or_404, render, HttpResponse
+from django.shortcuts import get_object_or_404, render, HttpResponse, HttpResponseRedirect
 from .models import User
 from .forms import CustomUserCreationForm
 from django.views.generic import ListView
@@ -16,6 +16,13 @@ class UserList(LoginRequiredMixin, ListView):
     """Lists all users on the server."""
     model = User
     template_name = "user_list.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['login_user'] = self.request.user
+        context['friends'] = self.request.user.friends.all()
+
+        return context
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -27,35 +34,44 @@ class FriendList(LoginRequiredMixin, ListView):
     model = User
     template_name = "friends_list.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['followers'] = self.request.user.followers.all()
+        return context
+    
     def get_queryset(self):
         return self.request.user.friends.all()
 
+class FollowerList(LoginRequiredMixin, ListView):
+    """This view lists all the followers of logged in user. """
+    model = User
+    template_name = "followers_list.html"
+
+    def get_queryset(self):
+        return self.request.user.followers.all()
 
 class AddFriend(LoginRequiredMixin, View):
 
     def post(self, request):
-        # template = loader.get_template("user_list.html")
+        body_unicode = self.request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        friend_id = body['id']
+        friend = get_object_or_404(User, id=friend_id)
+        friend.followers.add(self.request.user)
+
+        return HttpResponseRedirect('friends/add/')
+
+
+class ConfirmFriend(LoginRequiredMixin, View):
+
+    def post(self, requst):
         body_unicode = self.request.body.decode('utf-8')
         body = json.loads(body_unicode)
         friend_id = body['id']
         friend = get_object_or_404(User, id=friend_id)
         self.request.user.friends.add(friend)
-        self.request.user.save()
-        return render(request, 'user_list.html')
-
-        # return HttpResponse(template.render(request))
-
-
-# def addFriend(request):
-#     if request.method == "POST":
-#         body_unicode = request.body.decode('utf-8')
-#         body = json.loads(body_unicode)
-#         friend_id = body['id']
-
-        # pass
-
-
-#     return render(request, 'user_list.html')
+        friend.followers.add(self.request.user)
+        return HttpResponseRedirect('profile/'+self.request.username)
 
 class SignUp(generic.CreateView):
     form_class = CustomUserCreationForm
@@ -70,11 +86,11 @@ class DeleteFriend(LoginRequiredMixin, View):
         body_unicode = self.request.body.decode('utf-8')
         body = json.loads(body_unicode)
         friend_id = body['id']
-        print("ID ", friend_id)
-        get_object_or_404(User, id=friend_id)
+        friend = get_object_or_404(User, id=friend_id)
         self.request.user.friends.remove(friend_id)
+        self.request.user.followers.remove(friend_id)
+        friend.followers.remove(self.request.user.id)
         context = {'object_list': self.request.user.friends.all()}
-
         return render(request, 'friends_list.html', context)
 
 
