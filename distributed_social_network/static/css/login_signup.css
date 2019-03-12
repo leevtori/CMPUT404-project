@@ -74,8 +74,6 @@ html, body {
 a{
     color: white;
     text-decoration: none;
-    /* height: 100%;
-    width:100%; */
 }
 
 #signup:hover{
@@ -94,5 +92,33 @@ a{
     width:50%;
     height: 50px;
     font-size: medium;
+}
+
+#signup_form_btn:hover{
+    background-color: rgb(174, 107, 189);
+}
+
+.logout{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    width:100%;
+}
+
+#login_again_btn{
+    border-radius: 3px;
+    border-width: 0;
+    background-color: rgb(116, 12, 139);
+    width:20%;
+    height: 50px;
+    font-size: medium;
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+#login_again_btn:hover{
+    background-color: rgb(174, 107, 189);
 }
 

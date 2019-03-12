@@ -1,11 +1,14 @@
 {% extends "base.html" %}
 {%load static%}
 
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/user.css' %}">  
+{% endblock %}
 
 {% block content %}
+<div style="padding:10px">
 
-    <h1>Users</h1>
-
+    <h2>Users</h2>
     {% for user in object_list %}
         {% if user != login_user %}
             {% include "includes/user_list_item.html" with user=user %}
@@ -14,4 +17,5 @@
 
     <script src=" {% static 'js/script.js' %}"></script>
 
+</div>
 {% endblock %}    

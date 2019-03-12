@@ -1,14 +1,17 @@
 
 {%load static%}
-<div>
-    <h3>{{user}} </h3>
-    {% csrf_token %}
+<div class='post' style="width:50%;">
+    <h4 class='fullname'>{{user.first_name}} {{user.last_name}}</h4>
+    <p class='username'>@{{user.username}}</p>
 
-    {% if user in friends %}
-        friends &#x2713;
-    {% else %}
-        <button id='addFriend' type='submit' onclick="addFriend('{{user.id}}')">Add Friend</button>
-    {% endif %}
+    {% csrf_token %}
+    <div style="padding:10px">
+        {% if user in friends %}
+            friends &#x2713;
+        {% else %}
+            <button class='add_friend_btn' type='submit' onclick="addFriend('{{user.id}}')">+ Add Friend</button>
+        {% endif %}
+    </div>
 
 </div>
 
