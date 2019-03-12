@@ -10,7 +10,9 @@
         <div>
             <h3>{{user}}</h3>
             {% csrf_token %}
-            {% if user in followers %}
+            {% if user in friends %}
+                Friend &#10003;
+            {% else %}
                 <button id='confirmFriend' type='submit' onclick="confirmFriend('{{user.id}}')">Confirm Friend</button>
             {% endif %}
         </div>
