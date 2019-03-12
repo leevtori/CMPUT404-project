@@ -46,6 +46,7 @@ class PostView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         post = get_object_or_404(Post, id=self.kwargs['postid'])
+        print(post.content)
         context['post'] = post
         context['post_comments'] = Comment.objects.filter(post=post)
         return context
@@ -85,6 +86,7 @@ def create(request):
                                 description=request.POST['description'],
                                 content_type='image/png;base64',
                                 unlisted=True)
+            new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
             new_post.save()
 
             # the next 3 lines were meant as a test, assuming that the image uploaded is a jpg
