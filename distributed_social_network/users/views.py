@@ -26,7 +26,7 @@ class UserList(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        return qs.filter(is_active=True)
+        return qs.filter(is_active=True).order_by("username")
 
 
 class FriendList(LoginRequiredMixin, ListView):

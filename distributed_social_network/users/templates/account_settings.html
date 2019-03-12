@@ -1,11 +1,16 @@
 {% extends "base.html" %}
 {%load static%}
 
-{% block content %}
-<h1>Account Settings</h1>
-<form method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Update">
-</form>
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/account_settings.css' %}">
+{% endblock %}
 
+{% block content %}
+<div style="padding:10px">
+    <h2>Account Settings</h2>
+    <form method="post" id='account_settings_form'>{% csrf_token %}
+        {{ form.as_p }}
+        <input type="Submit" value="Update" id="submit_btn">
+    </form>
+</div>
 {% endblock %}
