@@ -12,7 +12,8 @@
             <div id="logo">Social Network</div>
         </div>
         <div class="header2">
-            <a class="feed_link" href={% url 'feed' %}>Feed</a>
+            <a class="header_link" href={% url 'feed' %}>Feed</a>
+            <a class="header_link" href={% url 'users' %}>Search Users</a>
             <div class="dropdown">
                 <a class="dropbtn" href={% url 'profile' username=request.user.username %}>
                     {{request.user.first_name}} {{request.user.last_name}}

@@ -19,7 +19,6 @@ body,html{
 .header2{
     height: 50px;
     width:100%;
-    /* background-color: #710974; */
     background-color: rgba(255, 255, 255, 0.13);
     z-index:10;
     position:fixed;
@@ -34,9 +33,10 @@ body,html{
     font-weight: bold;
 }
 
-.feed_link{
+.header_link{
     float: left;
-    width:100px;
+    padding-left: 15px;
+    padding-right: 15px;
     height: 100%;
     display: flex;
     align-items: center;
@@ -45,7 +45,7 @@ body,html{
     text-decoration: none;
 }
 
-.header_bar:hover{
+.header_link:hover{
     background-color: rgba(255, 255, 255, 0.5);
 }
 
