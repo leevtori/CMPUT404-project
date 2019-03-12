@@ -10,7 +10,6 @@ User = get_user_model()
 class ProfileView(ListView):
     # model = Post
     template_name = 'profile.html'
-    ordering = ['-created']
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -27,7 +26,8 @@ class ProfileView(ListView):
     # overwrite get_queryset() to filter for posts by that user
     def get_queryset(self):
         user = get_object_or_404(User, username=self.kwargs['username'])
-        return Post.objects.filter(author=user)
+        #return 20 latest posts 
+        return Post.objects.filter(author=user).order_by("-published")[:20]
 
 
 class FeedView(TemplateView):
@@ -35,7 +35,7 @@ class FeedView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['latest_posts'] = Post.objects.all()[:5]
+        context['latest_posts'] = Post.objects.all().order_by("-published")[:20]
         return context
 
 
