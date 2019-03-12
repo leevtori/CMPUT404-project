@@ -35,7 +35,7 @@ class FeedView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['latest_posts'] = Post.objects.all()[:5]
+        context['latest_posts'] = Post.objects.filter(unlisted=False)[:5]
         return context
 
 

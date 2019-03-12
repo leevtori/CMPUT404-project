@@ -1,12 +1,11 @@
 {# render the passed-in post #}
-
 <div class='post'>
     <div>
         <h4 class='fullname'>{{post.author.first_name}} {{post.author.last_name}}</h4>
         <p class='username'>@{{post.author.username}}</p>
     </div>
     <div>
-        <a href="/post/"+{post.id}>{{post.title}}<a>
+        <a href={{post.id}}>{{post.title}}</a>
         <p>{{post.content}}</p>
     </div>
 
