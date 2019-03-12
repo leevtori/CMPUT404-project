@@ -3,8 +3,8 @@
 
 
 {% block content %}
-
-    <h1>Followers</h1>
+<div style="padding:10px">
+    <h2>Followers</h2>
 
     {% for user in object_list %}
         <div>
@@ -19,5 +19,5 @@
   
 
     <script src=" {% static 'js/script.js' %}"></script>
-
+</div>
 {% endblock %}

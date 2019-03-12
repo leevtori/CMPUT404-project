@@ -33,7 +33,7 @@ body,html{
     font-weight: bold;
 }
 
-.header_link{
+a.header_link{
     float: left;
     padding-left: 15px;
     padding-right: 15px;
@@ -42,6 +42,10 @@ body,html{
     align-items: center;
     justify-content: center;
     color:white;
+    text-decoration: none;
+}
+
+a{
     text-decoration: none;
 }
 

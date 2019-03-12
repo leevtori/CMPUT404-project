@@ -74,8 +74,6 @@ html, body {
 a{
     color: white;
     text-decoration: none;
-    /* height: 100%;
-    width:100%; */
 }
 
 #signup:hover{
@@ -94,5 +92,9 @@ a{
     width:50%;
     height: 50px;
     font-size: medium;
+}
+
+#signup_form_btn:hover{
+    background-color: rgb(174, 107, 189);
 }
 
