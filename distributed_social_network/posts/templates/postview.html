@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block styles %}
+{% endblock %}
+
+{% block content %}
+<div>
+    <h4 class='fullname'>{{post.author.first_name}} {{post.author.last_name}}</h4>
+    <p class='username'>@{{post.author.username}}</p>
+</div>
+<h1>{{ post.title }}</h1>
+<p>{{ post.comment }}</p>
+<p>{{ post.content }}</p>
+
+
+{% for comments in post_comments %}
+    {% include "comment.html"%}
+{% endfor %}
+
+<br>
+    <div border-style="solid";>
+
+        <form method="post" action="/newComment/" enctype="multipart/form-data">{% csrf_token %}
+            <input name="post" type="hidden" value={{ post.id }}>
+            <input name="comment" type="text">
+            <input type="submit">
+
+        </form>
+    </div>
+{% endblock%}

@@ -4,6 +4,7 @@ from django.conf import settings
 from .utils import ContentType, Visibility
 import uuid
 
+
 class Post (models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="posts")
