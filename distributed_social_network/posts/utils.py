@@ -13,7 +13,8 @@ visibility_str = {
     "PUBL": "Public",
     "FOAF": "Friend of a Friend",
     "PRIV": "Private",
-    "SERV": "Home Server Only"
+    "SERV": "Home Server Only",
+    "FRND": "Friends Only"
 }
 
 
@@ -27,13 +28,14 @@ class ContentType(Enum):
 
     @classmethod
     def get_choices(cls):
-        return (
-            (cls.MARKDOWN.value, "text/markdown"),
-            (cls.PLAIN.value, "text/plain"),
-            (cls.APPLICATION.value, "application/base64"),
-            (cls.PNG.value, "imgage/png;base64"),
-            (cls.JPEG.value, "image/jpeg;base64")
-        )
+        return [(key, value) for key, value in content_type_str.items()]
+        # return (
+        #     (cls.MARKDOWN.value, "text/markdown"),
+        #     (cls.PLAIN.value, "text/plain"),
+        #     (cls.APPLICATION.value, "application/base64"),
+        #     (cls.PNG.value, "imgage/png;base64"),
+        #     (cls.JPEG.value, "image/jpeg;base64")
+        # )
 
     def __str__(self):
         return self.value
@@ -56,15 +58,11 @@ class Visibility(Enum):
     FOAF = "FOAF"
     PRIVATE = "PRIV"
     SERVERONLY = "SERV"
+    FRIENDSONLY = "FRND"
 
     @classmethod
     def get_choices(cls):
-        return (
-            (cls.PUBLIC.value, "Public"),
-            (cls.FOAF.value, "Friend of a Friend"),
-            (cls.PRIVATE.value, "Private"),
-            (cls.SERVERONLY.value, "Home Server Only")
-        )
+        return [(key, value) for key, value in visibility_str.items()]
 
     def __str__(self):
         return self.value
