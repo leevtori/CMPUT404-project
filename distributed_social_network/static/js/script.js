@@ -5,7 +5,7 @@ function addFriend(friendId){
             'X-CSRFToken': document.cookie.split("=")[1]
         }, 
         body: JSON.stringify({'id':friendId})
-    });
+    }).then(setTimeout(function(){window.location.reload()},500));
 };
 
 

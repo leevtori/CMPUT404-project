@@ -21,6 +21,13 @@ class UserList(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['login_user'] = self.request.user
         context['friends'] = self.request.user.friends.all()
+        context['followers'] = self.request.user.followers.all()
+        #get all users who have me in their followers list
+        followings = []
+        for user in User.objects.all():
+            if self.request.user in user.followers.all():
+                followings.append(user)
+        context['followings'] = followings
 
         return context
 
