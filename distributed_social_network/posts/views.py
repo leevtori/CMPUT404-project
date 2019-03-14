@@ -56,8 +56,8 @@ class PostVisbilityMixin():
         return qs
 
 
-class ProfileView(ListView):
-    # model = Post
+class ProfileView(PostVisbilityMixin, ListView):
+    model = Post
     template_name = 'profile.html'
 
     def get_context_data(self, **kwargs):
@@ -74,8 +74,9 @@ class ProfileView(ListView):
 
     # overwrite get_queryset() to filter for posts by that user
     def get_queryset(self):
+        qs = super().get_queryset()
         user = get_object_or_404(User, username=self.kwargs['username'])
-        return user.posts.all().order_by("-published")
+        return qs.filter(author=user).order_by("-published")
 
 
 class FeedView(PostVisbilityMixin, ListView):
