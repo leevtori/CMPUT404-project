@@ -2,7 +2,7 @@
 <div class='post'>
     <div class='post_top'>
         <h4 class='fullname'><a href={% url 'profile' username=post.author.username %} class='fullname'>{{post.author.first_name}} {{post.author.last_name}}</a></h4>
-        <p class='username'>@{{post.author.username}}</p>
+        <p class='date'>{{post.published}}</p>
     </div>
     <div style="padding-top:10px;">
         <a href="{{post.source}}" class="post_title">{{post.title}}</a>

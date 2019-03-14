@@ -15,12 +15,12 @@ td.right_col{
 }
 
 div.stats{
-    background-color:  rgba(255, 255, 255, 0.5);
+    background-color:  rgba(255, 255, 255);
     box-shadow: 0 1px 0 rgba(12,13,14,0.1),0 4px 6px rgba(59,64,69,0.1);
     padding: 10px;
     margin: 5px;
     border-width: 0px;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 
 table.stats{
@@ -35,26 +35,34 @@ td.stats:hover{
 }
 
 div.about{
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255);
     box-shadow: 0 1px 0 rgba(12,13,14,0.1),0 4px 6px rgba(59,64,69,0.1);
     padding: 10px;
     margin: 5px;
     border-width: 0px;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 
-.banner{
+div.banner{
     position: sticky;
     min-width: 100%;
     height: auto;
     box-shadow: 0 1px 0 rgba(12,13,14,0.1),0 4px 6px rgba(59,64,69,0.1);
-    background-color: rgba(255, 255, 255, 0.5);
-    background-color: #B77DC6;
+    background-color: rgb(255, 255, 255);
     padding: 20px;
     top: 50px;
     z-index: 5;
-    color: white;
+    color: rgb(0, 0, 0);
 }
+h1.banner{
+    margin: 0;
+}
+
+h3.banner{
+    margin: 0;
+}
+
+
 
 a.stats {
     color: #581f99;
