@@ -1,10 +1,58 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404, HttpResponseRedirect
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
+
 from .models import Post, Comment
 from django.contrib.auth import get_user_model
 from django.views.generic.base import TemplateView
+import uuid
+
+
+from django.db import connection
+from django.db.models import Q
+from .utils import Visibility
+
+from functools import reduce
+from operator import __or__
 
 User = get_user_model()
+
+
+class PostVisbilityMixin():
+    """Filters posts to those viewable by the logged in user only."""
+    def get_queryset(self):
+        user = self.request.user
+        qs = super().get_queryset()
+
+        query_list = []
+
+        #  Public posts
+        query_list.append(Q(visibility=Visibility.PUBLIC))
+
+        # Friends' posts
+        query_list.append(Q(author__in=user.friends.all(), visibility=Visibility.FRIENDSONLY))
+
+        # Friend of Friend
+        # HACK: The ORM probably has a better way for doing this...
+        with connection.cursor() as cursor:
+            raw_sql = """SELECT DISTINCT from_user_id
+                FROM users_user_friends
+                WHERE to_user_id in (
+                    SELECT to_user_id
+                    FROM users_user_friends
+                    WHERE from_user_id = %s
+                ) AND from_user_id <> %s;"""
+            cursor.execute(raw_sql, (user.id.hex, user.id.hex))
+            foaf = cursor.fetchall()
+
+        foaf = [uuid.UUID(item[0]) for item in foaf]
+        query_list.append(Q(author__id__in=foaf, visibility=Visibility.FOAF))
+
+        visible = user.visible_posts.all()
+
+        qs = qs.filter(reduce(__or__, query_list))
+        qs = qs.union(visible).distinct()
+
+        return qs
 
 
 class ProfileView(ListView):
@@ -26,28 +74,21 @@ class ProfileView(ListView):
     # overwrite get_queryset() to filter for posts by that user
     def get_queryset(self):
         user = get_object_or_404(User, username=self.kwargs['username'])
-        #return 20 latest posts 
-        return Post.objects.filter(author=user).order_by("-published")[:20]
+        return user.posts.all().order_by("-published")
 
 
-class FeedView(TemplateView):
+class FeedView(PostVisbilityMixin, ListView):
     template_name = 'feed.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['latest_posts'] = Post.objects.all().order_by("-published")[:20]
-        return context
+    model = Post
 
 
-class PostView(TemplateView):
+class PostView(DetailView):
     template_name = 'postview.html'
+    model = Post
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        post = get_object_or_404(Post, id=self.kwargs['postid'])
-        print(post.content)
-        context['post'] = post
-        context['post_comments'] = Comment.objects.filter(post=post)
+        context['post_comments'] = self.object.comment_set.all()
         return context
 
 
