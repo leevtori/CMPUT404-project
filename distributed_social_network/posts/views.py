@@ -1,3 +1,4 @@
+from django.http import HttpResponseNotFound
 from django.shortcuts import render, HttpResponse, get_object_or_404, HttpResponseRedirect
 from django.views.generic import ListView, DetailView
 
@@ -6,8 +7,6 @@ from django.contrib.auth import get_user_model
 from django.views.generic.base import TemplateView
 import uuid
 import requests
-
-
 
 from django.db import connection
 from django.db.models import Q
@@ -21,6 +20,7 @@ User = get_user_model()
 
 class PostVisbilityMixin():
     """Filters posts to those viewable by the logged in user only."""
+
     def get_queryset(self):
         user = self.request.user
         qs = super().get_queryset()
@@ -99,6 +99,7 @@ class PostView(PostVisbilityMixin, DetailView):
 def create(request):
     # creates a post and redirects back to main page
     if request.method == "POST":
+        print(request.POST.keys())
         # i dont know if i need to do this if statement yet, just gonna leave this here in case
         if request.POST['type'] == 'text/plain':
             new_post = Post(author=request.user,
@@ -106,7 +107,7 @@ def create(request):
                             content=request.POST['content'],
                             description=request.POST['description'],
                             content_type=request.POST['type'])
-            new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post,'id'))
+            new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
             new_post.save()
 
         # turns out forms the request type as "picture/png" but the specs requires us to save as "image/png"
@@ -139,10 +140,10 @@ def create(request):
             # f=open('testimg.png','wb')
             # f.write(picture)
             # f.close()
-        elif request.POST['type']=='link':
+        elif request.POST['type'] == 'link':
             print('get picture')
-            response=requests.get(request.POST['content'])
-            if response.headers['Content-Type']=='image/jpeg':
+            response = requests.get(request.POST['content'])
+            if response.headers['Content-Type'] == 'image/jpeg':
                 new_post = Post(author=request.user,
                                 title=request.POST['title'],
                                 content=response.content,
@@ -150,7 +151,7 @@ def create(request):
                                 content_type='image/jpeg;base64',
                                 unlisted=True)
                 new_post.save()
-            elif response.headers['Content-Type']=='image/png':
+            elif response.headers['Content-Type'] == 'image/png':
                 new_post = Post(author=request.user,
                                 title=request.POST['title'],
                                 content=response.content,
@@ -163,7 +164,7 @@ def create(request):
                 # f.write(response.content)
                 # f.close()
 
-        elif request.POST['type']=='text/markdown':
+        elif request.POST['type'] == 'text/markdown':
             new_post = Post(author=request.user,
                             title=request.POST['title'],
                             content=request.POST['content'],
@@ -185,3 +186,15 @@ def create_comment(request):
         )
         new_comment.save()
     return HttpResponseRedirect(select_post.source)
+
+
+def delete_comment(request):
+    if request.method == "DELETE":
+        post_id=request.META['HTTP_POSTID']
+        to_be_deleted = get_object_or_404(Post, id=post_id)
+        post_author = get_object_or_404(User, id=to_be_deleted.author.id)
+        if post_author.id == request.user.id:
+            to_be_deleted.delete()
+            return HttpResponse('')
+
+    return HttpResponseNotFound("hello")
