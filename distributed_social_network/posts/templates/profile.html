@@ -25,7 +25,7 @@
                 <table class='stats'>
                     <tr style="height: 60px;">
                         <td class='stats'>
-                            <a href={% url 'followers' %}>
+                            <a href={% url 'followers' %} class='stats'>
                             <div style="height:100%;width:100%">
                                 {{follower_count}}<br/>Followers
                             </div>
@@ -33,7 +33,7 @@
                         </td>
                         <td class='stats'>?<br/>Following</td>
                         <td class='stats'>
-                            <a href={% url 'friends' %}>
+                            <a href={% url 'friends' %} class='stats'>
                             <div style="height:100%;width:100%">
                                     {{friend_count}}<br/>Friends
                             </div>

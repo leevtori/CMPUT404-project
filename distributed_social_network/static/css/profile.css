@@ -56,10 +56,10 @@ div.about{
     color: white;
 }
 
-a {
+a.stats {
     color: #581f99;
 }
 
-a:hover{
+a.stats:hover{
     background-color: rgba(88, 31, 153, 0.2);
 }

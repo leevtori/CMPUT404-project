@@ -123,13 +123,27 @@ div.post{
     border-radius: 10px;
 }
 
+div.post_top{
+    display:flex;
+    flex-direction: row; 
+    align-items: baseline;
+}
+
 .fullname{
     margin: 0px;
-    margin-top: 5px;
+    color: #581f99;
 }
 
 .username{
     margin: 0px;
-    font-size: small;
+    font-size: smaller;
     color: #581f99;
+    padding-left: 5px;
+}
+
+.post_title{
+    padding-top: 10px;
+    color: black;
+    font-weight: bold;
+    font-size: 14pt;
 }
