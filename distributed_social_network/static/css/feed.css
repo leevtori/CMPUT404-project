@@ -7,3 +7,21 @@ h3{
     padding-left:10px;
     color: #2b0f4d;
 }
+
+.newPost {
+    padding: 1% 1% 1% 1%;
+    border: 1px solid black;
+}
+
+#textPost {
+    display: none;
+}
+#markdownPost{
+    display: none;
+}
+#picturePost {
+    display: none;
+}
+#urlPicturePost{
+    display: none;
+}

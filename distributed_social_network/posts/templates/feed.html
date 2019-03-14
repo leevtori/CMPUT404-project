@@ -3,20 +3,7 @@
 
 {% block styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/feed.css' %}">
-    <script>
-    function getimageformat() {
-        var  selected_picture  = document.getElementById('createPostButton').files[0];
-        //var content_button;
-        var invis_field;
-        if (selected_picture.type == 'image/jpeg') {
-            invis_field = document.getElementById("picture_type");
-            invis_field.value = 'image/jpeg';
-            //content_button = document.getElementById('createPostButton');
-            //content_button.value = selected_picture.files;
-        }
-    }
-
-    </script>
+    <script src="{% static 'js/feed.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -45,9 +32,34 @@
             </form>
         </div>
 
+
+        <div id="markdownPost" class="newPost">
+            <form id="createmarkdownPost" method="post" action="/create/">{% csrf_token %}
+                <input name="type" type="hidden" value="text/markdown">
+                Title:
+                <input name="title" type="text">
+                <br>
+                Description:
+                <input name="description" type="text">
+                <br>
+                <textarea name="content" cols="50" rows="4">Enter text here.</textarea> <br><br>
+                Privacy:<br>
+                <select name="visibility">
+                    <option value="PUBLIC">Public</option>
+                    <option value="FRIENDS">Friends Only</option>
+                    <option value="FOAF">Friends Of Friends Only</option>
+                    <option value="SERVERONLY">Friends on this host only</option>
+                    <option value="PRIVATE">Custom</option>
+                </select>
+                <input type="submit" value="Create">
+            </form>
+        </div>
+
+
         <div id="picturePost" class="newPost">
-            <form id="createpicturePost" method="post" action="/create/" enctype="multipart/form-data">{% csrf_token %}
-                <input name="type" type="hidden" value="picture/png" id="picture_type">
+            <form id="createpicturePost" method="post" action="/create/" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input name="type" type="hidden" value="image/png" id="picture_type">
                 Title:
                 <input name="title" type="text">
                 <br>
@@ -66,6 +78,38 @@
                 </select>
                 <input type="submit" value="Create">
             </form>
+        </div>
+
+
+        <div id="urlPicturePost" class="newPost">
+            <form id="createLinkPost" method="post" action="/create/" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input name="type" type="hidden" value="link">
+                Title:
+                <input name="title" type="text">
+                <br>
+                Description:
+                <input name="description" type="text">
+                Content:
+                <input name="content" type="text">
+                Privacy:<br>
+                <select name="visibility">
+                    <option value="PUBLIC">Public</option>
+                    <option value="FRIENDS">Friends Only</option>
+                    <option value="FOAF">Friends Of Friends Only</option>
+                    <option value="SERVERONLY">Friends on this host only</option>
+                    <option value="PRIVATE">Custom</option>
+                </select>
+                <input type="submit" value="Create">
+            </form>
+        </div>
+
+
+        <div class="createPostTabs">
+            <button class="post_tags" onclick="openPostInterface('textPost')">Text</button>
+            <button class="post_tags" onclick="openPostInterface('markdownPost')">MarkDown</button>
+            <button class="post_tags" onclick="openPostInterface('picturePost')">Local Picture</button>
+            <button class="post_tags" onclick="openPostInterface('urlPicturePost')">Picture Url</button>
         </div>
 
         <h3>Latest Posts</h3>
