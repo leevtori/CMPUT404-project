@@ -1,9 +1,20 @@
 function getimageformat() {
-    var  selected_picture  = document.getElementById('createPostButton').files[0];
-    var invis_field;
+    var reader = new FileReader();
+    var select_button = document.getElementById('createPicturePostButton')
+    var selected_picture  = select_button.files[0];
+    var invis_field = document.getElementById("picture_type");
+
+    var hidden = document.getElementById('hiddencontent');
+    reader.readAsDataURL(selected_picture);
+    reader.onloadend = function(){
+        hidden.value = reader.result;
+        alert(hidden.value);
+    };
     if (selected_picture.type == 'image/jpeg') {
-            invis_field = document.getElementById("picture_type");
-            invis_field.value = 'image/jpeg';
+        invis_field.value = 'image/jpeg';
+    }
+    else if (selected_picture.type == 'image/png'){
+        invis_field.value = 'image/png'
     }
 }
 

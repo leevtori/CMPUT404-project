@@ -8,4 +8,5 @@ urlpatterns = [
     path('posts/<uuid:pk>', views.PostView.as_view(), name='post-detail'),
     path('newComment/', views.create_comment, name='new_comment'),
     path('posts/delete/', views.delete_comment, name='delete-post'),
+    path('posts/image/<uuid:post_image>', views.get_post_image, name='post_image'),
 ]

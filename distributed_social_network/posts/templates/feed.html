@@ -59,14 +59,15 @@
         <div id="picturePost" class="newPost">
             <form id="createpicturePost" method="post" action="/create/" enctype="multipart/form-data">
                 {% csrf_token %}
-                <input name="type" type="hidden" value="image/png" id="picture_type">
+                <input name="type" type="hidden" value="unknown" id="picture_type">
                 Title:
                 <input name="title" type="text">
                 <br>
                 Description:
                 <input name="description" type="text">
                 <br>
-                <input name="content" type="file" id="createPostButton" accept="image/png, image/jpeg" onchange="getimageformat()">
+                <input name="fake-content" type="file" id="createPicturePostButton" onchange="getimageformat()">
+                <input name="content" type="hidden" id="hiddencontent">
                 <br><br>
                 Privacy:<br>
                 <select name="visibility">

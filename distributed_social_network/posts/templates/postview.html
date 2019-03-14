@@ -9,13 +9,21 @@
                 headers:{'X-CSRFToken':'{{ csrf_token }}','postid':'{{ post.id }}'},
             }
             ).then((response) => {
-        if (response.status === 200) {
-            alert('post successfully deleted');
-            window.location.replace("/");
-        }else{
-            alert('hmm, something went wrong');
+                if (response.status === 200) {
+                    alert('post successfully deleted');
+                    window.location.replace("/");
+                }else{
+                    alert('hmm, something went wrong');
+                }
+            });
         }
-    });
+
+        function create_image(){
+            alert('hmm');
+            img_element = document.getElementById("post_image");
+            source = "data: {{ post.content_type }}," + "{{ post.content|safe }}";
+            img_element.src = source;
+            alert('should have image');
         }
     </script>
 {% endblock %}
@@ -28,7 +36,14 @@
 </div>
     <h1>{{ post.title }}</h1>
     <p>{{ post.comment }}</p>
-    <p>{{ post.content }}</p>
+    {% if post.content_type == 'text/plain' %}
+        <p>{{post.content}}</p>
+    {% elif post.content_type == 'text/markdown' %}
+        <p>{{post.content}}</p>
+    {% else %}
+        <img id="post_image" onload="create_image()">
+    {% endif %}
+
     {% if user.username == post.author.username %}
         <a href="javascript:delete_this()">delete</a>
     {% endif %}

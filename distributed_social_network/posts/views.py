@@ -99,7 +99,6 @@ class PostView(PostVisbilityMixin, DetailView):
 def create(request):
     # creates a post and redirects back to main page
     if request.method == "POST":
-        print(request.POST.keys())
         # i dont know if i need to do this if statement yet, just gonna leave this here in case
         if request.POST['type'] == 'text/plain':
             new_post = Post(author=request.user,
@@ -112,9 +111,8 @@ def create(request):
 
         # turns out forms the request type as "picture/png" but the specs requires us to save as "image/png"
         elif request.POST['type'] == 'image/jpeg' or request.POST['type'] == 'image/png':
-            print(request.POST['type'])
-            picture_location = request.FILES['content']
-            picture = picture_location.read()
+            print(request.POST['content'])
+            picture = request.POST['content']
             # saves the picture
             if request.POST['type'] == 'image/jpeg':
                 new_post = Post(author=request.user,
@@ -198,3 +196,10 @@ def delete_comment(request):
             return HttpResponse('')
 
     return HttpResponseNotFound("hello")
+
+
+def get_post_image(request, post_img):
+    post_in_question = get_object_or_404(Post, id=post_img)
+    image_src = post_in_question.content
+    return HttpResponseNotFound("hello")
+
