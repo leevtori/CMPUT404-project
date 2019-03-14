@@ -50,7 +50,8 @@ class PostVisbilityMixin():
         visible = user.visible_posts.all()
 
         qs = qs.filter(reduce(__or__, query_list))
-        qs = qs.union(visible).distinct()
+        # qs = qs.union(visible).distinct()  # this doesn't filter properly afterwards
+        qs = (qs | visible).distinct()  # But this works... somehow?
 
         return qs
 
@@ -82,7 +83,7 @@ class FeedView(PostVisbilityMixin, ListView):
     model = Post
 
 
-class PostView(DetailView):
+class PostView(PostVisbilityMixin, DetailView):
     template_name = 'postview.html'
     model = Post
 
