@@ -1,13 +1,15 @@
+
 body,html{
     margin:0;
     padding:0;
     font-family: Arial, Helvetica, sans-serif;
-    background-color: rgb(249, 235, 252);
+    background-color: rgb(235, 252, 245);
 }
 
 .header{
     height: 50px;
-    background-image: linear-gradient(to right,rgb(100, 14, 119), rgb(151, 67, 170),rgb(100, 14, 119));
+    /* background-image: linear-gradient(to right,rgb(61, 153, 112), rgb(84, 199, 119), #3D9970); */
+    /* background-image: url("{% static 'img/banner.png' %}"); */
     box-shadow: 0 1px 0 rgba(32, 29, 36, 0.2),0 6px 6px rgba(65, 59, 69, 0.2);
     z-index:9;
     position:sticky;
@@ -19,7 +21,7 @@ body,html{
 .header2{
     height: 50px;
     width:100%;
-    background-color: rgba(255, 255, 255, 0.13);
+    background-color: rgba(255, 255, 255, 0);
     z-index:10;
     position:fixed;
     top:0;
@@ -31,7 +33,7 @@ body,html{
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    font-size: large;
+    font-size: 20px;
 }
 
 a.header_link{
@@ -51,7 +53,7 @@ a{
 }
 
 .header_link:hover{
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
 
@@ -100,7 +102,7 @@ a{
   }
   
   /* Change color of dropdown links on hover */
-  .dropdown-content a:hover {background-color: #ddd;}
+  .dropdown-content a:hover {background-color: rgb(208, 224, 202);}
   
   /* Show the dropdown menu on hover */
   .dropdown:hover .dropdown-content {
@@ -129,9 +131,14 @@ div.post_top{
     align-items: baseline;
 }
 
+img.profile_pic_small{
+    width: 20px;
+    padding-right: 5px;
+}
+
 .fullname{
     margin: 0px;
-    color: #581f99;
+    color: #3D9970;
 }
 
 .date{

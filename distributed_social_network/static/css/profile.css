@@ -28,10 +28,10 @@ table.stats{
     width:100%;
 }
 td.stats{
-    width:25%;
+    width:33%;
 }
 td.stats:hover{
-    background-color: rgba(183, 125, 198, 0.2)
+    background-color: rgba(125, 198, 167, 0.2)
 }
 
 div.about{
@@ -48,7 +48,7 @@ div.banner{
     min-width: 100%;
     height: auto;
     box-shadow: 0 1px 0 rgba(12,13,14,0.1),0 4px 6px rgba(59,64,69,0.1);
-    background-color: rgb(255, 255, 255);
+    background-color:white;
     padding: 20px;
     top: 50px;
     z-index: 5;
@@ -65,7 +65,7 @@ h3.banner{
 
 
 a.stats {
-    color: #581f99;
+    color: #3D9970;
 }
 
 a.stats:hover{

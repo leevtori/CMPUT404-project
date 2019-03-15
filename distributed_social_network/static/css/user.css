@@ -2,12 +2,12 @@
     color: white;
     border-width: 0;
     border-radius: 3px;
-    background-color: rgb(116, 12, 139);
+    background-color: #3D9970;
     /* width:100px; */
     height: 30px;
     font-size: medium;
 }
 
 .add_friend_btn:hover{
-    background-color: rgb(174, 107, 189);
+    background-color:#78cfa8;
 }

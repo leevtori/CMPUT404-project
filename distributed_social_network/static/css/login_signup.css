@@ -16,15 +16,18 @@ html, body {
     align-items: center;
     height: 100%;
     padding-bottom: 100px;
-    background-image: linear-gradient(to bottom,rgb(255, 255, 255), rgb(242, 229, 248));
+    background-color: white;
 }
 
 .title{
     display: flex;
     justify-content: center;
+    align-items: center;
     width: 100%;
-    height:150px;
+    height:130px;
     box-shadow: 0 1px 0 rgba(32, 29, 36, 0.1),0 6px 6px rgba(65, 59, 69, 0.1);
+    color:white;
+    margin:0px;
 }
 
 .illustration{
@@ -44,14 +47,14 @@ html, body {
     color: white;
     border-width: 0;
     border-radius: 3px;
-    background-color: rgb(116, 12, 139);
+    background-color: #3D9970;
     width:75%;
     height: 50px;
     font-size: medium;
 }
 
 #login_btn:hover{
-    background-color: rgb(174, 107, 189);
+    background-color: #78cfa8;
 }
 
 #donthave{   
@@ -61,7 +64,7 @@ html, body {
 #signup{
     border-radius: 3px;
     border-width: 0;
-    background-color: rgb(116, 12, 139);
+    background-color: #3D9970;
     width:75%;
     height: 50px;
     font-size: medium;
@@ -77,7 +80,7 @@ a{
 }
 
 #signup:hover{
-    background-color: rgb(174, 107, 189);
+    background-color: #78cfa8;
 }
 
 .signup_form{
@@ -88,14 +91,14 @@ a{
     color: white;
     border-width: 0;
     border-radius: 3px;
-    background-color: rgb(116, 12, 139);
+    background-color: #3D9970;
     width:50%;
     height: 50px;
     font-size: medium;
 }
 
 #signup_form_btn:hover{
-    background-color: rgb(174, 107, 189);
+    background-color: #78cfa8;
 }
 
 .logout{
@@ -108,7 +111,7 @@ a{
 #login_again_btn{
     border-radius: 3px;
     border-width: 0;
-    background-color: rgb(116, 12, 139);
+    background-color: #3D9970;
     width:20%;
     height: 50px;
     font-size: medium;
@@ -119,6 +122,6 @@ a{
 }
 
 #login_again_btn:hover{
-    background-color: rgb(174, 107, 189);
+    background-color: #78cfa8;
 }
 
