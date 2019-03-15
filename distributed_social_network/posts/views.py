@@ -140,22 +140,29 @@ def create(request):
         elif request.POST['type'] == 'link':
             print('get picture')
             response = requests.get(request.POST['content'])
+            encoded = base64.b64encode(response.content)
+            sample_string = "data:{};base64,{}".format(response.headers['Content-Type'], encoded.decode())
+            print(sample_string)
             if response.headers['Content-Type'] == 'image/jpeg':
                 new_post = Post(author=request.user,
                                 title=request.POST['title'],
-                                content=response.content,
+                                content=sample_string,
                                 description=request.POST['description'],
                                 content_type='image/jpeg;base64',
                                 unlisted=True)
+                new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
                 new_post.save()
+
             elif response.headers['Content-Type'] == 'image/png':
                 new_post = Post(author=request.user,
                                 title=request.POST['title'],
-                                content=response.content,
+                                content=sample_string,
                                 description=request.POST['description'],
                                 content_type='image/png;base64',
                                 unlisted=True)
+                new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
                 new_post.save()
+
                 # testing purposes
                 # f=open('testimg.png','wb')
                 # f.write(response.content)
