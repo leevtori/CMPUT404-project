@@ -17,8 +17,9 @@ class ProfileView(ListView):
         user = get_object_or_404(User, username=self.kwargs['username'])
         # put user object in context
         context['user'] = user
-        context['friend_count'] = self.request.user.friends.count
-        context['follower_count'] = self.request.user.followers.count
+        context['post_count'] = Post.objects.filter(author=user).count
+        context['friend_count'] = user.friends.count
+        context['follower_count'] = user.followers.count
 
         # pass context to template
         return context
@@ -35,7 +36,9 @@ class FeedView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['latest_posts'] = Post.objects.all().order_by("-published")[:20]
+        context['post_count'] =Post.objects.filter(author=self.request.user).count
+        context['friend_count'] = self.request.user.friends.count
+        context['follower_count'] = self.request.user.followers.count
         return context
 
 

@@ -20,59 +20,94 @@
 {% endblock %}
 
 {% block content %}
+    
 
-    <div style="padding:10px;">
-        <h3>Add New Post</h3>
-        <div id="textPost" class="newPost">
-            <form id="createtextPost" method="post" action="/create/">{% csrf_token %}
-                <input name="type" type="hidden" value="text/plain">
-                Title:
-                <input name="title" type="text">
-                <br>
-                Description:
-                <input name="description" type="text">
-                <br>
-                <textarea name="content" cols="50" rows="4">Enter text here.</textarea> <br><br>
-                Privacy:<br>
-                <select name="visibility">
-                    <option value="PUBLIC">Public</option>
-                    <option value="FRIENDS">Friends Only</option>
-                    <option value="FOAF">Friends Of Friends Only</option>
-                    <option value="SERVERONLY">Friends on this host only</option>
-                    <option value="PRIVATE">Custom</option>
-                </select>
-                <input type="submit" value="Create">
-            </form>
+    <div class="feed_container">
+        <div class="left_col">
+            <div class='left_box'>
+                <h3>{{request.user.first_name}} {{request.user.last_name}}</h3>
+                <h5>{{request.user.username}}</5>
+                    <table class='stats'>
+                        <tr style="height: 60px;">
+                            <td class='stats'>
+                                <a href={% url 'followers' %} class='stats'>
+                                <div style="height:100%;width:100%">
+                                    {{follower_count}}<br/>Followers
+                                </div>
+                                </a>
+                            </td>
+                            <td class='stats'>
+                                <a href={% url 'friends' %} class='stats'>
+                                <div style="height:100%;width:100%">
+                                        {{friend_count}}<br/>Friends
+                                </div>
+                                </a>
+                            </td>
+                            <td class='stats'>
+                                <a href={% url 'profile' username=request.user.username %} class='stats'>
+                                <div style="height:100%;width:100%">
+                                    {{post_count}}<br/>Posts
+                                </div>
+                                </a>
+                            </td>
+                            
+                        </tr>
+                    </table>
+            </div>
         </div>
+        <div class="right_col">
+            <h3 class='heading'>Add New Post</h3>
+            <div class="post">
+                <form id="createtextPost" method="post" action="/create/" >{% csrf_token %}
+                    <input name="type" type="hidden" value="text/plain">
+                    Title:
+                    <input name="title" type="text">
+                    <br>
+                    Description:
+                    <input name="description" type="text">
+                    <br>
+                    <textarea name="content" cols="50" rows="4">Enter text here.</textarea> <br><br>
+                    Privacy:<br>
+                    <select name="visibility">
+                        <option value="PUBLIC">Public</option>
+                        <option value="FRIENDS">Friends Only</option>
+                        <option value="FOAF">Friends Of Friends Only</option>
+                        <option value="SERVERONLY">Friends on this host only</option>
+                        <option value="PRIVATE">Custom</option>
+                    </select>
+                    <input type="submit" value="Create">
+                </form>
+            </div>
 
-        <div id="picturePost" class="newPost">
-            <form id="createpicturePost" method="post" action="/create/" enctype="multipart/form-data">{% csrf_token %}
-                <input name="type" type="hidden" value="picture/png" id="picture_type">
-                Title:
-                <input name="title" type="text">
-                <br>
-                Description:
-                <input name="description" type="text">
-                <br>
-                <input name="content" type="file" id="createPostButton" accept="image/png, image/jpeg" onchange="getimageformat()">
-                <br><br>
-                Privacy:<br>
-                <select name="visibility">
-                    <option value="PUBLIC">Public</option>
-                    <option value="FRIENDS">Friends Only</option>
-                    <option value="FOAF">Friends Of Friends Only</option>
-                    <option value="SERVERONLY">Friends on this host only</option>
-                    <option value="PRIVATE">Custom</option>
-                </select>
-                <input type="submit" value="Create">
-            </form>
-        </div>
+            <div class="post">
+                <form id="createpicturePost" method="post" action="/create/" enctype="multipart/form-data">{% csrf_token %}
+                    <input name="type" type="hidden" value="picture/png" id="picture_type">
+                    Title:
+                    <input name="title" type="text">
+                    <br>
+                    Description:
+                    <input name="description" type="text">
+                    <br>
+                    <input name="content" type="file" id="createPostButton" accept="image/png, image/jpeg" onchange="getimageformat()">
+                    <br><br>
+                    Privacy:<br>
+                    <select name="visibility">
+                        <option value="PUBLIC">Public</option>
+                        <option value="FRIENDS">Friends Only</option>
+                        <option value="FOAF">Friends Of Friends Only</option>
+                        <option value="SERVERONLY">Friends on this host only</option>
+                        <option value="PRIVATE">Custom</option>
+                    </select>
+                    <input type="submit" value="Create">
+                </form>
+            </div>
 
-        <h3>Latest Posts</h3>
-        <div style="padding-bottom: 2000px;">
-            {% for post in latest_posts %}
-                {% include "post.html"%}
-            {% endfor %}
+            <h3 class='heading'>Latest Posts</h3>
+            <div style="padding-bottom: 2000px;">
+                {% for post in latest_posts %}
+                    {% include "post.html"%}
+                {% endfor %}
+            </div>
         </div>
     </div>
   

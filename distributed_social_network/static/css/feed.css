@@ -3,7 +3,46 @@
     background-color: rgba(255, 255, 255, 0.5);
 }
 
-h3{
+h3.heading{
     padding-left:10px;
     color: #2b0f4d;
+}
+
+div.feed_container{
+    display: flex; 
+    flex-direction: row; 
+    justify-content: flex-end;
+
+}
+
+div.left_col{
+    width:38%;
+    padding: 10px;
+    position:fixed;
+    left:0;
+    top: 50px;
+}
+
+div.right_col{
+    width:60%;
+    padding: 10px;
+}
+
+div.new_post{
+    padding:10px;
+}
+
+table.stats{
+    text-align: center;
+    width:100%;
+}
+td.stats{
+    width:33%;
+}
+td.stats:hover{
+    background-color: rgba(125, 198, 167, 0.2)
+}
+
+a.stats {
+    color: #3D9970;
 }
