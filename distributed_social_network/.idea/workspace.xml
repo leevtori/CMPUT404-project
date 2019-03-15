@@ -10,32 +10,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/posts/templates/feed.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="69" column="71" selection-start-line="69" selection-start-column="71" selection-end-line="69" selection-end-column="71" />
-              <folding>
-                <element signature="e#243#264#0#HTML" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/static/js/feed.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="131">
-              <caret line="8" column="34" lean-forward="true" selection-start-line="8" selection-start-column="34" selection-end-line="8" selection-end-column="34" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/posts/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="437">
-              <caret line="117" column="52" lean-forward="true" selection-start-line="117" selection-start-column="52" selection-end-line="117" selection-end-column="52" />
+            <state relative-caret-position="556">
+              <caret line="198" lean-forward="true" selection-start-line="198" selection-end-line="198" />
               <folding>
                 <element signature="e#0#44#0" expanded="true" />
               </folding>
@@ -44,10 +23,40 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/posts/urls.py">
+        <entry file="file://$PROJECT_DIR$/distributed_social_network/urls.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="306">
+              <caret line="20" column="36" lean-forward="true" selection-start-line="20" selection-start-column="36" selection-end-line="20" selection-end-column="36" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/posts/utils.py">
           <provider selected="true" editor-type-id="text-editor">
             <state>
-              <caret column="9" lean-forward="true" selection-start-column="9" selection-end-column="9" />
+              <caret column="21" selection-start-column="21" selection-end-column="21" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/posts/urls.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="153">
+              <caret line="9" column="68" selection-start-line="9" selection-start-column="68" selection-end-line="9" selection-end-column="68" />
+              <folding>
+                <element signature="e#0#37#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/posts/templates/postview.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="374">
+              <caret line="22" column="52" selection-start-line="22" selection-start-column="52" selection-end-line="22" selection-end-column="52" />
             </state>
           </provider>
         </entry>
@@ -69,12 +78,12 @@
         <option value="$PROJECT_DIR$/posts/templates/comment.html" />
         <option value="$PROJECT_DIR$/static/css/feed.css" />
         <option value="$PROJECT_DIR$/posts/tests.py" />
-        <option value="$PROJECT_DIR$/posts/templates/postview.html" />
         <option value="$PROJECT_DIR$/posts/templates/post.html" />
-        <option value="$PROJECT_DIR$/posts/urls.py" />
         <option value="$PROJECT_DIR$/posts/templates/feed.html" />
-        <option value="$PROJECT_DIR$/posts/views.py" />
         <option value="$PROJECT_DIR$/static/js/feed.js" />
+        <option value="$PROJECT_DIR$/posts/templates/postview.html" />
+        <option value="$PROJECT_DIR$/posts/views.py" />
+        <option value="$PROJECT_DIR$/posts/urls.py" />
       </list>
     </option>
   </component>
@@ -192,12 +201,12 @@
       <workItem from="1552535591348" duration="17237000" />
       <workItem from="1552594958092" duration="602000" />
       <workItem from="1552596066688" duration="418000" />
-      <workItem from="1552596556596" duration="6195000" />
+      <workItem from="1552596556596" duration="10145000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="58349000" />
+    <option name="totallyTimeSpent" value="62299000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
@@ -300,13 +309,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/static/css/post.css" />
-    <entry file="file://$PROJECT_DIR$/posts/utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="21" selection-start-column="21" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/users/templates/logout.html">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -317,13 +319,6 @@
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/users/templates/base.html" />
-    <entry file="file://$PROJECT_DIR$/distributed_social_network/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="20" column="36" lean-forward="true" selection-start-line="20" selection-start-column="36" selection-end-line="20" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/distributed_social_network/settings.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="624">
@@ -402,13 +397,6 @@
     <entry file="file://$PROJECT_DIR$/static/js/script.js">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/posts/templates/postview.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="20" column="32" lean-forward="true" selection-start-line="20" selection-start-column="32" selection-end-line="20" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/posts/templates/comment.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
@@ -423,29 +411,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/posts/urls.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="9" lean-forward="true" selection-start-column="9" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/posts/templates/feed.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
+        <state>
           <caret line="69" column="71" selection-start-line="69" selection-start-column="71" selection-end-line="69" selection-end-column="71" />
           <folding>
             <element signature="e#243#264#0#HTML" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/posts/views.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="437">
-          <caret line="117" column="52" lean-forward="true" selection-start-line="117" selection-start-column="52" selection-end-line="117" selection-end-column="52" />
-          <folding>
-            <element signature="e#0#44#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -454,6 +425,47 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="131">
           <caret line="8" column="34" lean-forward="true" selection-start-line="8" selection-start-column="34" selection-end-line="8" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/posts/templates/postview.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="374">
+          <caret line="22" column="52" selection-start-line="22" selection-start-column="52" selection-end-line="22" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/distributed_social_network/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="20" column="36" lean-forward="true" selection-start-line="20" selection-start-column="36" selection-end-line="20" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/posts/utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="21" selection-start-column="21" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/posts/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" column="68" selection-start-line="9" selection-start-column="68" selection-end-line="9" selection-end-column="68" />
+          <folding>
+            <element signature="e#0#37#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/posts/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="556">
+          <caret line="198" lean-forward="true" selection-start-line="198" selection-end-line="198" />
+          <folding>
+            <element signature="e#0#44#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

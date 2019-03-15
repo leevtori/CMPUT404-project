@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.views.generic.base import TemplateView
 import uuid
 import requests
+import base64
 
 from django.db import connection
 from django.db.models import Q
@@ -111,8 +112,9 @@ def create(request):
 
         # turns out forms the request type as "picture/png" but the specs requires us to save as "image/png"
         elif request.POST['type'] == 'image/jpeg' or request.POST['type'] == 'image/png':
-            print(request.POST['content'])
+            #print(request.POST['content'])
             picture = request.POST['content']
+            print(type(picture))
             # saves the picture
             if request.POST['type'] == 'image/jpeg':
                 new_post = Post(author=request.user,
@@ -129,15 +131,12 @@ def create(request):
                                 content_type='image/png;base64',
                                 unlisted=True)
             new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
-            new_post.save()
 
             # the next 3 lines were meant as a test, assuming that the image uploaded is a jpg
             # this will create a copy of it in the folder of this project
             # just going to leave this here in case something breaks
 
-            # f=open('testimg.png','wb')
-            # f.write(picture)
-            # f.close()
+            new_post.save()
         elif request.POST['type'] == 'link':
             print('get picture')
             response = requests.get(request.POST['content'])
@@ -195,11 +194,5 @@ def delete_comment(request):
             to_be_deleted.delete()
             return HttpResponse('')
 
-    return HttpResponseNotFound("hello")
-
-
-def get_post_image(request, post_img):
-    post_in_question = get_object_or_404(Post, id=post_img)
-    image_src = post_in_question.content
     return HttpResponseNotFound("hello")
 
