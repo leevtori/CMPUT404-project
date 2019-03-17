@@ -100,13 +100,15 @@ class PostView(PostVisbilityMixin, DetailView):
 def create(request):
     # creates a post and redirects back to main page
     if request.method == "POST":
+        print(request.POST['visibility'])
         # i dont know if i need to do this if statement yet, just gonna leave this here in case
         if request.POST['type'] == 'text/plain':
             new_post = Post(author=request.user,
                             title=request.POST['title'],
                             content=request.POST['content'],
                             description=request.POST['description'],
-                            content_type=request.POST['type'])
+                            content_type=request.POST['type'],
+                            visibility=request.POST['visibility'])
             new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
             new_post.save()
 
@@ -115,6 +117,7 @@ def create(request):
             #print(request.POST['content'])
             picture = request.POST['content']
             print(type(picture))
+            print(request.POST['visibility'])
             # saves the picture
             if request.POST['type'] == 'image/jpeg':
                 new_post = Post(author=request.user,
@@ -122,6 +125,7 @@ def create(request):
                                 content=picture,
                                 description=request.POST['description'],
                                 content_type='image/jpeg;base64',
+                                visibility=request.POST['visibility'],
                                 unlisted=True)
             else:
                 new_post = Post(author=request.user,
@@ -129,6 +133,7 @@ def create(request):
                                 content=picture,
                                 description=request.POST['description'],
                                 content_type='image/png;base64',
+                                visibility=request.POST['visibility'],
                                 unlisted=True)
             new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
 
@@ -139,6 +144,7 @@ def create(request):
             new_post.save()
         elif request.POST['type'] == 'link':
             print('get picture')
+            print(request.POST['visibility'])
             response = requests.get(request.POST['content'])
             encoded = base64.b64encode(response.content)
             sample_string = "data:{};base64,{}".format(response.headers['Content-Type'], encoded.decode())
@@ -149,6 +155,7 @@ def create(request):
                                 content=sample_string,
                                 description=request.POST['description'],
                                 content_type='image/jpeg;base64',
+                                visibility=request.POST['visibility'],
                                 unlisted=True)
                 new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
                 new_post.save()
@@ -159,6 +166,7 @@ def create(request):
                                 content=sample_string,
                                 description=request.POST['description'],
                                 content_type='image/png;base64',
+                                visibility=request.POST['visibility'],
                                 unlisted=True)
                 new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
                 new_post.save()
@@ -169,10 +177,12 @@ def create(request):
                 # f.close()
 
         elif request.POST['type'] == 'text/markdown':
+            print(request.POST['visibility'])
             new_post = Post(author=request.user,
                             title=request.POST['title'],
                             content=request.POST['content'],
                             description=request.POST['description'],
+                            visibility=request.POST['visibility'],
                             content_type=request.POST['type'])
             new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
             new_post.save()
