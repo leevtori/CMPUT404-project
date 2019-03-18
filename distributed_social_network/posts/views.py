@@ -1,7 +1,7 @@
 from django.http import HttpResponseNotFound
 from django.shortcuts import render, HttpResponse, get_object_or_404, HttpResponseRedirect
 from django.views.generic import ListView, DetailView
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Post, Comment
 from django.contrib.auth import get_user_model
 from django.views.generic.base import TemplateView
@@ -20,7 +20,7 @@ from operator import __or__
 User = get_user_model()
 
 
-class PostVisbilityMixin():
+class PostVisbilityMixin(LoginRequiredMixin):
     """Filters posts to those viewable by the logged in user only."""
 
     def get_queryset(self):
