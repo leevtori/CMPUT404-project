@@ -13,7 +13,10 @@
     <div class="left_col">
         <div class='left_box'>
             <h3>{{request.user.first_name}} {{request.user.last_name}}</h3>
-            <h5>{{request.user.username}}</5>
+            <h5>{{request.user.username}}</h5>
+            <a href={% url 'friend_request' %} style='color:red'>{{ requestCount }}</i>
+                <img src={% static "img/add_user.png" %} class='profile_pic_small'>
+            </a>
                 <table class='stats'>
                     <tr style="height: 60px;">
                         <td class='stats'>
@@ -36,8 +39,7 @@
                                 {{post_count}}<br/>Posts
                             </div>
                             </a>
-                        </td>
-                        
+                        </td>                        
                     </tr>
                 </table>
         </div>

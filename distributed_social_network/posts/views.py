@@ -5,6 +5,7 @@ from django.views.generic import ListView, DetailView
 from .models import Post, Comment
 from django.contrib.auth import get_user_model
 from django.views.generic.base import TemplateView
+from users.views import FriendRequests
 import uuid
 import requests
 import base64
@@ -92,6 +93,8 @@ class FeedView(PostVisbilityMixin, ListView):
         context['post_count'] =Post.objects.filter(author=self.request.user).count
         context['friend_count'] = self.request.user.friends.count
         context['follower_count'] = self.request.user.followers.count
+        q = list(set(self.request.user.followers.all()).difference(set(self.request.user.friends.all())))
+        context['requestCount'] = len(q)
         return context
     
 
