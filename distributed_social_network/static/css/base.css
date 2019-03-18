@@ -50,6 +50,7 @@ a.header_link{
 
 a{
     text-decoration: none;
+    outline: none;
 }
 
 .header_link:hover{

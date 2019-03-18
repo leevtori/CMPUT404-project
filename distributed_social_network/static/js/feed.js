@@ -43,4 +43,40 @@ function openPostInterface(post_type){
         }
     }
 
+    //highlight selected post type
+    var all_post_btns = document.getElementsByClassName("post_btn");
+    all_post_btns[0].style.backgroundColor = '#3D9970';
+    all_post_btns[1].style.backgroundColor = '#3D9970';
+    all_post_btns[2].style.backgroundColor = '#3D9970';
+    all_post_btns[3].style.backgroundColor = '#3D9970';
+    if(post_type == 'textPost'){
+        all_post_btns[0].style.backgroundColor = '#78cfa8';
+    }
+    else if(post_type == 'markdownPost'){
+        all_post_btns[1].style.backgroundColor = '#78cfa8';
+    }
+    else if(post_type == 'picturePost'){
+        all_post_btns[2].style.backgroundColor = '#78cfa8';
+    }
+    else if(post_type == 'urlPicturePost'){
+        all_post_btns[3].style.backgroundColor = '#78cfa8';
+    }
+
+
+
+
+    // Array.prototype.forEach.call(all_post_btns, function(btn) {
+    //     // console.log(btn.id);
+    //     // console.log(post_type);
+    //     if(btn.innerHTML == post_type){
+    //         console.log("yes");
+    //         btn.style.backgroundColor = '#78cfa8';
+    //     } else{
+    //         console.log("no"); 
+    //         btn.style.backgroundColor = '#3D9970';
+    //     }
+    // });
+
+
+
 }

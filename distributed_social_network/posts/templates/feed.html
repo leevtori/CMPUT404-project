@@ -47,8 +47,16 @@
 
 
     <div class="right_col">
-        <h3 class='heading'>Add New Post</h3>
-            <div id="textPost">
+
+            <div class="post_content_types">
+                <button class="post_btn" onclick="openPostInterface('textPost')" style="background-color: #78cfa8">Text</button>
+                <button class="post_btn" onclick="openPostInterface('markdownPost')">MarkDown</button>
+                <button class="post_btn" onclick="openPostInterface('picturePost')">Local Picture</button>
+                <button class="post_btn" onclick="openPostInterface('urlPicturePost')">Picture Url</button>
+            </div>
+        
+            <div id="textPost" class='newPost'>
+                <h3 class='heading'>Add Text Post</h3>
                 <form id="createtextPost" method="post" action="/create/">{% csrf_token %}
                     <input name="type" type="hidden" value="text/plain">
                     Title:
@@ -71,7 +79,8 @@
             </div>
 
 
-            <div id="markdownPost">
+            <div id="markdownPost" class='newPost'>
+                <h3 class='heading'>Add Markdown Post</h3>
                 <form id="createmarkdownPost" method="post" action="/create/">{% csrf_token %}
                     <input name="type" type="hidden" value="text/markdown">
                     Title:
@@ -94,7 +103,8 @@
             </div>
 
 
-            <div id="picturePost">
+            <div id="picturePost" class='newPost'>
+                <h3 class='heading'>Add Picture</h3>
                 <form id="createpicturePost" method="post" action="/create/" enctype="multipart/form-data">
                     {% csrf_token %}
                     <input name="type" type="hidden" value="unknown" id="picture_type">
@@ -120,7 +130,8 @@
             </div>
 
 
-            <div id="urlPicturePost">
+            <div id="urlPicturePost" class='newPost'>
+                <h3 class='heading'>Add URL Picture</h3>
                 <form id="createLinkPost" method="post" action="/create/" enctype="multipart/form-data">
                     {% csrf_token %}
                     <input name="type" type="hidden" value="link">
@@ -143,12 +154,7 @@
                 </form>
             </div>
 
-            <div class="createPostTabs">
-                <button class="post_tags" onclick="openPostInterface('textPost')">Text</button>
-                <button class="post_tags" onclick="openPostInterface('markdownPost')">MarkDown</button>
-                <button class="post_tags" onclick="openPostInterface('picturePost')">Local Picture</button>
-                <button class="post_tags" onclick="openPostInterface('urlPicturePost')">Picture Url</button>
-            </div>
+            
 
         
 

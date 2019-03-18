@@ -25,7 +25,7 @@ div.left_col{
 }
 
 div.right_col{
-    width:67%;
+    width:68%;
     padding: 10px;
     /* background-color: yellow; */
 }
@@ -48,26 +48,24 @@ td.stats:hover{
 a.stats {
     color: #3D9970;
 }
-
-
-
-
-
-
-
+.heading{
+    margin:0px;
+}
 
 
 .newPost {
     background-color: rgba(255, 255, 255);
     box-shadow: 0 1px 0 rgba(12,13,14,0.1),0 4px 6px rgba(59,64,69,0.1);
     padding: 10px;
-    margin: 5px;
-    border-width: 0px;
-    border-radius: 5px;
+    margin: 10px;
+    margin-top:0;
+    /* border-width: 0px;
+    border-radius: 5px; */
+    background-color: #78cfa8;
 }
 
 #textPost {
-    display: none;
+    display: block;
 }
 #markdownPost{
     display: none;
@@ -77,4 +75,23 @@ a.stats {
 }
 #urlPicturePost{
     display: none;
+}
+
+.post_btn{
+    color: white;
+    border-width: 0;
+    border-radius: 0;
+    background-color: #3D9970;
+    /* width:100px; */
+    height: 30px;
+    font-size: medium;
+}
+
+/* .post_btn:hover{
+    background-color:#78cfa8;
+} */
+
+.post_content_types{
+    padding:10px;
+    padding-bottom:0;
 }
