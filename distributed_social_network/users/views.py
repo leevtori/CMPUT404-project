@@ -80,7 +80,8 @@ class ConfirmRequest(LoginRequiredMixin, View):
         friend = get_object_or_404(User, id=friend_id)
         self.request.user.friends.add(friend)
         friend.followers.add(self.request.user)
-        return HttpResponseRedirect('/profile/'+self.request.username)
+        url = reverse('friends')
+        return HttpResponseRedirect(url)
 
 class SignUp(generic.CreateView):
     form_class = CustomUserCreationForm

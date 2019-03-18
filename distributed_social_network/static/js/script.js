@@ -21,7 +21,7 @@ function deleteFriend(friendId){
 }
 
 function confirmFriend(friendId){
-    fetch("followers/confirm", {
+    fetch("confirm/", {
         method: 'post',
         headers: {
             'X-CSRFToken': document.cookie.split("=")[1]
