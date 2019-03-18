@@ -34,6 +34,12 @@ div.new_post{
     padding:10px;
 }
 
+div.posts_list{
+    padding:5px; 
+    padding-bottom: 2000px; 
+    padding-top:15px;
+}
+
 table.stats{
     text-align: center;
     width:100%;
@@ -95,3 +101,23 @@ a.stats {
     padding:10px;
     padding-bottom:0;
 }
+
+.new_post_form{
+    padding:10px;
+}
+
+.create_btn{
+    color: white;
+    border-width: 0;
+    border-radius: 3px;
+    background-color: #3D9970;
+    /* width:100px; */
+    height: 30px;
+    font-size: medium;
+}
+
+.create_btn:hover{
+    background-color:#5eb68e;
+}
+
+

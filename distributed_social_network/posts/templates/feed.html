@@ -57,7 +57,7 @@
         
             <div id="textPost" class='newPost'>
                 <h3 class='heading'>Add Text Post</h3>
-                <form id="createtextPost" method="post" action="/create/">{% csrf_token %}
+                <form id="createtextPost" class='new_post_form' method="post" action="/create/">{% csrf_token %}
                     <input name="type" type="hidden" value="text/plain">
                     Title:
                     <input name="title" type="text">
@@ -74,14 +74,14 @@
                         <option value="SERV">Friends on this host only</option>
                         <option value="PRIV">Custom</option>
                     </select>
-                    <input type="submit" value="Create">
+                    <input type="submit" value="Create" class='create_btn'>
                 </form>
             </div>
 
 
             <div id="markdownPost" class='newPost'>
                 <h3 class='heading'>Add Markdown Post</h3>
-                <form id="createmarkdownPost" method="post" action="/create/">{% csrf_token %}
+                <form id="createmarkdownPost" class='new_post_form' method="post" action="/create/">{% csrf_token %}
                     <input name="type" type="hidden" value="text/markdown">
                     Title:
                     <input name="title" type="text">
@@ -98,14 +98,14 @@
                         <option value="SERV">Friends on this host only</option>
                         <option value="PRIV">Custom</option>
                     </select>
-                    <input type="submit" value="Create">
+                    <input type="submit" value="Create" class='create_btn'>
                 </form>
             </div>
 
 
             <div id="picturePost" class='newPost'>
                 <h3 class='heading'>Add Picture</h3>
-                <form id="createpicturePost" method="post" action="/create/" enctype="multipart/form-data">
+                <form id="createpicturePost" class='new_post_form' method="post" action="/create/" enctype="multipart/form-data">
                     {% csrf_token %}
                     <input name="type" type="hidden" value="unknown" id="picture_type">
                     Title:
@@ -125,14 +125,14 @@
                         <option value="SERV">Friends on this host only</option>
                         <option value="PRIV">Custom</option>
                     </select>
-                    <input type="submit" value="Create">
+                    <input type="submit" value="Create" class='create_btn'>
                 </form>
             </div>
 
 
             <div id="urlPicturePost" class='newPost'>
                 <h3 class='heading'>Add URL Picture</h3>
-                <form id="createLinkPost" method="post" action="/create/" enctype="multipart/form-data">
+                <form id="createLinkPost" class='new_post_form' method="post" action="/create/" enctype="multipart/form-data">
                     {% csrf_token %}
                     <input name="type" type="hidden" value="link">
                     Title:
@@ -150,7 +150,7 @@
                         <option value="SERV">Friends on this host only</option>
                         <option value="PRIV">Custom</option>
                     </select>
-                    <input type="submit" value="Create">
+                    <input type="submit" value="Create" class='create_btn'>
                 </form>
             </div>
 
@@ -158,8 +158,8 @@
 
         
 
-        <h3 class='heading'>Latest Posts</h3>
-        <div style="padding-bottom: 2000px;">
+        <div class='posts_list'>
+            <h3 class='heading'>Latest Posts</h3>
             {% for post in object_list %}
                 {% include "post.html"%}
             {% endfor %}
