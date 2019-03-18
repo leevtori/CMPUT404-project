@@ -16,16 +16,18 @@ div.feed_container{
 }
 
 div.left_col{
-    width:38%;
+    width:30%;
     padding: 10px;
     position:fixed;
     left:0;
     top: 50px;
+    /* background-color: green; */
 }
 
 div.right_col{
-    width:60%;
+    width:67%;
     padding: 10px;
+    /* background-color: yellow; */
 }
 
 div.new_post{
@@ -45,4 +47,34 @@ td.stats:hover{
 
 a.stats {
     color: #3D9970;
+}
+
+
+
+
+
+
+
+
+
+.newPost {
+    background-color: rgba(255, 255, 255);
+    box-shadow: 0 1px 0 rgba(12,13,14,0.1),0 4px 6px rgba(59,64,69,0.1);
+    padding: 10px;
+    margin: 5px;
+    border-width: 0px;
+    border-radius: 5px;
+}
+
+#textPost {
+    display: none;
+}
+#markdownPost{
+    display: none;
+}
+#picturePost {
+    display: none;
+}
+#urlPicturePost{
+    display: none;
 }

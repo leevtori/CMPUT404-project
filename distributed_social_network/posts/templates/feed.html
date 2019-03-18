@@ -3,62 +3,53 @@
 
 {% block styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/feed.css' %}">
-    <script>
-    function getimageformat() {
-        var  selected_picture  = document.getElementById('createPostButton').files[0];
-        //var content_button;
-        var invis_field;
-        if (selected_picture.type == 'image/jpeg') {
-            invis_field = document.getElementById("picture_type");
-            invis_field.value = 'image/jpeg';
-            //content_button = document.getElementById('createPostButton');
-            //content_button.value = selected_picture.files;
-        }
-    }
-
-    </script>
+    <script src="{% static 'js/feed.js' %}"></script>
 {% endblock %}
 
 {% block content %}
     
 
-    <div class="feed_container">
-        <div class="left_col">
-            <div class='left_box'>
-                <h3>{{request.user.first_name}} {{request.user.last_name}}</h3>
-                <h5>{{request.user.username}}</5>
-                    <table class='stats'>
-                        <tr style="height: 60px;">
-                            <td class='stats'>
-                                <a href={% url 'followers' %} class='stats'>
-                                <div style="height:100%;width:100%">
-                                    {{follower_count}}<br/>Followers
-                                </div>
-                                </a>
-                            </td>
-                            <td class='stats'>
-                                <a href={% url 'friends' %} class='stats'>
-                                <div style="height:100%;width:100%">
-                                        {{friend_count}}<br/>Friends
-                                </div>
-                                </a>
-                            </td>
-                            <td class='stats'>
-                                <a href={% url 'profile' username=request.user.username %} class='stats'>
-                                <div style="height:100%;width:100%">
-                                    {{post_count}}<br/>Posts
-                                </div>
-                                </a>
-                            </td>
-                            
-                        </tr>
-                    </table>
-            </div>
+<div class="feed_container">
+    <div class="left_col">
+        <div class='left_box'>
+            <h3>{{request.user.first_name}} {{request.user.last_name}}</h3>
+            <h5>{{request.user.username}}</5>
+                <table class='stats'>
+                    <tr style="height: 60px;">
+                        <td class='stats'>
+                            <a href={% url 'followers' %} class='stats'>
+                            <div style="height:100%;width:100%">
+                                {{follower_count}}<br/>Followers
+                            </div>
+                            </a>
+                        </td>
+                        <td class='stats'>
+                            <a href={% url 'friends' %} class='stats'>
+                            <div style="height:100%;width:100%">
+                                    {{friend_count}}<br/>Friends
+                            </div>
+                            </a>
+                        </td>
+                        <td class='stats'>
+                            <a href={% url 'profile' username=request.user.username %} class='stats'>
+                            <div style="height:100%;width:100%">
+                                {{post_count}}<br/>Posts
+                            </div>
+                            </a>
+                        </td>
+                        
+                    </tr>
+                </table>
         </div>
-        <div class="right_col">
-            <h3 class='heading'>Add New Post</h3>
-            <div class="post">
-                <form id="createtextPost" method="post" action="/create/" >{% csrf_token %}
+    </div>
+
+        
+
+
+    <div class="right_col">
+        <h3 class='heading'>Add New Post</h3>
+            <div id="textPost">
+                <form id="createtextPost" method="post" action="/create/">{% csrf_token %}
                     <input name="type" type="hidden" value="text/plain">
                     Title:
                     <input name="title" type="text">
@@ -69,47 +60,106 @@
                     <textarea name="content" cols="50" rows="4">Enter text here.</textarea> <br><br>
                     Privacy:<br>
                     <select name="visibility">
-                        <option value="PUBLIC">Public</option>
-                        <option value="FRIENDS">Friends Only</option>
+                        <option value="PUBL">Public</option>
+                        <option value="FRND">Friends Only</option>
                         <option value="FOAF">Friends Of Friends Only</option>
-                        <option value="SERVERONLY">Friends on this host only</option>
-                        <option value="PRIVATE">Custom</option>
+                        <option value="SERV">Friends on this host only</option>
+                        <option value="PRIV">Custom</option>
                     </select>
                     <input type="submit" value="Create">
                 </form>
             </div>
 
-            <div class="post">
-                <form id="createpicturePost" method="post" action="/create/" enctype="multipart/form-data">{% csrf_token %}
-                    <input name="type" type="hidden" value="picture/png" id="picture_type">
+
+            <div id="markdownPost">
+                <form id="createmarkdownPost" method="post" action="/create/">{% csrf_token %}
+                    <input name="type" type="hidden" value="text/markdown">
                     Title:
                     <input name="title" type="text">
                     <br>
                     Description:
                     <input name="description" type="text">
                     <br>
-                    <input name="content" type="file" id="createPostButton" accept="image/png, image/jpeg" onchange="getimageformat()">
-                    <br><br>
+                    <textarea name="content" cols="50" rows="4">Enter text here.</textarea> <br><br>
                     Privacy:<br>
                     <select name="visibility">
-                        <option value="PUBLIC">Public</option>
-                        <option value="FRIENDS">Friends Only</option>
+                        <option value="PUBL">Public</option>
+                        <option value="FRND">Friends Only</option>
                         <option value="FOAF">Friends Of Friends Only</option>
-                        <option value="SERVERONLY">Friends on this host only</option>
-                        <option value="PRIVATE">Custom</option>
+                        <option value="SERV">Friends on this host only</option>
+                        <option value="PRIV">Custom</option>
                     </select>
                     <input type="submit" value="Create">
                 </form>
             </div>
 
-            <h3 class='heading'>Latest Posts</h3>
-            <div style="padding-bottom: 2000px;">
-                {% for post in latest_posts %}
-                    {% include "post.html"%}
-                {% endfor %}
+
+            <div id="picturePost">
+                <form id="createpicturePost" method="post" action="/create/" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input name="type" type="hidden" value="unknown" id="picture_type">
+                    Title:
+                    <input name="title" type="text">
+                    <br>
+                    Description:
+                    <input name="description" type="text">
+                    <br>
+                    <input name="fake-content" type="file" id="createPicturePostButton" onchange="getimageformat()">
+                    <input name="content" type="hidden" id="hiddencontent">
+                    <br><br>
+                    Privacy:<br>
+                    <select name="visibility">
+                        <option value="PUBL">Public</option>
+                        <option value="FRND">Friends Only</option>
+                        <option value="FOAF">Friends Of Friends Only</option>
+                        <option value="SERV">Friends on this host only</option>
+                        <option value="PRIV">Custom</option>
+                    </select>
+                    <input type="submit" value="Create">
+                </form>
             </div>
+
+
+            <div id="urlPicturePost">
+                <form id="createLinkPost" method="post" action="/create/" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input name="type" type="hidden" value="link">
+                    Title:
+                    <input name="title" type="text">
+                    <br>
+                    Description:
+                    <input name="description" type="text">
+                    Content:
+                    <input name="content" type="text">
+                    Privacy:<br>
+                    <select name="visibility">
+                        <option value="PUBL">Public</option>
+                        <option value="FRND">Friends Only</option>
+                        <option value="FOAF">Friends Of Friends Only</option>
+                        <option value="SERV">Friends on this host only</option>
+                        <option value="PRIV">Custom</option>
+                    </select>
+                    <input type="submit" value="Create">
+                </form>
+            </div>
+
+            <div class="createPostTabs">
+                <button class="post_tags" onclick="openPostInterface('textPost')">Text</button>
+                <button class="post_tags" onclick="openPostInterface('markdownPost')">MarkDown</button>
+                <button class="post_tags" onclick="openPostInterface('picturePost')">Local Picture</button>
+                <button class="post_tags" onclick="openPostInterface('urlPicturePost')">Picture Url</button>
+            </div>
+
+        
+
+        <h3 class='heading'>Latest Posts</h3>
+        <div style="padding-bottom: 2000px;">
+            {% for post in object_list %}
+                {% include "post.html"%}
+            {% endfor %}
         </div>
     </div>
-  
+</div>
+
 
 {% endblock%}

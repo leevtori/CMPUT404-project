@@ -2,21 +2,54 @@
 {% load static %}
 
 {% block styles %}
+    <script>
+        function delete_this(){
+            fetch("/posts/delete/",{
+	            method: "DELETE",
+                headers:{'X-CSRFToken':'{{ csrf_token }}','postid':'{{ post.id }}'},
+            }
+            ).then((response) => {
+                if (response.status === 200) {
+                    window.location.replace("/");
+                }else{
+                    alert('hmm, something went wrong');
+                }
+            });
+        }
+
+        window.onload = function(){
+            var img_element = document.getElementById("post_image");
+            var source = "{{ post.content }}";
+            img_element.setAttribute('src', source);
+        }
+    </script>
 {% endblock %}
 
 {% block content %}
 <div>
     <h4 class='fullname'>{{post.author.first_name}} {{post.author.last_name}}</h4>
     <p class='username'>@{{post.author.username}}</p>
+
 </div>
-<h1>{{ post.title }}</h1>
-<p>{{ post.comment }}</p>
-<p>{{ post.content }}</p>
+    <h1>{{ post.title }}</h1>
+    <p>{{ post.comment }}</p>
+    {% if post.content_type == 'text/plain' %}
+        <p>{{post.content}}</p>
+    {% elif post.content_type == 'text/markdown' %}
+        <p>{{post.content}}</p>
+    {% else %}
+        <img id="post_image">
+    {% endif %}
+
+    {% if user.username == post.author.username %}
+        <a href="javascript:delete_this()">delete</a>
+    {% endif %}
 
 
-{% for comments in post_comments %}
-    {% include "comment.html"%}
-{% endfor %}
+
+    {% for comments in post_comments %}
+        {% include "comment.html"%}
+    {% endfor %}
 
 <br>
     <div border-style="solid";>

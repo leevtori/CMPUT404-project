@@ -6,8 +6,16 @@
         <h4 class='fullname'><a href={% url 'profile' username=post.author.username %} class='fullname'>{{post.author.first_name}} {{post.author.last_name}}</a></h4>
         <p class='date'>{{post.published}}</p>
     </div>
-    <div style="padding-top:10px;">
-        <a href="{{post.source}}" class="post_title">{{post.title}}</a>
-        <p>{{post.content}}</p>
+    <div>
+        <a href={{post.source}} class="post_title">{{post.title}}</a>
+        {% if post.content_type == 'text/plain' %}
+            <p>{{post.content}}</p>
+        {% elif post.content_type == 'text/markdown' %}
+            <p>{{post.content}}</p>
+        {% else %}
+            <p>Picture Post, Click on link to see image</p>
+        {% endif %}
     </div>
+
+
 </div>
