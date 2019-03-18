@@ -12,6 +12,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 import json
 
+
 class UserList(LoginRequiredMixin, ListView):
     """Lists all users on the server."""
     model = User
@@ -111,5 +112,25 @@ class AccountSettingsView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
     def get_success_url(self):
-        return reverse('profile', kwargs={'username':self.request.user.username})
+        return reverse('profile', kwargs={'username': self.request.user.username})
         
+class FriendRequests(LoginRequiredMixin, ListView):
+    """This view lists all the pending friend requests. """
+    model = User
+    template_name = 'pending_friend_requests.html'
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = super().get_queryset()
+        # subtract my friends from my followers, to get the pending requests
+        qs = set(user.followers.all()).difference(set(user.friends.all()))
+        q = list(qs)
+        print(q)
+        return q
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        q = self.get_queryset() 
+        context['requestCount'] = len(q)
+        print("count ", q.count)
+        return context
