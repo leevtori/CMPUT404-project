@@ -17,6 +17,5 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('signup/', views.SignUp.as_view(), name='signup'),
     path('account_settings/', views.AccountSettingsView.as_view(), name='account_settings'),
-    path('requests', views.FriendRequests, name='friend_request')
-
+    path('requests/', views.FriendRequests.as_view(), name='friend_request'),
 ]
