@@ -32,11 +32,13 @@ div.banner{
     min-width: 100%;
     height: auto;
     box-shadow: 0 1px 0 rgba(12,13,14,0.1),0 4px 6px rgba(59,64,69,0.1);
-    background-color:white;
+    background-color:#ffffff;
     padding: 20px;
     top: 50px;
     z-index: 5;
     color: rgb(0, 0, 0);
+    display:flex;
+    flex-direction: row;
 }
 h1.banner{
     margin: 0;

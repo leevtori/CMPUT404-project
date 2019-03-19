@@ -26,5 +26,5 @@ function confirmFriend(friendId){
             'X-CSRFToken': document.cookie.split("=")[1]
         }, 
         body: JSON.stringify({'id':friendId})
-    }).then(setTimeout(function(){window.location.href.reload()},500));
+    }).then(setTimeout(function(){window.location.reload()},500));
 };

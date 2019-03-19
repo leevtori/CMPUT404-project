@@ -14,13 +14,13 @@
             <a class="header_link" href={% url 'feed' %}>Feed</a>
             <a class="header_link" href={% url 'users' %}>Search Users</a>
             <div class="dropdown">
-                <a class="dropbtn" href={% url 'profile' username=request.user.username %}>
-                    {{request.user.first_name}} {{request.user.last_name}}
-                </a>
+                <div class="dropbtn">
+                    <img src={% static "img/menu.png"%} id='menu_icon'>
+                </div>
                 <div class="dropdown-content">
-                    <a href={% url 'logout' %}>Log Out</a>
+                    <a href={% url 'profile' username=request.user.username %}>My Profile</a>
                     <a href={% url 'account_settings' %}>Account Settings</a>
-                    <a href="#">Link 3</a>
+                    <a href={% url 'logout' %} style="color:#db6b2a">Log Out</a>
                 </div>
             </div>
         </div>

@@ -87,6 +87,7 @@ class ProfileView(PostVisbilityMixin, ListView):
 class FeedView(PostVisbilityMixin, ListView):
     template_name = 'feed.html'
     model = Post
+    ordering = '-published'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -105,7 +106,7 @@ class PostView(PostVisbilityMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['post_comments'] = self.object.comment_set.all()
+        context['post_comments'] = self.object.comment_set.all().order_by("-published")
         return context
 
 

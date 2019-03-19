@@ -1,25 +1,25 @@
 {% extends "base.html" %}
 {%load static%}
 
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/user.css' %}"> 
+<script src=" {% static 'js/script.js' %}"></script>
+
+{% endblock %}
 
 {% block content %}
 <div style="padding:10px">
+    <div class='user_list'>
     <h2>Followers</h2>
 
-    {% for user in object_list %}
-        <div>
-            <h3>{{user}}</h3>
-            {% csrf_token %}
-            {% if user in friends %}
-                Friend &#10003;
-            {% else %}
-                <button id='confirmFriend' type='submit' onclick="confirmFriend('{{user.id}}')">Confirm Friend</button>
-            {% endif %}
-        </div>
+    {% for user in object_list %} 
+        {% if user != login_user %}
+        {% include "includes/followers_list_item.html" with user=user %}
+        {% endif %} 
     {% endfor %}
-
+    </div>
   
 
-    <script src=" {% static 'js/script.js' %}"></script>
+    
 </div>
 {% endblock %}
