@@ -1,3 +1,9 @@
+div.user_list{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
 .add_friend_btn{
     color: white;
     border-width: 0;
@@ -25,3 +31,4 @@
 .delete_friend_btn:hover{
     background-color:#e98a8a;
 }
+

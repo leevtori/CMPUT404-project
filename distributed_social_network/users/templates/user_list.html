@@ -12,11 +12,13 @@
 <div style="padding:10px">
 
     <h2>Users</h2>
+    <div class='user_list'>
     {% for user in object_list %}
         {% if user != login_user %}
             {% include "includes/user_list_item.html" with user=user %}
         {% endif %}
     {% endfor %}
+    </div>
 
     
 
