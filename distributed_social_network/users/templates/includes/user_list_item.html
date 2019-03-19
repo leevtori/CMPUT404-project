@@ -1,10 +1,9 @@
-
 {%load static%}
 
 
 <div class='post' style="width:50%;">
     <div class='post_top'>
-        <img src={% static "img/profile2.png"%} class='profile_pic_small' %}>
+        <img src={% static "img/profile.png"%} class='profile_pic_small' %}>
         <h4 class='fullname'>{{user.first_name}} {{user.last_name}}</h4>
     </div>
     {% csrf_token %}
@@ -14,7 +13,7 @@
         {% elif user in followings %}
             Friend Request Sent &#x2713;    Following &#x2713;
         {% elif user in followers %}
-            <button class='add_friend_btn' type='submit' onclick="addFriend('{{user.id}}')">+ Confirm Friend</button>
+            <button class='add_friend_btn' type='submit' onclick="confirmFriend('{{user.id}}')">+ Confirm Friend</button>
         {% else %}
             <button class='add_friend_btn' type='submit' onclick="addFriend('{{user.id}}')">+ Add Friend</button>
         {% endif %}
@@ -22,8 +21,5 @@
 
 </div>
 
-<script>
-console.log("{{followings}}");
-</script>
 
 

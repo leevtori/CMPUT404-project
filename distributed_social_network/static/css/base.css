@@ -61,7 +61,6 @@ a{
 /* Dropdown Button */
 .dropbtn {
     float:right;
-    min-width:100px;
     height: 100%;
     background-color: rgba(255, 255, 255, 0.0);
     color: white;
@@ -72,26 +71,28 @@ a{
     padding-left: 10px;
     padding-right: 10px;
   }
+  #menu_icon{
+      width:30px;
+  }
   
   /* The container <div> - needed to position the dropdown content */
   .dropdown {
     position: relative;
     display: inline-block;
     float:right;
-    width:250px;
   
   }
   
   /* Dropdown Content (Hidden by Default) */
   .dropdown-content {
     display: none;
-    /* position: relative; */
     position: fixed;
     background-color: white;
     width: 250px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
     top:50px;
+    right:0;
   }
   
   /* Links inside the dropdown */
@@ -138,7 +139,7 @@ div.post{
 div.post_top{
     display:flex;
     flex-direction: row; 
-    align-items: baseline;
+    align-items: center;
 }
 div.post_bottom{
     padding-top:10px;

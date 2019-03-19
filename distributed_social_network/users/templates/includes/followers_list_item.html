@@ -1,0 +1,21 @@
+{%load static%}
+
+
+<div class='post' style="width:50%;">
+    <div class='post_top'>
+        <img src={% static "img/profile.png"%} class='profile_pic_small' %}>
+        <h4 class='fullname'>{{user.first_name}} {{user.last_name}}</h4>
+    </div>
+    {% csrf_token %}
+    <div style="padding:10px">
+        {% if user in friends %}
+            Friends &#x2713;    Following &#x2713;     
+        {% else %}
+            <button class='add_friend_btn' type='submit' onclick="confirmFriend('{{user.id}}')">+ Confirm Friend</button>
+        {% endif %}
+    </div>
+
+</div>
+
+
+

@@ -11,3 +11,17 @@
 .add_friend_btn:hover{
     background-color:#78cfa8;
 }
+
+.delete_friend_btn{
+    color: white;
+    border-width: 0;
+    border-radius: 3px;
+    background-color: #d46161;
+    /* width:100px; */
+    height: 30px;
+    font-size: medium;
+}
+
+.delete_friend_btn:hover{
+    background-color:#e98a8a;
+}
