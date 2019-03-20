@@ -1,13 +1,11 @@
 from django.test import TestCase
 from django.test.client import Client
-from rest_framework.test import RequestsClient
 import json
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
 class LoginTest(TestCase):
-    # client = RequestsClient()
     client = Client()
     username = "test1"
     password = "pass123"
@@ -46,24 +44,6 @@ class LoginTest(TestCase):
             "password": self.register_input["password"]},
             content_type="application/json")
         self.assertEqual(response.status_code, 200)
-
-
-        # # u = User.objects.create_user(username=self.username, password=self.password)
-        # # user = User.objects.create(username='testuser')
-        # # user.set_password('12345')
-        # # user.save()
-        # login = self.client.login(username=self.username, password="pass123")
-        # # self.assertEqual(u.password, self.password)
-        # self.assertEqual(login, True)
-        # # self.assertTrue(login)
-
-        # self.client = Client()
-        # self.username = 'agconti'
-        # self.email = 'test@test.com'
-        # self.password = 'test'        
-        # self.test_user = User.objects.create_user(self.username, self.email, self.password)
-        # login = self.client.login(username=self.username, password=self.password)
-        # self.assertEqual(login, True)
 
 # class FriendsTest(TestCase):
 
