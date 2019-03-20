@@ -1,19 +1,20 @@
 from django.test import TestCase
+from django.test.client import Client
 from rest_framework.test import RequestsClient
-from users.models import CustomUserManager
 import json
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
 class LoginTest(TestCase):
-    client = RequestsClient()
+    # client = RequestsClient()
+    client = Client()
     username = "test1"
-    password = "password123"
+    password = "pass123"
 
     register_input = {
-        "username": "Moimoi",
-        "password": "password1",
+        "username": "test1",
+        "password": "pass123",
         "displayName": "moi_displayname",
         "github": "https://github.com/moimoi/",
         "bio": "I am moi, tu es toi",
@@ -24,14 +25,16 @@ class LoginTest(TestCase):
 
     def setUp(self):
         User.objects.all().delete
+        User.objects.create_user(username=self.username, password="pass123")
+
+    def test_users(self):
+        u = len(User.objects.all())
+        self.assertEqual(u, 1)
 
     def test_login_fail(self):
-        response = self.client.post("/users/login/", data={
-            "username": "self.username", 
-            "password": "self.password"}, 
-            content_type="application/json")
-        self.assertEqual(response.status_code, 200)
-
+        login = self.client.login(username="invalid_user", password='invalid_password')
+        self.assertFalse(login)
+        
     def test_login_pass(self):
         # register
         response = self.client.post("/users/signup/", data=self.register_input, 
@@ -42,18 +45,29 @@ class LoginTest(TestCase):
             "username": self.register_input["username"], 
             "password": self.register_input["password"]},
             content_type="application/json")
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)
 
 
+        # # u = User.objects.create_user(username=self.username, password=self.password)
+        # # user = User.objects.create(username='testuser')
+        # # user.set_password('12345')
+        # # user.save()
+        # login = self.client.login(username=self.username, password="pass123")
+        # # self.assertEqual(u.password, self.password)
+        # self.assertEqual(login, True)
+        # # self.assertTrue(login)
 
-
-
-
-
+        # self.client = Client()
+        # self.username = 'agconti'
+        # self.email = 'test@test.com'
+        # self.password = 'test'        
+        # self.test_user = User.objects.create_user(self.username, self.email, self.password)
+        # login = self.client.login(username=self.username, password=self.password)
+        # self.assertEqual(login, True)
 
 # class FriendsTest(TestCase):
 
-#     client = RequestsClient()
+#     client = Client()
 #     user1 = 'user1'
 #     password1 = 'qwerty'
 #     user2 = 'user2'
@@ -64,6 +78,9 @@ class LoginTest(TestCase):
 #     password4 = 'qwertypoiu'
 
 #     def setUp(self):
+
+#         user1 = User.objects.create_user(username=self.username, password=self.password)
+
 #         self.u1 = User.objects.create_superuser(username=self.user1, password=self.password1)
 #         User.objects.create_superuser(username=self.user2, password=self.password2)
 
