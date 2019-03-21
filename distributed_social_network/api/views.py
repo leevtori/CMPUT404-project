@@ -10,6 +10,8 @@ from rest_framework.response import Response
 
 from rest_framework.decorators import action
 
+from posts.views import PostVisbilityMixin
+
 import json
 
 from . import serializers
@@ -57,6 +59,7 @@ class AuthorViewset (viewsets.ReadOnlyModelViewSet):
             return Response("[]")
 
 
+
 class PostViewSet (viewsets.ReadOnlyModelViewSet):
     """API endpoint for reading posts and lists of posts.
     - gets single post
@@ -79,6 +82,11 @@ class PostViewSet (viewsets.ReadOnlyModelViewSet):
 
         if request.method == "POST":
             return Response(status=501)
+
+    def list(self, request):
+        qs = Post.objects.filter(visibility=Visibility.PUBLIC)
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
 
 
 class AreFriendsView(APIView):

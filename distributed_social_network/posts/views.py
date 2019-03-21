@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from django.views.generic.base import TemplateView
 from users.views import FriendRequests
 import uuid
-import requests
+# import requests
 import base64
 
 from django.db import connection
@@ -97,7 +97,7 @@ class FeedView(PostVisbilityMixin, ListView):
         q = list(set(self.request.user.followers.all()).difference(set(self.request.user.friends.all())))
         context['requestCount'] = len(q)
         return context
-    
+
 
 
 class PostView(PostVisbilityMixin, DetailView):
