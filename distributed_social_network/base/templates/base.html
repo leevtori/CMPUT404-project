@@ -12,12 +12,23 @@
         </div>
         <div class="header2">
             <a class="header_link" href={% url 'feed' %}>Feed</a>
-            <a class="header_link" href={% url 'users' %}>Search Users</a>
+            <a class="header_link" href={% url 'friend_request' %}>
+                Notifications 
+                {% if friend_request_count > 0 %}
+                    <span class="notify_bubble">{{friend_request_count}}</span>
+                {% endif %}
+            </a>
+
+            
             <div class="dropdown">
                 <div class="dropbtn">
                     <img src={% static "img/menu.png"%} id='menu_icon'>
                 </div>
                 <div class="dropdown-content">
+                    <div id="menu_me">
+                        <img src={% static "img/profile.png"%} class='profile_pic_large' %}>
+                        <h3>{{request.user.first_name}} {{request.user.last_name}}</h3>
+                    </div>
                     <a href={% url 'profile' username=request.user.username %}>My Profile</a>
                     <a href={% url 'account_settings' %}>Account Settings</a>
                     <a href={% url 'logout' %} style="color:#db6b2a">Log Out</a>

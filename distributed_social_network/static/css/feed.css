@@ -104,14 +104,64 @@ a.stats {
 
 .new_post_form{
     padding:10px;
+    display:flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
+
+input.short{
+    width: 50%;
+    border: none;
+    font-size: small;
+    margin-top: 5px;
+    margin-bottom:5px;
+    padding: 5px;
+}
+
+input.long{
+    width: 100%;
+    border: none;
+    font-size: small;
+    margin-top: 5px;
+    margin-bottom:5px;
+    padding: 5px;
+}
+
+input.browse_btn{
+    width:30%;
+    height: 30px;
+    font-size: small; 
+}
+
+textarea{
+    width: 100%;
+    border:none;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: small;
+    margin-top: 5px;
+    margin-bottom:5px;
+    padding: 5px;
+}
+select{
+    width:30%;
+    border: none;
+    background-color: white;
+    font-size: small;
+    font-family: Arial, Helvetica, sans-serif;
+    height: 30px;
+    padding: 5px;
+    white-space: nowrap;
+}
+
+
+
 
 .create_btn{
     color: white;
     border-width: 0;
     border-radius: 3px;
     background-color: #3D9970;
-    /* width:100px; */
+    width:80px;
     height: 30px;
     font-size: medium;
 }

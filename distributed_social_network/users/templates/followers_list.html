@@ -9,16 +9,16 @@
 
 {% block content %}
 <div style="padding:10px">
-    <div class='user_list'>
+    
     <h2>Followers</h2>
-
+    <div class='user_list'>
     {% for user in object_list %} 
         {% if user != login_user %}
         {% include "includes/followers_list_item.html" with user=user %}
         {% endif %} 
     {% endfor %}
     </div>
-  
+    </div>
 
     
 </div>

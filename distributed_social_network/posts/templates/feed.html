@@ -14,9 +14,6 @@
         <div class='left_box'>
             <h3>{{request.user.first_name}} {{request.user.last_name}}</h3>
             <h5>{{request.user.username}}</h5>
-            <a href={% url 'friend_request' %} style='color:red'>{{ requestCount }}</i>
-                <img src={% static "img/add_user.png" %} class='profile_pic_small'>
-            </a>
                 <table class='stats'>
                     <tr style="height: 60px;">
                         <td class='stats'>
@@ -43,6 +40,10 @@
                     </tr>
                 </table>
         </div>
+        <div class='left_box'>
+            <h3>Users</h3>
+            <a href={% url 'users' %}>View All Users</a>
+        </div>
     </div>
 
         
@@ -54,28 +55,26 @@
                 <button class="post_btn" onclick="openPostInterface('textPost')" style="background-color: #78cfa8">Text</button>
                 <button class="post_btn" onclick="openPostInterface('markdownPost')">MarkDown</button>
                 <button class="post_btn" onclick="openPostInterface('picturePost')">Local Picture</button>
-                <button class="post_btn" onclick="openPostInterface('urlPicturePost')">Picture Url</button>
+                <button class="post_btn" onclick="openPostInterface('urlPicturePost')">Picture URL</button>
             </div>
         
             <div id="textPost" class='newPost'>
                 <h3 class='heading'>Add Text Post</h3>
                 <form id="createtextPost" class='new_post_form' method="post" action="/create/">{% csrf_token %}
                     <input name="type" type="hidden" value="text/plain">
-                    Title:
-                    <input name="title" type="text">
-                    <br>
-                    Description:
-                    <input name="description" type="text">
-                    <br>
-                    <textarea name="content" cols="50" rows="4">Enter text here.</textarea> <br><br>
-                    Privacy:<br>
-                    <select name="visibility">
-                        <option value="PUBL">Public</option>
-                        <option value="FRND">Friends Only</option>
-                        <option value="FOAF">Friends Of Friends Only</option>
-                        <option value="SERV">Friends on this host only</option>
-                        <option value="PRIV">Custom</option>
-                    </select>
+                    <input name="title" type="text" class="short" placeholder="Title">
+                    <input name="description" type="text" class="short" placeholder="Description">
+                    <textarea name="content" cols="50" rows="4" placeholder="Enter Text here..."></textarea>
+                    <div style="padding-top:20px; padding-bottom:20px;">
+                        Privacy: 
+                        <select name="visibility">
+                            <option value="PUBL">Public</option>
+                            <option value="FRND">Friends Only</option>
+                            <option value="FOAF">Friends Of Friends Only</option>
+                            <option value="SERV">Friends on this host only</option>
+                            <option value="PRIV">Custom</option>
+                        </select>
+                    </div>
                     <input type="submit" value="Create" class='create_btn'>
                 </form>
             </div>
@@ -85,21 +84,19 @@
                 <h3 class='heading'>Add Markdown Post</h3>
                 <form id="createmarkdownPost" class='new_post_form' method="post" action="/create/">{% csrf_token %}
                     <input name="type" type="hidden" value="text/markdown">
-                    Title:
-                    <input name="title" type="text">
-                    <br>
-                    Description:
-                    <input name="description" type="text">
-                    <br>
-                    <textarea name="content" cols="50" rows="4">Enter text here.</textarea> <br><br>
-                    Privacy:<br>
-                    <select name="visibility">
-                        <option value="PUBL">Public</option>
-                        <option value="FRND">Friends Only</option>
-                        <option value="FOAF">Friends Of Friends Only</option>
-                        <option value="SERV">Friends on this host only</option>
-                        <option value="PRIV">Custom</option>
-                    </select>
+                    <input name="title" type="text" class="short" placeholder="Title">
+                    <input name="description" type="text" class="short" placeholder="Description">
+                    <textarea name="content" cols="50" rows="4" placeholder="Enter Markdown here..."></textarea>
+                    <div style="padding-top:20px; padding-bottom:20px;">
+                        Privacy:
+                        <select name="visibility"> 
+                            <option value="PUBL">Public</option>
+                            <option value="FRND">Friends Only</option>
+                            <option value="FOAF">Friends Of Friends Only</option>
+                            <option value="SERV">Friends on this host only</option>
+                            <option value="PRIV">Custom</option>
+                        </select>
+                    </div>
                     <input type="submit" value="Create" class='create_btn'>
                 </form>
             </div>
@@ -110,23 +107,20 @@
                 <form id="createpicturePost" class='new_post_form' method="post" action="/create/" enctype="multipart/form-data">
                     {% csrf_token %}
                     <input name="type" type="hidden" value="unknown" id="picture_type">
-                    Title:
-                    <input name="title" type="text">
-                    <br>
-                    Description:
-                    <input name="description" type="text">
-                    <br>
-                    <input name="fake-content" type="file" id="createPicturePostButton" onchange="getimageformat()">
+                    <input name="title" type="text" class="short" placeholder="Title">
+                    <input name="description" type="text" class="short" placeholder="Description">
+                    <input name="fake-content" type="file" id="createPicturePostButton" onchange="getimageformat()" class="browse_btn">
                     <input name="content" type="hidden" id="hiddencontent">
-                    <br><br>
-                    Privacy:<br>
-                    <select name="visibility">
-                        <option value="PUBL">Public</option>
-                        <option value="FRND">Friends Only</option>
-                        <option value="FOAF">Friends Of Friends Only</option>
-                        <option value="SERV">Friends on this host only</option>
-                        <option value="PRIV">Custom</option>
-                    </select>
+                    <div style="padding-top:20px; padding-bottom:20px;">
+                        Privacy:
+                        <select name="visibility">
+                            <option value="PUBL">Public</option>
+                            <option value="FRND">Friends Only</option>
+                            <option value="FOAF">Friends Of Friends Only</option>
+                            <option value="SERV">Friends on this host only</option>
+                            <option value="PRIV">Custom</option>
+                        </select>
+                    </div>
                     <input type="submit" value="Create" class='create_btn'>
                 </form>
             </div>
@@ -137,21 +131,19 @@
                 <form id="createLinkPost" class='new_post_form' method="post" action="/create/" enctype="multipart/form-data">
                     {% csrf_token %}
                     <input name="type" type="hidden" value="link">
-                    Title:
-                    <input name="title" type="text">
-                    <br>
-                    Description:
-                    <input name="description" type="text">
-                    Content:
-                    <input name="content" type="text">
-                    Privacy:<br>
-                    <select name="visibility">
-                        <option value="PUBL">Public</option>
-                        <option value="FRND">Friends Only</option>
-                        <option value="FOAF">Friends Of Friends Only</option>
-                        <option value="SERV">Friends on this host only</option>
-                        <option value="PRIV">Custom</option>
-                    </select>
+                    <input name="title" type="text" class="short" placeholder="Title">
+                    <input name="description" type="text" class="short" placeholder="Description">
+                    <input name="content" type="text" class="long" placeholder="Picture URL">
+                    <div style="padding-top:20px; padding-bottom:20px;">
+                        Privacy:
+                        <select name="visibility">
+                            <option value="PUBL">Public</option>
+                            <option value="FRND">Friends Only</option>
+                            <option value="FOAF">Friends Of Friends Only</option>
+                            <option value="SERV">Friends on this host only</option>
+                            <option value="PRIV">Custom</option>
+                        </select>
+                    </div>
                     <input type="submit" value="Create" class='create_btn'>
                 </form>
             </div>
