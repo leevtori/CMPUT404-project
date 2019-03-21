@@ -6,4 +6,5 @@ from posts.models import Post, Comment
 
 class PostTestCase(TestCase):
     def setup(self):
-        Comment.objects.create()
+        Post.objects.create()
+
