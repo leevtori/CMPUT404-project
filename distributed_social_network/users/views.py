@@ -122,16 +122,16 @@ class FriendRequests(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         user = self.request.user
-        qs = super().get_queryset()
+        # qs = super().get_queryset()
         # subtract my friends from my followers, to get the pending requests
         qs = set(user.followers.all()).difference(set(user.friends.all()))
         q = list(qs)
-        print(q)
+        # print(q)
         return q
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        q = self.get_queryset() 
-        context['requestCount'] = len(q)
-        print("count ", q.count)
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     q = self.get_queryset() 
+    #     context['requestCount'] = len(q)
+    #     print("count ", q.count)
+    #     return context
