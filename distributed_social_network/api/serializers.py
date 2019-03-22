@@ -33,7 +33,6 @@ class AuthorSerializer(serializers.ModelSerializer):
         return obj.get_url()
 
 
-
 class CommentSerializer(serializers.ModelSerializer):
     contentType = serializers.SerializerMethodField()
     author = AuthorSerializer()

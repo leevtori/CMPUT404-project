@@ -6,13 +6,12 @@ from django.contrib.auth import get_user_model
 from posts.utils import Visibility
 from posts.models import Post, Comment
 
+from rest_framework import permissions
 from rest_framework.response import Response
 
 from rest_framework.decorators import action
 
 from posts.views import PostVisbilityMixin
-
-import json
 
 from . import serializers
 import re
@@ -56,8 +55,27 @@ class AuthorViewset (viewsets.ReadOnlyModelViewSet):
             response_data["authors"] = [str(friend) for friend in are_friends]
 
             return Response(response_data)
-            return Response("[]")
 
+    @action(methods=["get"], detail=True)
+    def posts(self, request, pk=None):
+        if request.method == "GET":
+            # Get publicly visible posts to user.
+            return Response(status=501)
+
+
+class AuthorPostView(APIView):
+    """
+    Gets a list of posts visible to currently authenticated used or
+    creates new post for authenticated user.
+    /author/{author_id}/posts
+    """
+    permission_classes = (permissions.IsAuthenticated)
+
+    def get(self, request):
+        return Response(status=501)
+
+    def post(self, request):
+        return Response(status=501)
 
 
 class PostViewSet (viewsets.ReadOnlyModelViewSet):
@@ -90,8 +108,10 @@ class PostViewSet (viewsets.ReadOnlyModelViewSet):
 
 
 class AreFriendsView(APIView):
-    """/author/<author1_id>/friends/<author2_id>
+    """
+    Checks if two users are friends
+    /author/<author1_id>/friends/<author2_id>
     """
 
-    def get(self, request):
+    def get(self, request, pk1, pk2):
         return Response(status=501)

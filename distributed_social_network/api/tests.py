@@ -6,12 +6,14 @@ from users.models import User
 from posts.utils import Visibility
 
 from .views import AuthorViewset, PostViewSet
+from rest_framework.test import force_authenticate
 
 
 class TestAuthorViewSet(APITestCase):
     # TODO: TEST the friend action (actions don't seem to work with as_view?)
     @classmethod
     def setUpTestData(cls):
+
         cls.user = User.objects.create_user(
             username="test",
             email="test@test.com",
@@ -40,6 +42,45 @@ class TestAuthorViewSet(APITestCase):
         cls.friend.friends.add(cls.user)
 
         cls.factory = APIRequestFactory()
+
+    def test_get_friends(self):
+        """import json
+        Tests getting a list of friends
+        endpoint: /user/<userid>/friends
+        """
+
+        request = self.factory.get(
+            "api/author/%s/friends/" % self.user.id
+        )
+
+        view = AuthorViewset.as_view({'get': 'friend'})
+        response = view(request, pk=self.user.id)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_post_friends_none(self):
+        """
+        Tests checking if anyone in post body is a friend.
+        endpoint: /user/<userid>/friends
+        """
+        request = self.factory.post(
+            "api/author/%s/friends/" % self.user.id,
+            {
+                "query": "friends",
+                "author": "author_id",
+                "authors": [
+                    "http://127.0.0.1:5454/author/de305d54-75b4-431b-adb2-eb6b9e546013",
+                    "http://127.0.0.1:5454/author/ae345d54-75b4-431b-adb2-fb6b9e547891"
+                ]
+            }
+        )
+
+        force_authenticate(request, user=self.user)
+
+        view = AuthorViewset.as_view({'post': 'friend'})
+        response = view(request, pk=self.user.id)
+        self.assertEqual(response.status_code, 200)
+
 
     def test_retrieve_author(self):
         request = self.factory.get("/api/author/%s/" % self.user.id)
