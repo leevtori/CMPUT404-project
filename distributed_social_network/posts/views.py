@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from django.views.generic.base import TemplateView
 from users.views import FriendRequests
 import uuid
-# import requests
+import requests
 import base64
 
 from django.db import connection
