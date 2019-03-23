@@ -1,7 +1,7 @@
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import get_object_or_404, render, HttpResponse, HttpResponseRedirect
 from .models import User
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, UserCreationForm
 from django.views.generic import ListView
 from django.views.generic.edit import UpdateView
 from django.views import View
@@ -83,10 +83,17 @@ class ConfirmRequest(LoginRequiredMixin, View):
         url = reverse('friends')
         return HttpResponseRedirect(url)
 
+
+class CustomUserCreationForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ('first_name', 'last_name',) + UserCreationForm.Meta.fields
+
 class SignUp(generic.CreateView):
     form_class = CustomUserCreationForm
     success_url = reverse_lazy('login')
     template_name = 'signup.html'
+    # fields = ['first_name','last_name', 'username', 'email', 'password', 'password']
     success_message = "Congratulations, you've successfully signed up! Wait to be approved."
 
 class DeleteFriend(LoginRequiredMixin, View):    
