@@ -96,6 +96,20 @@ class FeedView(PostVisbilityMixin, ListView):
         context['follower_count'] = self.request.user.followers.count
         q = list(set(self.request.user.followers.all()).difference(set(self.request.user.friends.all())))
         context['requestCount'] = len(q)
+
+        #get all users who have me in their followers list
+        followings = []
+        for user in User.objects.all():
+            if self.request.user in user.followers.all():
+                followings.append(user)
+        #get list of posts from user's followings
+        following_posts = []
+        qs = super().get_queryset()
+        for post in qs:
+            if post.author in followings:
+                following_posts.append(post)
+        context['following_posts'] = following_posts
+
         return context
 
 
