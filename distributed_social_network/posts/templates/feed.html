@@ -159,11 +159,26 @@
 
         <div class='posts_list'>
             <h3 class='heading'>Latest Posts</h3>
-            {% for post in object_list %}
-                {% if post.visibility != "UNLS" %}
-                    {% include "post.html"%}
-                {%  endif %}
-            {% endfor %}
+            <div class="tab">
+                <button class="tablinks active" onclick="openFeed(event, 'public_posts')">Public</button>
+                <button class="tablinks" onclick="openFeed(event, 'following_posts')">Following</button>
+            </div>
+
+            <div id="public_posts" class="tabcontent">
+                {% for post in object_list %}
+                    {% if post.visibility != "UNLS" %}
+                        {% include "post.html"%}
+                    {%  endif %}
+                {% endfor %}
+            </div>
+            
+            <div id="following_posts" class="tabcontent">
+                {% for post in following_posts %}
+                {% include "post.html"%}
+                {% endfor %}
+            </div>
+
+            
         </div>
     </div>
 </div>

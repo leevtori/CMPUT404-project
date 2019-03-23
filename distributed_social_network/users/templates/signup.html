@@ -1,9 +1,12 @@
 {% extends 'login_base.html' %}
-
+{% load static %}
 
 {% block content %}
 <div class="content">
-  <div class="illustration">illustration here</div>
+  <div class="illustration">
+      <img src={% static "img/login.png"%} id="login_pic"%}>
+  </div>
+
   <div class="signup_form">
     <h2>Sign up</h2>
     <form method="post" class="signup_form">
@@ -13,10 +16,10 @@
           {{ field.label_tag }}<br>
           {{ field }}
           {% if field.help_text %}
-            <small style="color: rgb(168, 89, 199)">{{ field.help_text }}</small>
+            <small style="color: rgb(90, 90, 90)">{{ field.help_text }}</small>
           {% endif %}
           {% for error in field.errors %}
-            <p style="color: rgb(207, 5, 123)">{{ error }}</p>
+            <p style="color: rgb(211, 84, 0)">{{ error }}</p>
           {% endfor %}
         </p>
       {% endfor %}
