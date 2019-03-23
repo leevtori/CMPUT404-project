@@ -72,7 +72,9 @@
                             <option value="FRND">Friends Only</option>
                             <option value="FOAF">Friends Of Friends Only</option>
                             <option value="SERV">Friends on this host only</option>
-                            <option value="PRIV">Custom</option>
+                            <option value="PRIV">Private</option>
+                            <option value="CUST">Custom</option>
+                            <option value="UNLS">Unlisted</option>                
                         </select>
                     </div>
                     <input type="submit" value="Create" class='create_btn'>
@@ -94,8 +96,9 @@
                             <option value="FRND">Friends Only</option>
                             <option value="FOAF">Friends Of Friends Only</option>
                             <option value="SERV">Friends on this host only</option>
-                            <option value="PRIV">Custom</option>
-                        </select>
+                            <option value="PRIV">Private</option>
+                            <option value="CUST">Custom</option>
+                            <option value="UNLS">Unlisted</option>                            </select>
                     </div>
                     <input type="submit" value="Create" class='create_btn'>
                 </form>
@@ -118,8 +121,9 @@
                             <option value="FRND">Friends Only</option>
                             <option value="FOAF">Friends Of Friends Only</option>
                             <option value="SERV">Friends on this host only</option>
-                            <option value="PRIV">Custom</option>
-                        </select>
+                            <option value="PRIV">Private</option>
+                            <option value="CUST">Custom</option>
+                            <option value="UNLS">Unlisted</option>                            </select>
                     </div>
                     <input type="submit" value="Create" class='create_btn'>
                 </form>
@@ -141,8 +145,9 @@
                             <option value="FRND">Friends Only</option>
                             <option value="FOAF">Friends Of Friends Only</option>
                             <option value="SERV">Friends on this host only</option>
-                            <option value="PRIV">Custom</option>
-                        </select>
+                            <option value="PRIV">Private</option>
+                            <option value="CUST">Custom</option>
+                            <option value="UNLS">Unlisted</option>                            </select>
                     </div>
                     <input type="submit" value="Create" class='create_btn'>
                 </form>
@@ -155,7 +160,9 @@
         <div class='posts_list'>
             <h3 class='heading'>Latest Posts</h3>
             {% for post in object_list %}
-                {% include "post.html"%}
+                {% if post.visibility != "UNLS" %}
+                    {% include "post.html"%}
+                {%  endif %}
             {% endfor %}
         </div>
     </div>

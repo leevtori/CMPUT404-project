@@ -1,6 +1,7 @@
 {# render the passed-in post #}
 {% load static %}
 <div class='post'>
+
     <div class='post_top'>
         <img src={% static "img/profile.png"%} class='profile_pic_small' %}>
         <h4 class='fullname'><a href={% url 'profile' username=post.author.username %} class='fullname'>{{post.author.first_name}} {{post.author.last_name}}</a></h4>
@@ -16,6 +17,5 @@
             <p>Picture Post, Click on link to see image</p>
         {% endif %}
     </div>
-
 
 </div>
