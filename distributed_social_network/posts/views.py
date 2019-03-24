@@ -29,6 +29,9 @@ class PostVisbilityMixin(LoginRequiredMixin):
 
         query_list = []
 
+        # the user's own posts
+        query_list.append(Q(author=user))
+
         #  Public posts
         query_list.append(Q(visibility=Visibility.PUBLIC))
 
