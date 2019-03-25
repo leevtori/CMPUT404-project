@@ -28,9 +28,6 @@ class AuthorSerializer(serializers.ModelSerializer):
             "github"
         )
 
-    def get_id(self, obj):
-        return obj.get_url()
-
 
 class CommentSerializer(serializers.ModelSerializer):
     contentType = serializers.SerializerMethodField()

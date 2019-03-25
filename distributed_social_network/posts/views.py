@@ -21,12 +21,7 @@ User = get_user_model()
 
 
 class PostVisbilityMixin(LoginRequiredMixin):
-    """Filters posts to those viewable by the logged in user only."""
-
-    def get_queryset(self):
-        user = self.request.user
-        qs = super().get_queryset()
-
+    def filter_user_visible(self, user, qs):
         query_list = []
 
         # the user's own posts
@@ -62,6 +57,15 @@ class PostVisbilityMixin(LoginRequiredMixin):
         qs = qs.filter(reduce(__or__, query_list))
         # qs = qs.union(visible).distinct()  # this doesn't filter properly afterwards
         qs = (qs | visible).distinct()  # But this works... somehow?
+
+        return qs
+
+    """Filters posts to those viewable by the logged in user only."""
+    def get_queryset(self):
+        user = self.request.user
+        qs = super().get_queryset()
+
+        qs = self.filter_user_visible(user, qs)
 
         return qs
 
