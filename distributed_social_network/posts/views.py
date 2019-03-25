@@ -1,3 +1,5 @@
+import json
+
 from django.http import HttpResponseNotFound
 from django.shortcuts import render, HttpResponse, get_object_or_404, HttpResponseRedirect
 from django.views.generic import ListView, DetailView
@@ -7,8 +9,6 @@ from django.contrib.auth import get_user_model
 from django.views.generic.base import TemplateView
 from users.views import FriendRequests
 import uuid
-import requests
-import base64
 
 from django.db import connection
 from django.db.models import Q
@@ -129,98 +129,34 @@ class PostView(PostVisbilityMixin, DetailView):
         return context
 
 
-def create(request):
+def postapi(request, id):
     # creates a post and redirects back to main page
-    if request.method == "POST":
-        print(request.POST['visibility'])
-        # i dont know if i need to do this if statement yet, just gonna leave this here in case
-        if request.POST['type'] == 'text/plain':
-            new_post = Post(author=request.user,
-                            title=request.POST['title'],
-                            content=request.POST['content'],
-                            description=request.POST['description'],
-                            content_type=request.POST['type'],
-                            visibility=request.POST['visibility'])
-            new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
-            new_post.save()
+    if request.method=="POST":
+        data=json.loads(request.body.decode("utf-8"))
+        if Post.objects.filter(id=data["id"]).count() != 0:
+            return HttpResponse(status=400)
+        if data["id"]!=id:
+            return HttpResponse(status=400)
+        new_post = Post(id=data["id"],
+                    author=request.user,
+                    title=data["title"],
+                    content=data['content'],
+                    description=data['description'],
+                    content_type=data['type'],
+                    visibility=data['visibility'])
 
-        # turns out forms the request type as "picture/png" but the specs requires us to save as "image/png"
-        elif request.POST['type'] == 'image/jpeg' or request.POST['type'] == 'image/png':
-            #print(request.POST['content'])
-            picture = request.POST['content']
-            print(type(picture))
-            print(request.POST['visibility'])
-            # saves the picture
-            if request.POST['type'] == 'image/jpeg':
-                new_post = Post(author=request.user,
-                                title=request.POST['title'],
-                                content=picture,
-                                description=request.POST['description'],
-                                content_type='image/jpeg;base64',
-                                visibility=request.POST['visibility'],
-                                unlisted=True)
-            else:
-                new_post = Post(author=request.user,
-                                title=request.POST['title'],
-                                content=picture,
-                                description=request.POST['description'],
-                                content_type='image/png;base64',
-                                visibility=request.POST['visibility'],
-                                unlisted=True)
-            new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
+        new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
+        new_post.origin = new_post.source
 
-            # the next 3 lines were meant as a test, assuming that the image uploaded is a jpg
-            # this will create a copy of it in the folder of this project
-            # just going to leave this here in case something breaks
-
-            new_post.save()
-        elif request.POST['type'] == 'link':
-            print('get picture')
-            print(request.POST['visibility'])
-            response = requests.get(request.POST['content'])
-            encoded = base64.b64encode(response.content)
-            sample_string = "data:{};base64,{}".format(response.headers['Content-Type'], encoded.decode())
-            print(sample_string)
-            if response.headers['Content-Type'] == 'image/jpeg':
-                new_post = Post(author=request.user,
-                                title=request.POST['title'],
-                                content=sample_string,
-                                description=request.POST['description'],
-                                content_type='image/jpeg;base64',
-                                visibility=request.POST['visibility'],
-                                unlisted=True)
-                new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
-                new_post.save()
-
-            elif response.headers['Content-Type'] == 'image/png':
-                new_post = Post(author=request.user,
-                                title=request.POST['title'],
-                                content=sample_string,
-                                description=request.POST['description'],
-                                content_type='image/png;base64',
-                                visibility=request.POST['visibility'],
-                                unlisted=True)
-                new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
-                new_post.save()
-
-                # testing purposes
-                # f=open('testimg.png','wb')
-                # f.write(response.content)
-                # f.close()
-
-        elif request.POST['type'] == 'text/markdown':
-            print(request.POST['visibility'])
-            new_post = Post(author=request.user,
-                            title=request.POST['title'],
-                            content=request.POST['content'],
-                            description=request.POST['description'],
-                            visibility=request.POST['visibility'],
-                            content_type=request.POST['type'])
-            new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
-            new_post.save()
-
-    return HttpResponseRedirect('/')
-
+        new_post.save()
+        return HttpResponse(status=200)
+    elif request.method=="GET":
+        if "python" in request.META['HTTP_USER_AGENT'].lower():
+            pass
+        else:
+            #browser
+            pass
+            
 
 def create_comment(request):
     if request.method == "POST":

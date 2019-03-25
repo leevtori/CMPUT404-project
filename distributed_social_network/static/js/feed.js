@@ -8,13 +8,12 @@ function getimageformat() {
     reader.readAsDataURL(selected_picture);
     reader.onloadend = function(){
         hidden.value = reader.result;
-        alert(hidden.value);
     };
     if (selected_picture.type == 'image/jpeg') {
-        invis_field.value = 'image/jpeg';
+        invis_field.value = 'image/jpeg;base64';
     }
     else if (selected_picture.type == 'image/png'){
-        invis_field.value = 'image/png'
+        invis_field.value = 'image/png;base64'
     }
 }
 
@@ -86,4 +85,118 @@ function openFeed(evt, feedName) {
     // Show the current tab, and add an "active" class to the button that opened the tab
     document.getElementById(feedName).style.display = "block";
     evt.currentTarget.className += " active";
+  }
+
+  //taken from https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+//end of stack overflow code
+
+//Taken from Djangon's official documentation
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+  function createTextPost(){
+        var id = uuidv4();
+        var data = {
+            "id":id,
+            "type":document.getElementById("plaintype").value,
+            "title":document.getElementById("plaintitle").value,
+            "description":document.getElementById("plaindescription").value,
+            "content":document.getElementById("plaincontent").value,
+            "visibility":document.getElementById("plainvisibility").value
+        };
+        var csrftoken = getCookie('csrftoken');
+
+        fetch("/posts/"+id,{
+	        method: "POST",
+            headers:{
+	            "X-CSRFToken":csrftoken,
+	            "Content-type":"application/json"
+            },
+            body:JSON.stringify(data)
+        },).then((response)=>{
+            if (response.status==200){
+                alert('Your post has been created, the page will refresh now');
+                location.reload();
+            }
+            else{
+                alert('something went wrong, please try again');
+            }
+
+        });
+
+  }
+  function createMarkdownPost(){
+        var id = uuidv4();
+        var csrftoken = getCookie('csrftoken');
+        var data = {
+            "id":id,
+            "type":document.getElementById("mdtype").value,
+            "title":document.getElementById("mdtitle").value,
+            "description":document.getElementById("mddescription").value,
+            "content":document.getElementById("mdcontent").value,
+            "visibility":document.getElementById("mdvisibility").value
+        };
+
+        fetch("/posts/"+id,{
+	        method: "POST",
+            headers:{"Content-type":"application/json","X-CSRFToken":csrftoken},
+            body:JSON.stringify(data)
+        }).then((response)=>{
+            if (response.status==200){
+                alert('Your post has been created, the page will refresh now');
+                location.reload();
+            }
+            else{
+                alert('something went wrong, please try again');
+            }
+
+        });
+
+  }
+  function createPicturePost(){
+        var id = uuidv4();
+        var csrftoken = getCookie('csrftoken');
+        var data = {
+            "id":id,
+            "type":document.getElementById("picture_type").value,
+            "title":document.getElementById("imgtitle").value,
+            "description":document.getElementById("imgdescription").value,
+            "content":document.getElementById("hiddencontent").value,
+            "visibility":document.getElementById("imgvisibility").value
+        };
+        fetch("/posts/"+id,{
+	        method: "POST",
+            headers:{"Content-type":"application/json","X-CSRFToken":csrftoken,},
+            body:JSON.stringify(data)
+        }).then((response)=>{
+            if (response.status==200){
+                alert('Your post has been created, the page will refresh now');
+                location.reload();
+            }
+            else{
+                alert('something went wrong, please try again');
+            }
+
+        });
+
   }

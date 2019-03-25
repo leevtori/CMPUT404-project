@@ -3,6 +3,7 @@
 
 {% block styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/feed.css' %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="{% static 'js/feed.js' %}"></script>
 {% endblock %}
 
@@ -55,19 +56,18 @@
                 <button class="post_btn" onclick="openPostInterface('textPost')" style="background-color: #78cfa8">Text</button>
                 <button class="post_btn" onclick="openPostInterface('markdownPost')">MarkDown</button>
                 <button class="post_btn" onclick="openPostInterface('picturePost')">Local Picture</button>
-                <button class="post_btn" onclick="openPostInterface('urlPicturePost')">Picture URL</button>
             </div>
         
             <div id="textPost" class='newPost'>
                 <h3 class='heading'>Add Text Post</h3>
-                <form id="createtextPost" class='new_post_form' method="post" action="/create/">{% csrf_token %}
-                    <input name="type" type="hidden" value="text/plain">
-                    <input name="title" type="text" class="short" placeholder="Title">
-                    <input name="description" type="text" class="short" placeholder="Description">
-                    <textarea name="content" cols="50" rows="4" placeholder="Enter Text here..."></textarea>
+                <form id="createtextPost" class='new_post_form' onsubmit="event.preventDefault();">{% csrf_token %}
+                    <input name="type" type="hidden" value="text/plain" id="plaintype">
+                    <input name="title" type="text" class="short" placeholder="Title" id="plaintitle">
+                    <input name="description" type="text" class="short" placeholder="Description" id="plaindescription">
+                    <textarea name="content" cols="50" rows="4" placeholder="Enter Text here..." id="plaincontent"></textarea>
                     <div style="padding-top:20px; padding-bottom:20px;">
                         Privacy: 
-                        <select name="visibility">
+                        <select name="visibility" id="plainvisibility">
                             <option value="PUBL">Public</option>
                             <option value="FRND">Friends Only</option>
                             <option value="FOAF">Friends Of Friends Only</option>
@@ -77,21 +77,21 @@
                             <option value="UNLS">Unlisted</option>                
                         </select>
                     </div>
-                    <input type="submit" value="Create" class='create_btn'>
+                    <input type="submit" value="Create" class='create_btn' onclick="createTextPost()">
                 </form>
             </div>
 
 
             <div id="markdownPost" class='newPost'>
                 <h3 class='heading'>Add Markdown Post</h3>
-                <form id="createmarkdownPost" class='new_post_form' method="post" action="/create/">{% csrf_token %}
-                    <input name="type" type="hidden" value="text/markdown">
-                    <input name="title" type="text" class="short" placeholder="Title">
-                    <input name="description" type="text" class="short" placeholder="Description">
-                    <textarea name="content" cols="50" rows="4" placeholder="Enter Markdown here..."></textarea>
+                <form id="createmarkdownPost" class='new_post_form' onsubmit="event.preventDefault();">{% csrf_token %}
+                    <input name="type" type="hidden" value="text/markdown" id="mdtype">
+                    <input name="title" type="text" class="short" placeholder="Title" id="mdtitle">
+                    <input name="description" type="text" class="short" placeholder="Description" id="mddescription">
+                    <textarea name="content" cols="50" rows="4" placeholder="Enter Markdown here..." id="mdcontent"></textarea>
                     <div style="padding-top:20px; padding-bottom:20px;">
                         Privacy:
-                        <select name="visibility"> 
+                        <select name="visibility" id="mdvisibility">
                             <option value="PUBL">Public</option>
                             <option value="FRND">Friends Only</option>
                             <option value="FOAF">Friends Of Friends Only</option>
@@ -100,23 +100,23 @@
                             <option value="CUST">Custom</option>
                             <option value="UNLS">Unlisted</option>                            </select>
                     </div>
-                    <input type="submit" value="Create" class='create_btn'>
+                    <input type="submit" value="Create" class='create_btn' onclick="createMarkdownPost()">
                 </form>
             </div>
 
 
             <div id="picturePost" class='newPost'>
                 <h3 class='heading'>Add Picture</h3>
-                <form id="createpicturePost" class='new_post_form' method="post" action="/create/" enctype="multipart/form-data">
+                <form id="createpicturePost" class='new_post_form' onsubmit="event.preventDefault();">
                     {% csrf_token %}
                     <input name="type" type="hidden" value="unknown" id="picture_type">
-                    <input name="title" type="text" class="short" placeholder="Title">
-                    <input name="description" type="text" class="short" placeholder="Description">
+                    <input name="title" type="text" class="short" placeholder="Title" id="imgtitle">
+                    <input name="description" type="text" class="short" placeholder="Description" id="imgdescription">
                     <input name="fake-content" type="file" id="createPicturePostButton" onchange="getimageformat()" class="browse_btn">
                     <input name="content" type="hidden" id="hiddencontent">
                     <div style="padding-top:20px; padding-bottom:20px;">
                         Privacy:
-                        <select name="visibility">
+                        <select name="visibility" id="imgvisibility">
                             <option value="PUBL">Public</option>
                             <option value="FRND">Friends Only</option>
                             <option value="FOAF">Friends Of Friends Only</option>
@@ -125,31 +125,7 @@
                             <option value="CUST">Custom</option>
                             <option value="UNLS">Unlisted</option>                            </select>
                     </div>
-                    <input type="submit" value="Create" class='create_btn'>
-                </form>
-            </div>
-
-
-            <div id="urlPicturePost" class='newPost'>
-                <h3 class='heading'>Add URL Picture</h3>
-                <form id="createLinkPost" class='new_post_form' method="post" action="/create/" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <input name="type" type="hidden" value="link">
-                    <input name="title" type="text" class="short" placeholder="Title">
-                    <input name="description" type="text" class="short" placeholder="Description">
-                    <input name="content" type="text" class="long" placeholder="Picture URL">
-                    <div style="padding-top:20px; padding-bottom:20px;">
-                        Privacy:
-                        <select name="visibility">
-                            <option value="PUBL">Public</option>
-                            <option value="FRND">Friends Only</option>
-                            <option value="FOAF">Friends Of Friends Only</option>
-                            <option value="SERV">Friends on this host only</option>
-                            <option value="PRIV">Private</option>
-                            <option value="CUST">Custom</option>
-                            <option value="UNLS">Unlisted</option>                            </select>
-                    </div>
-                    <input type="submit" value="Create" class='create_btn'>
+                    <input type="submit" value="Create" class='create_btn' onclick="createPicturePost()">
                 </form>
             </div>
 
