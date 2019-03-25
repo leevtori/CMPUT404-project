@@ -1,4 +1,4 @@
-from django.test import TestCase, Client
+from django.test import TestCase, Client, TransactionTestCase
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 
@@ -117,15 +117,48 @@ class TestPostVisbilityMixin(TestCase):
         self.assertEqual(response.context['user'], AnonymousUser())
 
         #try to view feed
-        print('soruce', self.post.source)
         response = self.client.get(reverse('post-detail', args=[self.post.source]))
         self.assertNotEqual(response.status_code, 200)
         response = self.client.get(reverse('feed'))
         self.assertEqual(response.status_code, 302)
 
-    def test_create_post(self):
+    def test_feed(self):
+        # log in
         login = self.client.login(username=self.user.username, password='aNewPw019')
         self.assertTrue(login)
+
+        # view feed
+        response = self.client.get(reverse('feed'))
+        self.assertEqual(response.status_code, 200)
+
+        #test public feed
+        public_feed_posts = response.context['object_list']
+        print(public_feed_posts)
+        print(self.post)
+        print(self.post in public_feed_posts) #true
+        self.assertTrue(self.post in public_feed_posts)
+        self.assertTrue(self.foaf_post in public_feed_posts)
+        self.assertFalse(self.private_post in public_feed_posts)
+
+        #TODO: test following feed
+
+
+    def test_add_post(self):
+        #create public post
+        post1 = Post.objects.create(
+            title="Test Post 1",
+            content="Test public post 1",
+            author=self.user,
+            source='uuid5',
+        )
+
+        #TODO: create private post
+        #TODO: create foaf post
+        #TODO: create friends only post
+
+
+
+        
         
 
 
