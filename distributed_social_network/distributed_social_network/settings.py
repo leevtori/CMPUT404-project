@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/2.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
-
+import django_heroku
 import os
 Temp_Path = os.path.realpath('.')
 
@@ -150,3 +150,5 @@ REST_FRAMEWORK = {
     ),
     'PAGE_SIZE': 50
 }
+
+django_heroku.settings(locals()) # bottom of the file

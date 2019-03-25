@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from django.views.generic.base import TemplateView
 from users.views import FriendRequests
 import uuid
-# import requests
+import requests
 import base64
 
 from django.db import connection
@@ -28,6 +28,9 @@ class PostVisbilityMixin(LoginRequiredMixin):
         qs = super().get_queryset()
 
         query_list = []
+
+        # the user's own posts
+        query_list.append(Q(author=user))
 
         #  Public posts
         query_list.append(Q(visibility=Visibility.PUBLIC))
@@ -52,6 +55,9 @@ class PostVisbilityMixin(LoginRequiredMixin):
         query_list.append(Q(author__id__in=foaf, visibility=Visibility.FOAF))
 
         visible = user.visible_posts.all()
+
+        # add unlisted, but don't show it in the feed
+        query_list.append(Q(visibility=Visibility.UNLISTED))
 
         qs = qs.filter(reduce(__or__, query_list))
         # qs = qs.union(visible).distinct()  # this doesn't filter properly afterwards
@@ -91,13 +97,26 @@ class FeedView(PostVisbilityMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['post_count'] =Post.objects.filter(author=self.request.user).count
+        context['post_count'] = Post.objects.filter(author=self.request.user).count
         context['friend_count'] = self.request.user.friends.count
         context['follower_count'] = self.request.user.followers.count
         q = list(set(self.request.user.followers.all()).difference(set(self.request.user.friends.all())))
         context['requestCount'] = len(q)
-        return context
 
+        #get all users who have me in their followers list
+        followings = []
+        for user in User.objects.all():
+            if self.request.user in user.followers.all():
+                followings.append(user)
+        #get list of posts from user's followings
+        following_posts = []
+        qs = super().get_queryset()
+        for post in qs:
+            if post.author in followings:
+                following_posts.append(post)
+        context['following_posts'] = following_posts
+
+        return context
 
 
 class PostView(PostVisbilityMixin, DetailView):
