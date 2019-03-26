@@ -46,6 +46,9 @@ class LoginTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'], AnonymousUser())
 
+
+
+
 # class FriendsTest(TestCase):
 
 #     client = Client()
