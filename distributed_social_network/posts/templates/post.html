@@ -8,7 +8,7 @@
         <p class='date'>{{post.published}}</p>
     </div>
     <div class='post_bottom'>
-        <a href={{post.source}} class="post_title">{{post.title}}</a>
+        <a href={% url 'postdetail' pk=post.id %} class="post_title">{{post.title}}</a>
         {% if post.content_type == 'text/plain' %}
             <p>{{post.content}}</p>
         {% elif post.content_type == 'text/markdown' %}
