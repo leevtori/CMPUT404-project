@@ -2,6 +2,8 @@ from django.test import TestCase
 from django.test.client import Client
 import json
 from django.contrib.auth import get_user_model
+from django.urls import reverse
+from django.contrib.auth.models import AnonymousUser
 
 User = get_user_model()
 
@@ -10,20 +12,22 @@ class LoginTest(TestCase):
     username = "test1"
     password = "pass123"
 
-    register_input = {
-        "username": "test1",
-        "password": "pass123",
-        "displayName": "moi_displayname",
-        "github": "https://github.com/moimoi/",
-        "bio": "I am moi, tu es toi",
-        "firstName": "Moi",
-        "lastName": "Toi",
-        "email": "moi@gmail.com",
-    }
+    # register_input = {
+    #     "username": "test1",
+    #     "password": 'pass123',
+    #     "displayName": "moi_displayname",
+    #     "github": "https://github.com/moimoi/",
+    #     "bio": "I am moi, tu es toi",
+    #     "firstName": "Moi",
+    #     "lastName": "Toi",
+    #     "email": "moi@gmail.com",
+    #     "is_active": 1,
+    # }
 
     def setUp(self):
         User.objects.all().delete
-        User.objects.create_user(username=self.username, password="pass123")
+        self.user = User.objects.create_user(username=self.username, email="test@test.com",
+            bio="Hello world", password=self.password, is_active=1)
 
     def test_users(self):
         u = len(User.objects.all())
@@ -32,18 +36,15 @@ class LoginTest(TestCase):
     def test_login_fail(self):
         login = self.client.login(username="invalid_user", password='invalid_password')
         self.assertFalse(login)
-        
-    def test_login_pass(self):
-        # register
-        response = self.client.post("/users/signup/", data=self.register_input, 
-            content_type="application/json")
+    
+    def test_login_success(self):
+        login = self.client.login(username=self.user.username, password=self.password)
+        self.assertTrue(login)
+
+    def test_logout(self):
+        response = self.client.get(reverse('logout'))
         self.assertEqual(response.status_code, 200)
-        # login
-        response = self.client.post("/users/login/", data={
-            "username": self.register_input["username"], 
-            "password": self.register_input["password"]},
-            content_type="application/json")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['user'], AnonymousUser())
 
 # class FriendsTest(TestCase):
 
