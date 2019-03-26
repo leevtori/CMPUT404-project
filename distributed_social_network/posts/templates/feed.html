@@ -61,7 +61,7 @@
             <div id="textPost" class='newPost'>
                 <h3 class='heading'>Add Text Post</h3>
                 <form id="createtextPost" class='new_post_form' onsubmit="event.preventDefault();">{% csrf_token %}
-                    <input name="type" type="hidden" value="text/plain" id="plaintype">
+                    <input name="type" type="hidden" value="TXT" id="plaintype">
                     <input name="title" type="text" class="short" placeholder="Title" id="plaintitle">
                     <input name="description" type="text" class="short" placeholder="Description" id="plaindescription">
                     <textarea name="content" cols="50" rows="4" placeholder="Enter Text here..." id="plaincontent"></textarea>
@@ -85,7 +85,7 @@
             <div id="markdownPost" class='newPost'>
                 <h3 class='heading'>Add Markdown Post</h3>
                 <form id="createmarkdownPost" class='new_post_form' onsubmit="event.preventDefault();">{% csrf_token %}
-                    <input name="type" type="hidden" value="text/markdown" id="mdtype">
+                    <input name="type" type="hidden" value="MKD" id="mdtype">
                     <input name="title" type="text" class="short" placeholder="Title" id="mdtitle">
                     <input name="description" type="text" class="short" placeholder="Description" id="mddescription">
                     <textarea name="content" cols="50" rows="4" placeholder="Enter Markdown here..." id="mdcontent"></textarea>

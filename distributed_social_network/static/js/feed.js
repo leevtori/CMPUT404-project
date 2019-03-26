@@ -10,10 +10,10 @@ function getimageformat() {
         hidden.value = reader.result;
     };
     if (selected_picture.type == 'image/jpeg') {
-        invis_field.value = 'image/jpeg;base64';
+        invis_field.value = 'JPG';
     }
     else if (selected_picture.type == 'image/png'){
-        invis_field.value = 'image/png;base64'
+        invis_field.value = 'PNG'
     }
 }
 
