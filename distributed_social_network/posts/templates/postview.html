@@ -2,6 +2,12 @@
 {% load static %}
 
 {% block styles %}
+    <style xmlns:border="http://www.w3.org/1999/xhtml" xmlns:border="http://www.w3.org/1999/xhtml">
+        span{
+            background-color:grey;
+            display:block;
+        }
+    </style>
     <script>
         function delete_this(){
             fetch("/posts/delete/",{
@@ -17,15 +23,167 @@
             });
         }
 
-        window.onload = function(){
+        function mkdown(){
+            var node;
+            var text;
+            var endbracket;
+            var linkstart;
+            var linkend;
+
+            var ordered = false;
+            var unordered = false;
+            var block = false;
+            var codeblock = false;
+            var listnode;
+            var count = 1;
+            var listrow;
+
+            var original = "{{ post.content|escapejs }}".split("\u000A");
+            var displayed_post = document.getElementById("mkdowndiv");
+            for (i = 0; i < original.length; i++) {
+                if (ordered) {
+                    if (original[i].startsWith(count + ".")) {
+                        count = count + 1;
+                        listrow = document.createElement("li");
+                        text = document.createTextNode(original[i].slice(3));
+                        listrow.appendChild(text);
+                        listnode.appendChild(listrow);
+                    } else {
+                        count = 1;
+                        ordered = false;
+                        displayed_post.appendChild(listnode);
+                    }
+
+                } else if (unordered) {
+                    if (original[i].startsWith("*")) {
+                        listrow = document.createElement("li");
+                        text = document.createTextNode(original[i].slice(2));
+                        listrow.appendChild(text);
+                        listnode.appendChild(listrow);
+                    } else {
+                        unordered = false;
+                        displayed_post.appendChild(listnode);
+                    }
+                } else if (block) {
+                    listnode.appendChild(document.createElement('br'));
+                    if (original[i].startsWith(">")) {
+                        text = document.createTextNode(original[i].slice(2));
+                        listnode.appendChild(text);
+                    } else {
+                        block = false;
+                        displayed_post.appendChild(listnode);
+                    }
+                } else if (codeblock) {
+                    listnode.appendChild(document.createElement('br'));
+                    if (original[i].startsWith("'''")) {
+                        codeblock = false;
+                        displayed_post.appendChild(listnode);
+                    } else {
+                        text = document.createTextNode(original[i]);
+                        listnode.appendChild(text);
+                    }
+
+                } else if (original[i].startsWith("##")) {
+                    node = document.createElement("h1");
+                    text = document.createTextNode(original[i].slice(2));
+                    node.appendChild(text);
+                    displayed_post.appendChild(node);
+                } else if (original[i].startsWith("#")) {
+                    node = document.createElement("h2");
+                    text = document.createTextNode(original[i].slice(1));
+                    node.appendChild(text);
+                    displayed_post.appendChild(node);
+                }
+                else if (original[i].startsWith("**")) {
+                    node = document.createElement("b");
+                    text = document.createTextNode(original[i].slice(2, -2));
+                    node.appendChild(text);
+                    displayed_post.appendChild(node);
+                } else if (original[i].startsWith("*") && original[i].endsWith("*")) {
+                    node = document.createElement("i");
+                    text = document.createTextNode(original[i].slice(1,-1));
+                    node.appendChild(text);
+                    displayed_post.appendChild(node);
+                } else if (original[i].startsWith("![Image]")) {
+                    linkstart = original[i].indexOf("(");
+                    linkend = original[i].indexOf(")");
+                    node = document.createElement("img");
+                    node.src = original[i].slice(linkstart + 1, linkend);
+                    displayed_post.appendChild(node);
+                } else if (original[i].startsWith("[")) {
+                    endbracket = original[i].indexOf("]");
+                    linkstart = original[i].indexOf("(");
+                    linkend = original[i].indexOf(")");
+                    node = document.createElement("a");
+                    text = document.createTextNode(original[i].slice(1, endbracket));
+                    node.appendChild(text);
+                    node.href = original[i].slice(linkstart + 1, linkend);
+                    displayed_post.appendChild(node);
+                } else if (original[i].startsWith("1.")) {
+                    ordered = true;
+                    count = count + 1;
+                    listnode = document.createElement("ol");
+                    listrow = document.createElement("li");
+                    text = document.createTextNode(original[i].slice(3));
+                    listrow.appendChild(text);
+                    listnode.appendChild(listrow);
+                } else if (original[i].startsWith("*")) {
+                    unordered = true;
+                    listnode = document.createElement("ul");
+                    listrow = document.createElement("li");
+                    text = document.createTextNode(original[i].slice(2));
+                    listrow.appendChild(text);
+                    listnode.appendChild(listrow);
+                } else if (original[i].startsWith(">")) {
+                    block = true;
+                    listnode = document.createElement("blockquote");
+                    text = document.createTextNode(original[i].slice(2));
+                    listnode.appendChild(text);
+                } else if (original[i].startsWith("'''")) {
+                    codeblock = true;
+                    listnode = document.createElement("span")
+                } else if (original[i].indexOf("'") !== original[i].lastIndexOf("'")) {
+                    if (original[i].indexOf("'") !== 1) {
+                        var before = original[i].split(0, original[i].indexOf("'"));
+                    } else {
+                        before = ""
+                    }
+                    displayed_post.appendChild(document.createTextNode(before));
+                    var custombackground = document.createElement("span");
+                    text = document.createTextNode(original[i].slice(original[i].indexOf("'")+ 1, original[i].lastIndexOf("'")));
+                    custombackground.appendChild(text);
+                    displayed_post.appendChild(custombackground);
+                    displayed_post.appendChild(document.createTextNode(original[i].slice(original[i].lastIndexOf("'"), original[i].length)));
+                } else if (original[i].startsWith("---")) {
+                    displayed_post.appendChild(document.createElement("hr"))
+                } else {
+                    text = document.createTextNode(original[i]);
+                    displayed_post.append(text);
+                }
+
+
+            }
+            if (ordered == true || unordered == true || block == true|| codeblock == true){
+                displayed_post.appendChild(listnode);
+            }
+        }
+        function imgsrc(){
             var img_element = document.getElementById("post_image");
-            var source = "{{ post.content }}";
+            var source = "{{ post.content|escapejs }}";
             img_element.setAttribute('src', source);
         }
+        {% if post.content_type == "text/markdown" %}
+        window.onload = mkdown;
+        {% else %}
+        window.onload = imgsrc;
+        {% endif %}
+
+
     </script>
 {% endblock %}
 
 {% block content %}
+    <div style="width:50%; border:1px solid black">
 <div>
     <h4 class='fullname'>{{post.author.first_name}} {{post.author.last_name}}</h4>
     <p class='username'>@{{post.author.username}}</p>
@@ -36,6 +194,9 @@
     {% if post.content_type == 'text/plain' %}
         <p>{{post.content}}</p>
     {% elif post.content_type == 'text/markdown' %}
+        <div id="mkdowndiv">
+        </div>
+        <br><br>
         <p>{{post.content}}</p>
     {% else %}
         <img id="post_image">
@@ -44,7 +205,7 @@
     {% if user.username == post.author.username %}
         <a href="javascript:delete_this()">delete</a>
     {% endif %}
-
+</div>
 
 
     {% for comments in post_comments %}

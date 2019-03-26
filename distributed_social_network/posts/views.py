@@ -161,10 +161,10 @@ def postapi(request, rid):
                 post_author = desired_post.author
                 post_comments=Comment.objects.filter(post_id=rid).order_by('-published')
                 send_comments=[]
-                counter=5
+                #counter=5
                 for comment in post_comments:
-                    if counter==0:
-                        break
+                    #if counter==0:
+                        #break
                     #TODO:
                     #add the url back once we get that, also our host
                     comment_data={
@@ -181,7 +181,7 @@ def postapi(request, rid):
                         "id": str(comment.id)
                     }
                     send_comments.append(comment_data)
-                    counter=counter-1
+                    #counter=counter-1
 
 
                 #TODO:
@@ -245,3 +245,6 @@ def delete_comment(request):
             return HttpResponse('')
 
     return HttpResponseNotFound("hello")
+
+def visible_to_user(request):
+    pass
