@@ -13,9 +13,9 @@ from django.test.client import RequestFactory
 
 # Create your tests here.
 
-class PostTestCase(TestCase):
-    def setup(self):
-        Comment.objects.create()
+# class PostTestCase(TestCase):
+#     def setup(self):
+#         Comment.objects.create()
 
 
 class TestPostVisbilityMixin(TestCase):
@@ -59,7 +59,6 @@ class TestPostVisbilityMixin(TestCase):
             title="Public Post",
             content="Public post content",
             author=self.user,
-            source='uuid1',
         )
 
         self.comment = Comment.objects.create(
@@ -73,7 +72,6 @@ class TestPostVisbilityMixin(TestCase):
             content="Should not be visible",
             author=self.friend,
             visibility=Visibility.PRIVATE,
-            source='uuid2',
         )
 
         self.foaf_post = Post.objects.create(
@@ -81,7 +79,6 @@ class TestPostVisbilityMixin(TestCase):
             content="Hello",
             author=self.foaf,
             visibility=Visibility.FOAF,
-            source='uuid3',
         )
 
         self.user.friends.add(self.friend)
@@ -110,15 +107,78 @@ class TestPostVisbilityMixin(TestCase):
         self.assertTrue(qs.filter(id=self.foaf_post.id).exists())
 
 
+
+class TestPosts(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="test",
+            email="test@test.com",
+            bio="Hello world",
+            password="aNewPw019",
+            is_active=1,
+        )
+
+        self.friend = User.objects.create_user(
+            username="friend",
+            email="friend@test.com",
+            bio="Chicken",
+            password="aNewPw019",
+            is_active=1,
+        )
+
+        self.foaf = User.objects.create_user(
+            username="foaf",
+            email="foaf@test.com",
+            bio="Ostrich",
+            password="aNewPw019",
+            is_active=1,
+        )
+
+        self.post = Post.objects.create(
+            title="Public Post",
+            content="Public post content",
+            author=self.user,
+        )
+
+        self.comment = Comment.objects.create(
+            author=self.user,
+            post=self.post,
+            comment="Test comment",
+        )
+
+        self.private_post = Post.objects.create(
+            title="Private",
+            content="Should not be visible",
+            author=self.friend,
+            visibility=Visibility.PRIVATE,
+        )
+
+        self.foaf_post = Post.objects.create(
+            title="Foaf",
+            content="Hello",
+            author=self.foaf,
+            visibility=Visibility.FOAF,
+        )
+
+        self.user.friends.add(self.friend)
+        self.friend.friends.add(self.user)
+
+        self.friend.friends.add(self.foaf)
+        self.foaf.friends.add(self.friend)
+        print("client1",self.client)
+
+
     def test_view_post_logout(self):
         # log out
-        response = self.client.get(reverse('logout'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['user'], AnonymousUser())
-
+        # logout= self.client.logout() 
+        # print("logout", logout)
         #try to view post detail
-        # response = self.client.get(reverse('post-detail', args=[self.post.source]))
-        # self.assertNotEqual(response.status_code, 200)
+
+        response = self.client.get(reverse('postdetail', args=[self.post.id]))
+        print('content', response.content)
+        self.assertEqual(response.status_code, 302)
+
          #try to view feed
         response = self.client.get(reverse('feed'))
         self.assertEqual(response.status_code, 302)
@@ -159,7 +219,6 @@ class TestPostVisbilityMixin(TestCase):
             title="Test Post 1",
             content="Test public post",
             author=self.user,
-            source='uuid5',
         )
         # check if it's on the feed
         response = self.client.get(reverse('feed'))
@@ -174,8 +233,8 @@ class TestPostVisbilityMixin(TestCase):
         self.assertTrue(post1 in profile_posts)
 
         #check post detail
-        # response = self.client.get(reverse('post-detail', args=[post1.source]))
-        # self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('post-detail', args=[post1.id]))
+        self.assertEqual(response.status_code, 200)
 
     #TODO: create private post
     def test_add_private_post(self):

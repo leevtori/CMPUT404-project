@@ -29,10 +29,12 @@ html, body {
     box-shadow: 0 1px 0 rgba(32, 29, 36, 0.1),0 6px 6px rgba(65, 59, 69, 0.1);
     color:#3D9970;
     margin:0px;
+    z-index: 2;
+    background-color: white;
 }
 
 .illustration{
-    width:40%;
+    width: 40%;
     /* top: 130px; */
     /* display:flex;
     justify-content: center;
