@@ -61,16 +61,16 @@ class AuthorViewset (viewsets.ReadOnlyModelViewSet):
             serializer = serializers.PostSerializer(qs, many=True, context={'request': request})
             return Response(serializer.data)
 
-    def list(self, request):
-        qs = self.get_queryset()
-        page = self.paginate_queryset(qs)
+    # def list(self, request):
+    #     qs = self.get_queryset()
+    #     page = self.paginate_queryset(qs)
 
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data, model="authors", query="authors")
+    #     if page is not None:
+    #         serializer = self.get_serializer(page, many=True, context={'request': request})
+    #         return self.get_paginated_response(serializer.data, model="authors", query="authors")
 
-        serializer = self.get_serializer(qs, many=True)
-        return Response(serializer.data)
+    #     serializer = self.get_serializer(qs, many=True)
+    #     return Response(serializer.data)
 
 
 class FriendsView(APIView):
