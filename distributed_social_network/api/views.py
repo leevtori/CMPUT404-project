@@ -66,8 +66,8 @@ class AuthorViewset (viewsets.ReadOnlyModelViewSet):
         page = self.paginate_queryset(qs)
 
         if page is not None:
-            serializer = self.get_serializer(page)
-            return self.get_paginated_response(serializer.data, many=True, model="authors", query="authors")
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data, model="authors", query="authors")
 
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
