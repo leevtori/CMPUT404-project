@@ -170,15 +170,15 @@ class TestPosts(TestCase):
 
     def test_view_post_logout(self):
         #try to view public post detail without logging in
-        response = self.client.get(reverse('postdetail', args=[self.post.id]))
+        response = self.client.get(reverse('create', args=[self.post.id]))
         self.assertEqual(response.status_code, 302)
 
         #try to view public post detail without logging in
-        response = self.client.get(reverse('postdetail', args=[self.private_post.id]))
+        response = self.client.get(reverse('create', args=[self.private_post.id]))
         self.assertEqual(response.status_code, 302)
 
         #try to view public post detail without logging in
-        response = self.client.get(reverse('postdetail', args=[self.foaf_post.id]))
+        response = self.client.get(reverse('create', args=[self.foaf_post.id]))
         self.assertEqual(response.status_code, 302)
 
          #try to view feed
@@ -202,8 +202,7 @@ class TestPosts(TestCase):
 
 
     def test_add_public_post(self):
-        #create public post
-        post1 = Post.objects.create(
+        post = Post.objects.create(
             title="Test Post 1",
             content="Test public post",
             author=self.user,
@@ -216,28 +215,24 @@ class TestPosts(TestCase):
         response = self.client.get(reverse('feed'))
         self.assertEqual(response.status_code, 200)
         public_feed_posts = response.context['object_list']
-        self.assertTrue(post1 in public_feed_posts)
+        self.assertTrue(post in public_feed_posts)
 
         # check if it's on their profile
         response = self.client.get(reverse('profile', args=[self.user.username]))
         self.assertEqual(response.status_code, 200)
         profile_posts = response.context['object_list']
-        self.assertTrue(post1 in profile_posts)
+        self.assertTrue(post in profile_posts)
 
         #check post detail
-        response = self.client.get(reverse('postdetail', args=[post1.id]))
+        response = self.client.get(reverse('create', args=[post.id]))
         self.assertEqual(response.status_code, 200)
 
-    #TODO: create private post
     def test_add_private_post(self):
-
-        #create private post
-        post2 = Post.objects.create(
+        post = Post.objects.create(
             title="Test Post 2",
             content="Test private post",
             author=self.user,
             visibility=Visibility.PRIVATE,
-            source='uuid6',
         )
 
         # log in as friend
@@ -247,16 +242,56 @@ class TestPosts(TestCase):
         response = self.client.get(reverse('feed'))
         self.assertEqual(response.status_code, 200)
         public_feed_posts = response.context['object_list']
-        self.assertFalse(post2 in public_feed_posts)
+        self.assertFalse(post in public_feed_posts)
 
 
+    
+    def test_add_private_post(self):
+        post = Post.objects.create(
+            title="Test Post 3",
+            content="Test private post",
+            author=self.user,
+            visibility=Visibility.PRIVATE,
+        )
+
+        # log in as friend
+        login = self.client.login(username=self.friend, password='aNewPw019')
+        self.assertTrue(login)
+        # check if it's on friend's feed
+        response = self.client.get(reverse('feed'))
+        self.assertEqual(response.status_code, 200)
+        public_feed_posts = response.context['object_list']
+        self.assertFalse(post in public_feed_posts)
+
+    def test_add_friendsonly_post(self):
+        post = Post.objects.create(
+            title="Test Post 3",
+            content="Test friends only post",
+            author=self.user,
+            visibility=Visibility.FRIENDSONLY,
+        )
+
+        # log in as friend
+        login = self.client.login(username=self.friend, password='aNewPw019')
+        self.assertTrue(login)
+        # check if it's on friend's feed
+        response = self.client.get(reverse('feed'))
+        self.assertEqual(response.status_code, 200)
+        public_feed_posts = response.context['object_list']
+        self.assertTrue(post in public_feed_posts)
+
+        #log in as non-friend
+        self.client.logout()
+        login = self.client.login(username=self.foaf, password='aNewPw019')
+        self.assertTrue(login)
+        # check if it's on foaf's feed (it shouldn't)
+        response = self.client.get(reverse('feed'))
+        self.assertEqual(response.status_code, 200)
+        public_feed_posts = response.context['object_list']
+        self.assertFalse(post in public_feed_posts)
 
 
     #TODO: create foaf post
-
-
-    #TODO: create friends only post
-
 
 
         
