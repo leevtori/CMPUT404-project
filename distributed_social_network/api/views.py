@@ -15,13 +15,20 @@ from posts.views import PostVisbilityMixin
 
 from . import serializers
 import re, uuid
+import json
+
 User = get_user_model()
 
 
 
 class PaginateOverrideMixin:
     def get_paginated_response(self, data, **kwargs):
-        """
+        """        body_unicode = self.request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        friend_id = body['id']
+        print("added ", friend_id)
+        friend = get_object_or_404(User, id=friend_id)
+        friend.followers.add(self.request.user)
         Return a paginated style `Response` object for the given output data.
         overridden from GenericAPIView to pass in additional parameters.
         """
@@ -47,9 +54,9 @@ class AuthorViewset (viewsets.ReadOnlyModelViewSet):
             qs = post_filter.filter_user_visible(self.request.user, user.posts.all())
 
             page = self.paginate_queryset(qs)
-            if page is not none:
+            if page is not None:
                 serializer = serializers.PostSerializer(page, many=True, context={'request': request})
-                return self.get_paginated_response(serializer.data, model="posts", quey)
+                return self.get_paginated_response(serializer.data, model="posts", query="posts")
 
             serializer = serializers.PostSerializer(qs, many=True, context={'request': request})
             return Response(serializer.data)
@@ -168,7 +175,7 @@ class CommentView(APIView):
             return Response(serializer.data, status=201)
         print("ERRROR ", serializer.errors)
         return Response(serializer.errors, status=400)
-    
+
 
 class AreFriendsView(APIView):
     """
@@ -178,3 +185,16 @@ class AreFriendsView(APIView):
 
     def get(self, request, pk1, pk2):
         return Response(status=501)
+
+
+class FriendRequestView(APIView):
+    """
+    Makes a friend request
+    """
+    def post(self, request):
+        body_unicode = self.request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        friend_id = body['id']
+        print("added ", friend_id)
+        friend = get_object_or_404(User, id=friend_id)
+        friend.followers.add(self.request.user)
