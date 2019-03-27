@@ -9,10 +9,12 @@ User = get_user_model()
 
 # FIXME: The id and url are wrong.
 class AuthorSerializer(serializers.ModelSerializer):
-    id = serializers.HyperlinkedIdentityField(view_name="user-detail")
+    id = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
     firstName = serializers.CharField(source="first_name")
     lastName = serializers.CharField(source="last_name")
     displayName = serializers.CharField(source="display_name")
+    url = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
+
 
     class Meta:
         model = User
