@@ -4,16 +4,17 @@ from rest_framework import serializers
 from posts.utils import content_type_str, visibility_str
 from posts.models import Post, Comment
 
-from posts.models import Post, Comment
-
 User = get_user_model()
+
 
 # FIXME: The id and url are wrong.
 class AuthorSerializer(serializers.ModelSerializer):
-    id = serializers.SerializerMethodField()
+    id = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
     firstName = serializers.CharField(source="first_name")
     lastName = serializers.CharField(source="last_name")
     displayName = serializers.CharField(source="display_name")
+    url = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
+
 
     class Meta:
         model = User
@@ -28,9 +29,6 @@ class AuthorSerializer(serializers.ModelSerializer):
             "url",
             "github"
         )
-
-    def get_id(self, obj):
-        return obj.get_url()
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -49,6 +47,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_contentType(self, obj):
         return content_type_str[obj.content_type]
+
 
 # FIXME: missing size and next fields
 class PostSerializer(serializers.ModelSerializer):
@@ -90,6 +89,8 @@ class PostSerializer(serializers.ModelSerializer):
     def get_visibility(self, obj):
         return visibility_str[obj.visibility]
 
+
+# FIXME: have the correct fields.
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment

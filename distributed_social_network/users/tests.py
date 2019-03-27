@@ -42,14 +42,8 @@ class LoginTest(TestCase):
         self.assertTrue(login)
 
     def test_logout(self):
-        response = self.client.get(reverse('logout'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['user'], AnonymousUser())
-
-    def test_newwhat(self):
-        print("hello")
-        self.assertFalse(True)
-
+        logout=self.client.logout()
+        self.assertEqual(logout, None)
 
 
 

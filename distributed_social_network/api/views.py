@@ -59,8 +59,15 @@ class AuthorViewset (viewsets.ReadOnlyModelViewSet):
     @action(methods=["get"], detail=True)
     def posts(self, request, pk=None):
         if request.method == "GET":
-            # Get publicly visible posts to user.
-            return Response(status=501)
+            user = self.get_object()
+
+            # Not really meant to be used this way...but it works?
+            post_filter = PostVisbilityMixin()
+            qs = post_filter.filter_user_visible(user, Post.objects.all())
+
+            print(qs)
+            serializer = serializers.PostSerializer(qs, many=True, context={'request': request})
+            return Response(serializer.data)
 
 
 class AuthorPostView(APIView):
