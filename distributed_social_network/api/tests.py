@@ -10,7 +10,6 @@ from rest_framework.test import force_authenticate
 
 
 class TestAuthorViewSet(APITestCase):
-    # TODO: TEST the friend action (actions don't seem to work with as_view?)
     @classmethod
     def setUpTestData(cls):
 
@@ -38,7 +37,8 @@ class TestAuthorViewSet(APITestCase):
             is_active=True
         )
 
-        cls.user.friends.add(cls.friend)
+        cls.user.friends.add(cls.friend)    # TODO: TEST the friend action (actions don't seem to work with as_view?)
+
         cls.friend.friends.add(cls.user)
 
         cls.factory = APIRequestFactory()
@@ -57,6 +57,8 @@ class TestAuthorViewSet(APITestCase):
         response = view(request, pk=self.user.id)
 
         self.assertEqual(response.status_code, 200)
+        self.assertIn(response, self.friend.id)
+
 
     def test_post_friends_none(self):
         """

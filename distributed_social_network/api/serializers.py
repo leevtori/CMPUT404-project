@@ -4,33 +4,27 @@ from rest_framework import serializers
 from posts.utils import content_type_str, visibility_str
 from posts.models import Post, Comment
 
-from posts.models import Post, Comment
-
 User = get_user_model()
 
-# FIXME: The id and url are wrong.
+
 class AuthorSerializer(serializers.ModelSerializer):
-    id = serializers.SerializerMethodField()
-    firstName = serializers.CharField(source="first_name")
-    lastName = serializers.CharField(source="last_name")
+    id = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
+    # firstName = serializers.CharField(source="first_name")
+    # lastName = serializers.CharField(source="last_name")
+    # serializers.CharField(source="username")
     displayName = serializers.CharField(source="display_name")
+    url = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
 
     class Meta:
         model = User
         fields = (
             "id",
-            "email",
-            "bio",
             "host",
-            "firstName",
-            "lastName",
+            # "username",
             "displayName",
             "url",
             "github"
         )
-
-    def get_id(self, obj):
-        return obj.get_url()
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -50,10 +44,23 @@ class CommentSerializer(serializers.ModelSerializer):
     def get_contentType(self, obj):
         return content_type_str[obj.content_type]
 
-# FIXME: missing size and next fields
+
+class CommentPostSerializer(serializers.ModelSerializer):
+    contentType = serializers.CharField(source="content_type")
+    author = AuthorSerializer()
+
+    class Meta:
+        model = Comment
+        fields = (
+            "id",
+            "contentType",
+            "comment",
+            "published",
+            "author",
+        )
+
+
 class PostSerializer(serializers.ModelSerializer):
-    count = serializers.SerializerMethodField()
-    # size = serializers.SerializerMethodField()
     contentType = serializers.SerializerMethodField()
     visibility = serializers.SerializerMethodField()
     author = AuthorSerializer()
@@ -73,7 +80,6 @@ class PostSerializer(serializers.ModelSerializer):
            "content",
            "author",
            "categories",
-           "count",
            "comments",
            "published",
            "visibility",
@@ -81,16 +87,15 @@ class PostSerializer(serializers.ModelSerializer):
            "unlisted"
             )
 
-    def get_count(self, obj):
-        return obj.comment_set.count()
-
     def get_contentType(self, obj):
         return content_type_str[obj.content_type]
 
     def get_visibility(self, obj):
         return visibility_str[obj.visibility]
 
-class CommentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        fields = "__all__"
+
+# FIXME: have the correct fields.
+# class CommentSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Comment
+#         fields = "__all__"

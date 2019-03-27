@@ -1,3 +1,5 @@
+import json
+
 from django.http import HttpResponseNotFound
 from django.shortcuts import render, HttpResponse, get_object_or_404, HttpResponseRedirect
 from django.views.generic import ListView, DetailView
@@ -7,8 +9,7 @@ from django.contrib.auth import get_user_model
 from django.views.generic.base import TemplateView
 from users.views import FriendRequests
 import uuid
-import requests
-import base64
+
 
 from django.db import connection
 from django.db.models import Q
@@ -21,13 +22,11 @@ User = get_user_model()
 
 
 class PostVisbilityMixin(LoginRequiredMixin):
-    """Filters posts to those viewable by the logged in user only."""
-
-    def get_queryset(self):
-        user = self.request.user
-        qs = super().get_queryset()
-
+    def filter_user_visible(self, user, qs):
         query_list = []
+
+        # the user's own posts
+        query_list.append(Q(author=user))
 
         #  Public posts
         query_list.append(Q(visibility=Visibility.PUBLIC))
@@ -59,6 +58,15 @@ class PostVisbilityMixin(LoginRequiredMixin):
         qs = qs.filter(reduce(__or__, query_list))
         # qs = qs.union(visible).distinct()  # this doesn't filter properly afterwards
         qs = (qs | visible).distinct()  # But this works... somehow?
+
+        return qs
+
+    """Filters posts to those viewable by the logged in user only."""
+    def get_queryset(self):
+        user = self.request.user
+        qs = super().get_queryset()
+
+        qs = self.filter_user_visible(user, qs)
 
         return qs
 
@@ -100,22 +108,24 @@ class FeedView(PostVisbilityMixin, ListView):
         q = list(set(self.request.user.followers.all()).difference(set(self.request.user.friends.all())))
         context['requestCount'] = len(q)
 
-        #get all users who have me in their followers list
+        # get all users who have me in their followers list
         followings = []
         for user in User.objects.all():
             if self.request.user in user.followers.all():
                 followings.append(user)
-        #get list of posts from user's followings
+        # get list of posts from user's followings
         following_posts = []
         qs = super().get_queryset()
         for post in qs:
             if post.author in followings:
-                following_posts.append(post)
+                if post.visibility == Visibility.PUBLIC:
+                    following_posts.append(post)
         context['following_posts'] = following_posts
 
         return context
 
 
+# Pretty sure this wont be used anymore
 class PostView(PostVisbilityMixin, DetailView):
     template_name = 'postview.html'
     model = Post
@@ -126,97 +136,96 @@ class PostView(PostVisbilityMixin, DetailView):
         return context
 
 
-def create(request):
+def postapi(request, rid):
     # creates a post and redirects back to main page
     if request.method == "POST":
-        print(request.POST['visibility'])
-        # i dont know if i need to do this if statement yet, just gonna leave this here in case
-        if request.POST['type'] == 'text/plain':
-            new_post = Post(author=request.user,
-                            title=request.POST['title'],
-                            content=request.POST['content'],
-                            description=request.POST['description'],
-                            content_type=request.POST['type'],
-                            visibility=request.POST['visibility'])
-            new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
-            new_post.save()
+        data = json.loads(request.body.decode("utf-8"))
+        if Post.objects.filter(id=data["id"]).count() != 0:
+            return HttpResponse(status=400)
+        if data["id"] != str(rid):
+            return HttpResponse(status=400)
+        new_post = Post(id=data["id"],
+                        author=request.user,
+                        title=data["title"],
+                        content=data['content'],
+                        description=data['description'],
+                        content_type=data['type'],
+                        visibility=data['visibility'])
 
-        # turns out forms the request type as "picture/png" but the specs requires us to save as "image/png"
-        elif request.POST['type'] == 'image/jpeg' or request.POST['type'] == 'image/png':
-            #print(request.POST['content'])
-            picture = request.POST['content']
-            print(type(picture))
-            print(request.POST['visibility'])
-            # saves the picture
-            if request.POST['type'] == 'image/jpeg':
-                new_post = Post(author=request.user,
-                                title=request.POST['title'],
-                                content=picture,
-                                description=request.POST['description'],
-                                content_type='image/jpeg;base64',
-                                visibility=request.POST['visibility'],
-                                unlisted=True)
+        new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
+        new_post.origin = new_post.source
+
+        new_post.save()
+        return HttpResponse(status=200)
+    elif request.method == "GET":
+        if "python" in request.META['HTTP_USER_AGENT'].lower():
+            # TODO:
+            # if the node is authenticated
+            if True:
+                desired_post = get_object_or_404(Post, id=rid)
+                post_author = desired_post.author
+                post_comments=Comment.objects.filter(post_id=rid).order_by('-published')
+                send_comments=[]
+                #counter=5
+                for comment in post_comments:
+                    #if counter==0:
+                        #break
+                    #TODO:
+                    #add the url back once we get that, also our host
+                    comment_data={
+                        "author": {
+                            "id": str(comment.author.id),
+                            #"url": comment.author.url,
+                            "host": comment.author.host,
+                            "displayName": comment.author.display_name,
+                            "github": comment.author.github
+                        },
+                        "comment": comment.comment,
+                        "contentType": comment.content_type,
+                        "published": str(comment.published),
+                        "id": str(comment.id)
+                    }
+                    send_comments.append(comment_data)
+                    #counter=counter-1
+
+
+                #TODO:
+                #when users get an url, add url here
+                response = {
+                    "title": desired_post.title,
+                    "source": desired_post.source,
+                    "origin": desired_post.origin,
+                    "description": desired_post.description,
+                    "contentType":"text/plain",
+                    "author":{
+                        "id": str(post_author.id),
+                        "host":post_author.host,
+                        "displayName":post_author.display_name,
+                        #"url":,
+                        "github":post_author.github
+                    },
+                    "count":post_comments.count(),
+                    "size":5,
+                    #"next":"",
+                    "comments":send_comments,
+                    "published":str(desired_post.published),
+                    "id":str(desired_post.id),
+                    "visibility":desired_post.visibility,
+                    #"visibleTo":desired_post.visibleTo,
+                    "unlisted":desired_post.unlisted,
+                }
+                return HttpResponse(json.dumps(response),content_type="application/json")
+
             else:
-                new_post = Post(author=request.user,
-                                title=request.POST['title'],
-                                content=picture,
-                                description=request.POST['description'],
-                                content_type='image/png;base64',
-                                visibility=request.POST['visibility'],
-                                unlisted=True)
-            new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
+                return HttpResponse(status=404)
 
-            # the next 3 lines were meant as a test, assuming that the image uploaded is a jpg
-            # this will create a copy of it in the folder of this project
-            # just going to leave this here in case something breaks
-
-            new_post.save()
-        elif request.POST['type'] == 'link':
-            print('get picture')
-            print(request.POST['visibility'])
-            response = requests.get(request.POST['content'])
-            encoded = base64.b64encode(response.content)
-            sample_string = "data:{};base64,{}".format(response.headers['Content-Type'], encoded.decode())
-            print(sample_string)
-            if response.headers['Content-Type'] == 'image/jpeg':
-                new_post = Post(author=request.user,
-                                title=request.POST['title'],
-                                content=sample_string,
-                                description=request.POST['description'],
-                                content_type='image/jpeg;base64',
-                                visibility=request.POST['visibility'],
-                                unlisted=True)
-                new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
-                new_post.save()
-
-            elif response.headers['Content-Type'] == 'image/png':
-                new_post = Post(author=request.user,
-                                title=request.POST['title'],
-                                content=sample_string,
-                                description=request.POST['description'],
-                                content_type='image/png;base64',
-                                visibility=request.POST['visibility'],
-                                unlisted=True)
-                new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
-                new_post.save()
-
-                # testing purposes
-                # f=open('testimg.png','wb')
-                # f.write(response.content)
-                # f.close()
-
-        elif request.POST['type'] == 'text/markdown':
-            print(request.POST['visibility'])
-            new_post = Post(author=request.user,
-                            title=request.POST['title'],
-                            content=request.POST['content'],
-                            description=request.POST['description'],
-                            visibility=request.POST['visibility'],
-                            content_type=request.POST['type'])
-            new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
-            new_post.save()
-
-    return HttpResponseRedirect('/')
+        else:
+            # browser
+            # leaving space for visibility checks
+            if True:
+                post = get_object_or_404(Post, id=rid)
+                postcomments = Comment.objects.filter(post_id=rid).order_by('-published')
+                return render(request, "postview.html", {'post': post, 'post_comments': postcomments})
 
 
 def create_comment(request):
@@ -233,7 +242,7 @@ def create_comment(request):
 
 def delete_comment(request):
     if request.method == "DELETE":
-        post_id=request.META['HTTP_POSTID']
+        post_id = request.META['HTTP_POSTID']
         to_be_deleted = get_object_or_404(Post, id=post_id)
         post_author = get_object_or_404(User, id=to_be_deleted.author.id)
         if post_author.id == request.user.id:
@@ -242,3 +251,5 @@ def delete_comment(request):
 
     return HttpResponseNotFound("hello")
 
+def visible_to_user(request):
+    pass
