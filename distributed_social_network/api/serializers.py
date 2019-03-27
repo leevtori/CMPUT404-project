@@ -47,6 +47,21 @@ class CommentSerializer(serializers.ModelSerializer):
         return content_type_str[obj.content_type]
 
 
+class CommentPostSerializer(serializers.ModelSerializer):
+    contentType = serializers.CharField(source="content_type")
+    author = AuthorSerializer()
+
+    class Meta:
+        model = Comment
+        fields = (
+            "id",
+            "contentType",
+            "comment",
+            "published",
+            "author",
+        )
+
+
 class PostSerializer(serializers.ModelSerializer):
     contentType = serializers.SerializerMethodField()
     visibility = serializers.SerializerMethodField()

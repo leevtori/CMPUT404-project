@@ -8,4 +8,5 @@ routers.register('author', views.AuthorViewset, base_name="api-author")
 
 urlpatterns = [
     path('', include(routers.urls)),
+    path('posts/<uuid:pk>/comments/', views.CommentView.as_view())
 ]
