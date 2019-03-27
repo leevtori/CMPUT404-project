@@ -114,7 +114,7 @@ class FeedView(PostVisbilityMixin, ListView):
         qs = super().get_queryset()
         for post in qs:
             if post.author in followings:
-                if post.visibility=Visibility.PUBLIC
+                if post.visibility == Visibility.PUBLIC:
                     following_posts.append(post)
         context['following_posts'] = following_posts
 
