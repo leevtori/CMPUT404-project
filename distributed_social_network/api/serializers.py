@@ -47,10 +47,7 @@ class CommentSerializer(serializers.ModelSerializer):
         return content_type_str[obj.content_type]
 
 
-# FIXME: missing size and next fields
 class PostSerializer(serializers.ModelSerializer):
-    count = serializers.SerializerMethodField()
-    # size = serializers.SerializerMethodField()
     contentType = serializers.SerializerMethodField()
     visibility = serializers.SerializerMethodField()
     author = AuthorSerializer()
@@ -70,16 +67,12 @@ class PostSerializer(serializers.ModelSerializer):
            "content",
            "author",
            "categories",
-           "count",
            "comments",
            "published",
            "visibility",
            "visibleTo",
            "unlisted"
             )
-
-    def get_count(self, obj):
-        return obj.comment_set.count()
 
     def get_contentType(self, obj):
         return content_type_str[obj.content_type]
