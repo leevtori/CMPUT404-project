@@ -114,7 +114,40 @@ function getCookie(name) {
     return cookieValue;
 }
 
-  function createTextPost(){
+    
+
+function createPost(){
+    var form = document.getElementById('create_form')
+    for (let element of form.elements){
+        if(element.type !== "submit"){
+            
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function createTextPost(){
         var id = uuidv4();
         var data = {
             "id":id,

@@ -1,10 +1,12 @@
 from rest_framework import viewsets
+from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.views import APIView
 from rest_framework.mixins import RetrieveModelMixin
 
 from django.contrib.auth import get_user_model
 from posts.utils import Visibility
 from posts.models import Post, Comment
+
 
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -122,3 +124,7 @@ class AreFriendsView(APIView):
 
     def get(self, request, pk1, pk2):
         return Response(status=501)
+
+
+class CreatePostView(CreateAPIView):
+    serializer_class = serializers.PostSerializer

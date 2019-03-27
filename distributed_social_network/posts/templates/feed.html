@@ -51,7 +51,7 @@
 
 
     <div class="right_col">
-
+            {% comment %}
             <div class="post_content_types">
                 <button class="post_btn" onclick="openPostInterface('textPost')" style="background-color: #78cfa8">Text</button>
                 <button class="post_btn" onclick="openPostInterface('markdownPost')">MarkDown</button>
@@ -128,8 +128,20 @@
                     <input type="submit" value="Create" class='create_btn' onclick="createPicturePost()">
                 </form>
             </div>
+            {% endcomment %}
 
-            
+        <div class='newPost'>
+            <form id='create_form'>
+                <label for="{{form.title.id_for_label}}">Title</label> {{form.title}}
+                <label for="{{form.description.id_for_label}}">Description</label> {{form.description}}
+                <label for="{{form.content.id_for_label}}">Content</label>{{form.content}}
+                <label for="{{form.visble_to.id_for_label}}">Visible to</label>{{form.visible_to}}
+                <label for="{{form.visibility.id_for_label}}">Visibility</label>{{form.visibility}}
+                <label for="{{form.unlisted.id_for_label}}">Unlisted</label>{{form.unlisted}}
+                <label for="{{form.categories.id_for_label}}">Categories</label>{{form.categories}}
+                <input type="submit" onclick="createPost()">Submit</input>
+            </form>
+        </div>
 
         
 
