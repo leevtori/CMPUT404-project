@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.mixins import RetrieveModelMixin
-
+from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from posts.utils import Visibility
 from posts.models import Post, Comment
@@ -14,8 +14,9 @@ from rest_framework.decorators import action
 from posts.views import PostVisbilityMixin
 
 from . import serializers
-import re
+import re, uuid
 User = get_user_model()
+
 
 
 class PaginateOverrideMixin:
@@ -100,7 +101,7 @@ class AuthorPostView(APIView):
     creates new post for authenticated user.
     /author/posts
     """
-
+    permission_classes = (permissions.IsAuthenticated,)
     def get(self, request):
         return Response(status=501)
 
@@ -117,26 +118,6 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.PostSerializer
 
 
-    @action(methods=["post", "get"], detail=True)
-    def comments(self, request, pk=None):
-        """ For getting and creating comments"""
-        post = self.get_object()
-
-        if request.method == "GET":
-            comments = post.comment_set.all()
-
-            page = self.paginate_queryset(comments)
-            if page is not None:
-                serializer = serializers.CommentSerializer(page, many=True, context={'request': request})
-                return self.get_paginated_response(serializer.data, query="comments", model="comments")
-
-            serializer = serializers.CommentSerializer(comments, many=True, context={'request': request})
-
-            return Response(serializer.data)
-
-        if request.method == "POST":
-            return Response(status=501)
-
     def list(self, request):
         qs = Post.objects.filter(visibility=Visibility.PUBLIC)
 
@@ -149,6 +130,45 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
 
+class CommentView(APIView):
+
+    def get(self, request, pk):
+        post = get_object_or_404(Post, pk = pk)
+        comments = post.comment_set.all()
+
+        page = self.paginate_queryset(comments)
+        if page is not None:
+            serializer = serializers.CommentSerializer(page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data, query="comments", model="comments")
+
+        serializer = serializers.CommentSerializer(comments, many=True, context={'request': request})
+
+        return Response(serializer.data)
+
+    def post(self, request, pk):
+        print("data ", request.data['post'])
+
+        post = get_object_or_404(Post, pk=pk)
+
+        # check the user is valid
+        p = request.data['post']
+        a = p['author']['id']
+        # a = a['id']
+        a = a[:-1]
+        a = a.split('/')
+        id = a[-1]
+        commentUser = get_object_or_404(User, pk=uuid.UUID(id))
+        print("HERRRRRRRROOOO ", commentUser)
+
+        serializer = serializers.CommentPostSerializer(data = request.data['post'], context={'request':request})
+
+        if serializer.is_valid():
+            print("valid")
+            serializer.save(post_id=pk,author=commentUser)
+            return Response(serializer.data, status=201)
+        print("ERRROR ", serializer.errors)
+        return Response(serializer.errors, status=400)
+    
 
 class AreFriendsView(APIView):
     """

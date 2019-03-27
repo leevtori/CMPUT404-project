@@ -9,8 +9,9 @@ User = get_user_model()
 
 class AuthorSerializer(serializers.ModelSerializer):
     id = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
-    firstName = serializers.CharField(source="first_name")
-    lastName = serializers.CharField(source="last_name")
+    # firstName = serializers.CharField(source="first_name")
+    # lastName = serializers.CharField(source="last_name")
+    # serializers.CharField(source="username")
     displayName = serializers.CharField(source="display_name")
     url = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
 
@@ -18,11 +19,8 @@ class AuthorSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             "id",
-            "email",
-            "bio",
             "host",
-            "firstName",
-            "lastName",
+            # "username",
             "displayName",
             "url",
             "github"
@@ -45,6 +43,21 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_contentType(self, obj):
         return content_type_str[obj.content_type]
+
+
+class CommentPostSerializer(serializers.ModelSerializer):
+    contentType = serializers.CharField(source="content_type")
+    author = AuthorSerializer()
+
+    class Meta:
+        model = Comment
+        fields = (
+            "id",
+            "contentType",
+            "comment",
+            "published",
+            "author",
+        )
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -82,7 +95,7 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 # FIXME: have the correct fields.
-class CommentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        fields = "__all__"
+# class CommentSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Comment
+#         fields = "__all__"
