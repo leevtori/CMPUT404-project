@@ -30,13 +30,7 @@ class User(AbstractUser):
     github = models.URLField(null=True)
     bio = models.TextField(blank=True)
 
-    # url = models.URLField()
-
     is_active = models.BooleanField(default=False)
 
     friends = models.ManyToManyField('self', blank=True)
     followers = models.ManyToManyField('self', blank=True, symmetrical=False)
-
-    def get_url(self):
-        host = self.host or settings.HOSTNAME
-        return "%s/%s" % (host, self.id)
