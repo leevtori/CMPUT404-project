@@ -17,7 +17,7 @@ class UserList(LoginRequiredMixin, ListView):
     """Lists all users on the server."""
     model = User
     template_name = "user_list.html"
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['login_user'] = self.request.user
@@ -41,7 +41,7 @@ class FriendList(LoginRequiredMixin, ListView):
     """This view lists all friends of logged in user."""
     model = User
     template_name = "friends_list.html"
-    
+
     def get_queryset(self):
         return self.request.user.friends.all()
 
@@ -84,11 +84,6 @@ class ConfirmRequest(LoginRequiredMixin, View):
         return HttpResponseRedirect(url)
 
 
-class CustomUserCreationForm(UserCreationForm):
-    class Meta(UserCreationForm.Meta):
-        model = User
-        fields = ('first_name', 'last_name',) + UserCreationForm.Meta.fields
-
 class SignUp(generic.CreateView):
     form_class = CustomUserCreationForm
     success_url = reverse_lazy('login')
@@ -96,7 +91,7 @@ class SignUp(generic.CreateView):
     # fields = ['first_name','last_name', 'username', 'email', 'password', 'password']
     success_message = "Congratulations, you've successfully signed up! Wait to be approved."
 
-class DeleteFriend(LoginRequiredMixin, View):    
+class DeleteFriend(LoginRequiredMixin, View):
     model = User
 
     def delete(self, request):
@@ -121,7 +116,7 @@ class AccountSettingsView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse('profile', kwargs={'username': self.request.user.username})
-        
+
 class FriendRequests(LoginRequiredMixin, ListView):
     """This view lists all the pending friend requests. """
     model = User
@@ -138,7 +133,7 @@ class FriendRequests(LoginRequiredMixin, ListView):
 
     # def get_context_data(self, **kwargs):
     #     context = super().get_context_data(**kwargs)
-    #     q = self.get_queryset() 
+    #     q = self.get_queryset()
     #     context['requestCount'] = len(q)
     #     print("count ", q.count)
     #     return context
