@@ -18,6 +18,16 @@ import re
 User = get_user_model()
 
 
+class PaginateOverrideMixin:
+    def get_paginated_response(self, data, **kwargs):
+        """
+        Return a paginated style `Response` object for the given output data.
+        overridden from GenericAPIView to pass in additional parameters.
+        """
+        assert self.paginator is not None
+        return self.paginator.get_paginated_response(data, **kwargs)
+
+
 class AuthorViewset (viewsets.ReadOnlyModelViewSet):
     """API endpoint for getting users and user list
      - Gets profile
@@ -72,9 +82,9 @@ class AuthorViewset (viewsets.ReadOnlyModelViewSet):
 
 class AuthorPostView(APIView):
     """
-    Gets a list of posts visible to currently authenticated used or
+    Gets a list of posts visible to currently authenticated user or
     creates new post for authenticated user.
-    /author/{author_id}/posts
+    /author/posts
     """
     permission_classes = (permissions.IsAuthenticated)
 
@@ -85,7 +95,7 @@ class AuthorPostView(APIView):
         return Response(status=501)
 
 
-class PostViewSet (viewsets.ReadOnlyModelViewSet):
+class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
     """API endpoint for reading posts and lists of posts.
     - gets single post
     - gets a list of posts.
@@ -101,6 +111,12 @@ class PostViewSet (viewsets.ReadOnlyModelViewSet):
 
         if request.method == "GET":
             comments = post.comment_set.all()
+
+            page = self.paginate_queryset(comments)
+            if page is not None:
+                serializer = serializers.CommentSerializer(page, many=True, context={'request': request})
+                return self.get_paginated_response(serializer.data, query="comments", model="comments")
+
             serializer = serializers.CommentSerializer(comments, many=True, context={'request': request})
 
             return Response(serializer.data)
@@ -110,6 +126,13 @@ class PostViewSet (viewsets.ReadOnlyModelViewSet):
 
     def list(self, request):
         qs = Post.objects.filter(visibility=Visibility.PUBLIC)
+
+        page = self.paginate_queryset(qs)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data, query="posts", model="posts")
+
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
 
