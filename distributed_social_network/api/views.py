@@ -37,36 +37,6 @@ class AuthorViewset (viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.filter(is_active=True, host=None)
     serializer_class = serializers.AuthorSerializer
 
-    @action(methods=["post", "get"], detail=True)
-    def friend(self, request, pk=None):
-        """
-        FIXME: return a url instead of uuid.
-        """
-        user = self.get_object()
-        friends = user.friends.all()
-
-        if request.method == "GET":
-            serializer = serializers.AuthorSerializer(friends, many=True, context={'request': request})
-            return Response(serializer.data)
-
-        else:
-            print(request.data)
-            # Parse the url to a uuid only.
-            # UUID regex pattern from
-            # https://stackoverflow.com/questions/7905929/how-to-test-valid-uuid-guid/13653180#13653180
-            # Taken March 12, 2018
-
-            p = "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"
-            pattern = re.compile(p, re.IGNORECASE)
-            author_query = [pattern.search(id).group() for id in request.data["authors"]]
-
-            are_friends = friends.filter(id__in=author_query).values_list("id", flat=True)
-
-            response_data = dict(request.data)
-            response_data["authors"] = [str(friend) for friend in are_friends]
-
-            return Response(response_data)
-
     @action(methods=["get"], detail=True)
     def posts(self, request, pk=None):
         if request.method == "GET":
@@ -74,11 +44,55 @@ class AuthorViewset (viewsets.ReadOnlyModelViewSet):
 
             # Not really meant to be used this way...but it works?
             post_filter = PostVisbilityMixin()
-            qs = post_filter.filter_user_visible(user, Post.objects.all())
+            qs = post_filter.filter_user_visible(self.request.user, user.posts.all())
 
-            print(qs)
+            page = self.paginate_queryset(qs)
+            if page is not none:
+                serializer = serializers.PostSerializer(page, many=True, context={'request': request})
+                return self.get_paginated_response(serializer.data, model="posts", quey)
+
             serializer = serializers.PostSerializer(qs, many=True, context={'request': request})
             return Response(serializer.data)
+
+    def list(self, request):
+        qs = self.get_queryset()
+        page = self.paginate_queryset(qs)
+
+        if page is not None:
+            serialzer = self.get_serializer()
+
+
+class FriendsView(APIView):
+    def get(self, request):
+        user = self.get_object()
+        friends = user.friends.all()
+
+        page = self.paginate_queryset(friends)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data, query="friends", model="authors")
+
+        serializer = self.get_serializer(friends, many=True, context={'request': request})
+        return Response(serializer.data)
+
+
+    def post(self, request):
+        # Parse the url to a uuid only.
+        # UUID regex pattern from
+        # https://stackoverflow.com/questions/7905929/how-to-test-valid-uuid-guid/13653180#13653180
+        # Taken March 12, 2018
+
+        p = "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"
+        pattern = re.compile(p, re.IGNORECASE)
+        author_query = [pattern.search(id).group() for id in request.data["authors"]]
+
+        are_friends = friends.filter(id__in=author_query).values_list("id", flat=True)
+
+        response_data = dict(request.data)
+        response_data["authors"] = [str(friend) for friend in are_friends]
+
+        return Response(response_data)
 
 
 class AuthorPostView(APIView):
@@ -88,7 +102,6 @@ class AuthorPostView(APIView):
     /author/posts
     """
     permission_classes = (permissions.IsAuthenticated,)
-
     def get(self, request):
         return Response(status=501)
 

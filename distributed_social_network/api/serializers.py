@@ -7,7 +7,6 @@ from posts.models import Post, Comment
 User = get_user_model()
 
 
-# FIXME: The id and url are wrong.
 class AuthorSerializer(serializers.ModelSerializer):
     id = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
     # firstName = serializers.CharField(source="first_name")
@@ -15,7 +14,6 @@ class AuthorSerializer(serializers.ModelSerializer):
     # serializers.CharField(source="username")
     displayName = serializers.CharField(source="display_name")
     url = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
-
 
     class Meta:
         model = User
