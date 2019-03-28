@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from rest_framework.generics import CreateAPIView, UpdateAPIView
+from rest_framework.generics import GenericAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.views import APIView
 from rest_framework.mixins import RetrieveModelMixin
 from django.shortcuts import get_object_or_404
@@ -80,6 +80,7 @@ class FriendsView(APIView):
         user = self.get_object()
         friends = user.friends.all()
 
+
         page = self.paginate_queryset(friends)
 
         if page is not None:
@@ -144,7 +145,9 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
 
-class CommentView(APIView):
+
+class CommentView(PaginateOverrideMixin, GenericAPIView):
+    serializer_class = serializers.CommentPostSerializer
 
     def get(self, request, pk):
         post = get_object_or_404(Post, pk = pk)
@@ -197,7 +200,7 @@ class AreFriendsView(APIView):
 class CreatePostView(CreateAPIView):
     serializer_class = serializers.PostSerializer
 
-    
+
 class FriendRequestView(APIView):
     """
     Makes a friend request
