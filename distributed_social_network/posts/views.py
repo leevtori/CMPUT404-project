@@ -136,6 +136,20 @@ class PostDetailView(PostVisbilityMixin, DetailView):
         return context
 
 
+def create_post(request):
+    if (request.method == "POST"):
+        f = PostForm(request.POST)
+        new_post = f.save(commit=False)
+        new_post.author = request.user
+        new_post.save()
+        print("@@@@@@",new_post)
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=404)
+
+
+
+
 
 
 

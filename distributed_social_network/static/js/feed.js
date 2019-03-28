@@ -2,7 +2,7 @@ function getimageformat() {
     var reader = new FileReader();
     var select_button = document.getElementById('createPicturePostButton')
     var selected_picture  = select_button.files[0];
-    var invis_field = document.getElementById("picture_type");
+    invis_field = document.getElementById("image_upload");
 
     var hidden = document.getElementById('hiddencontent');
     reader.readAsDataURL(selected_picture);
@@ -44,26 +44,27 @@ function openPostInterface(post_type){
 
     //highlight selected post type
     //gives illusion of tabs
-    var all_post_btns = document.getElementsByClassName("post_btn");
-    all_post_btns[0].style.backgroundColor = '#3D9970';
-    all_post_btns[1].style.backgroundColor = '#3D9970';
-    all_post_btns[2].style.backgroundColor = '#3D9970';
-    all_post_btns[3].style.backgroundColor = '#3D9970';
-    if(post_type == 'textPost'){
-        all_post_btns[0].style.backgroundColor = '#78cfa8';
-    }
-    else if(post_type == 'markdownPost'){
-        all_post_btns[1].style.backgroundColor = '#78cfa8';
-    }
-    else if(post_type == 'picturePost'){
-        all_post_btns[2].style.backgroundColor = '#78cfa8';
-    }
-    else if(post_type == 'urlPicturePost'){
-        all_post_btns[3].style.backgroundColor = '#78cfa8';
-    }
+    // var all_post_btns = document.getElementsByClassName("post_btn");
+    // all_post_btns[0].style.backgroundColor = '#3D9970';
+    // all_post_btns[1].style.backgroundColor = '#3D9970';
+    // all_post_btns[2].style.backgroundColor = '#3D9970';
+    // all_post_btns[3].style.backgroundColor = '#3D9970';
+    // if(post_type == 'textPost'){
+    //     all_post_btns[0].style.backgroundColor = '#78cfa8';
+    // }
+    // else if(post_type == 'markdownPost'){
+    //     all_post_btns[1].style.backgroundColor = '#78cfa8';
+    // }
+    // else if(post_type == 'picturePost'){
+    //     all_post_btns[2].style.backgroundColor = '#78cfa8';
+    // }
+    // else if(post_type == 'urlPicturePost'){
+    //     all_post_btns[3].style.backgroundColor = '#78cfa8';
+    // }
 
 
 }
+
 
 
 function openFeed(evt, feedName) {
@@ -71,13 +72,13 @@ function openFeed(evt, feedName) {
     var i, tabcontent, tablinks;
   
     // Get all elements with class="tabcontent" and hide them
-    tabcontent = document.getElementsByClassName("tabcontent");
+    tabcontent = document.getElementsByClassName("feed_tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
       tabcontent[i].style.display = "none";
     }
   
     // Get all elements with class="tablinks" and remove the class "active"
-    tablinks = document.getElementsByClassName("tablinks");
+    tablinks = document.getElementsByClassName("feed_tablinks");
     for (i = 0; i < tablinks.length; i++) {
       tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
@@ -85,7 +86,31 @@ function openFeed(evt, feedName) {
     // Show the current tab, and add an "active" class to the button that opened the tab
     document.getElementById(feedName).style.display = "block";
     evt.currentTarget.className += " active";
-  }
+}
+
+
+function openNewPost(evt, newPostType) {
+    // Declare all variables
+    var i, tabcontent, tablinks;
+  
+    // Get all elements with class="tabcontent" and hide them
+    tabcontent = document.getElementsByClassName("post_tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+  
+    // Get all elements with class="tablinks" and remove the class "active"
+    tablinks = document.getElementsByClassName("post_tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+  
+    // Show the current tab, and add an "active" class to the button that opened the tab
+    document.getElementById(newPostType).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+
 
   //taken from https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
 function uuidv4() {
@@ -114,16 +139,11 @@ function getCookie(name) {
     return cookieValue;
 }
 
-    
 
-function createPost(){
-    var form = document.getElementById('create_form')
-    for (let element of form.elements){
-        if(element.type !== "submit"){
-            
-        }
-    }
-}
+
+
+
+
 
 
 

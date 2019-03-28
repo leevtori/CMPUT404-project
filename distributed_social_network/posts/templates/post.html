@@ -9,9 +9,9 @@
     </div>
     <div class='post_bottom'>
         <a href={% url 'postdetail' pk=post.id %} class="post_title">{{post.title}}</a>
-        {% if post.content_type == 'text/plain' %}
+        {% if post.content_type == 'TXT' %}
             <p>{{post.content}}</p>
-        {% elif post.content_type == 'text/markdown' %}
+        {% elif post.content_type == 'MKD' %}
             <p>{{post.content}}</p>
         {% else %}
             <p>Picture Post, Click on link to see image</p>
