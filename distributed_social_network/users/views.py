@@ -83,12 +83,16 @@ class ConfirmRequest(LoginRequiredMixin, View):
         url = reverse('friends')
         return HttpResponseRedirect(url)
 
+class CustomUserCreationForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ('first_name', 'last_name', 'display_name', 'email') + UserCreationForm.Meta.fields
+
 
 class SignUp(generic.CreateView):
     form_class = CustomUserCreationForm
     success_url = reverse_lazy('login')
     template_name = 'signup.html'
-    # fields = ['first_name','last_name', 'username', 'email', 'password', 'password']
     success_message = "Congratulations, you've successfully signed up! Wait to be approved."
 
 class DeleteFriend(LoginRequiredMixin, View):
