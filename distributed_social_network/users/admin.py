@@ -7,18 +7,13 @@ from django.contrib.auth.admin import UserAdmin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 
-# class ProfileInline(admin.StackedInline):
-#     model = User
-#     can_delete = False
-
-
 class CustomUserAdmin(UserAdmin):
     # inlines = (ProfileInline, )
 
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = User
-    list_display = ['email', 'username']
+    list_display = ['username', 'email']
     UserAdmin.fieldsets += ('Important stats', {'fields': ('friends', 'followers')}),
  
 

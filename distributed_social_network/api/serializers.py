@@ -7,24 +7,20 @@ from posts.models import Post, Comment
 User = get_user_model()
 
 
-# FIXME: The id and url are wrong.
 class AuthorSerializer(serializers.ModelSerializer):
     id = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
-    firstName = serializers.CharField(source="first_name")
-    lastName = serializers.CharField(source="last_name")
+    # firstName = serializers.CharField(source="first_name")
+    # lastName = serializers.CharField(source="last_name")
+    # serializers.CharField(source="username")
     displayName = serializers.CharField(source="display_name")
     url = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
-
 
     class Meta:
         model = User
         fields = (
             "id",
-            "email",
-            "bio",
             "host",
-            "firstName",
-            "lastName",
+            # "username",
             "displayName",
             "url",
             "github"
@@ -49,10 +45,22 @@ class CommentSerializer(serializers.ModelSerializer):
         return content_type_str[obj.content_type]
 
 
-# FIXME: missing size and next fields
+class CommentPostSerializer(serializers.ModelSerializer):
+    contentType = serializers.CharField(source="content_type")
+    author = AuthorSerializer()
+
+    class Meta:
+        model = Comment
+        fields = (
+            "id",
+            "contentType",
+            "comment",
+            "published",
+            "author",
+        )
+
+
 class PostSerializer(serializers.ModelSerializer):
-    count = serializers.SerializerMethodField()
-    # size = serializers.SerializerMethodField()
     contentType = serializers.SerializerMethodField()
     visibility = serializers.SerializerMethodField()
     author = AuthorSerializer()
@@ -72,16 +80,12 @@ class PostSerializer(serializers.ModelSerializer):
            "content",
            "author",
            "categories",
-           "count",
            "comments",
            "published",
            "visibility",
            "visibleTo",
            "unlisted"
             )
-
-    def get_count(self, obj):
-        return obj.comment_set.count()
 
     def get_contentType(self, obj):
         return content_type_str[obj.content_type]
@@ -91,7 +95,7 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 # FIXME: have the correct fields.
-class CommentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        fields = "__all__"
+# class CommentSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Comment
+#         fields = "__all__"

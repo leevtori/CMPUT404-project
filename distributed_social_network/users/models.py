@@ -5,11 +5,20 @@ from django.conf import settings
 import uuid
 
 
+
+# TODO: Add node authentication info
 class Node(models.Model):
+    # objects = NodeManager()
     hostname = models.URLField()
-
-    # TODO: Add node authentication info
-
+    user_auth = models.OneToOneField("User", on_delete=models.CASCADE)
+    prefix = models.CharField(max_length=20, blank=True)
+    send_username = models.CharField(max_length=100)
+    send_password = models.CharField(max_length=100)
+    active = False
+    
+    def __str__(self):
+        return self.user.username
+        
 
 class CustomUserManager(UserManager):
 
@@ -30,13 +39,7 @@ class User(AbstractUser):
     github = models.URLField(null=True)
     bio = models.TextField(blank=True)
 
-    # url = models.URLField()
-
     is_active = models.BooleanField(default=False)
 
     friends = models.ManyToManyField('self', blank=True)
     followers = models.ManyToManyField('self', blank=True, symmetrical=False)
-
-    def get_url(self):
-        host = self.host or settings.HOSTNAME
-        return "%s/%s" % (host, self.id)

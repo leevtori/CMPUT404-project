@@ -130,7 +130,9 @@
             
             <div id="following_posts" class="feed_tabcontent">
                 {% for post in following_posts %}
-                {% include "post.html"%}
+                    {% if post.visibility != "UNLS" %}
+                        {% include "post.html"%}
+                    {%  endif %}
                 {% endfor %}
             </div>
 

@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.views import APIView
 from rest_framework.mixins import RetrieveModelMixin
-
+from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from posts.utils import Visibility
 from posts.models import Post, Comment
@@ -16,8 +16,26 @@ from rest_framework.decorators import action
 from posts.views import PostVisbilityMixin
 
 from . import serializers
-import re
+import re, uuid
+import json
+
 User = get_user_model()
+
+
+
+class PaginateOverrideMixin:
+    def get_paginated_response(self, data, **kwargs):
+        """        body_unicode = self.request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        friend_id = body['id']
+        print("added ", friend_id)
+        friend = get_object_or_404(User, id=friend_id)
+        friend.followers.add(self.request.user)
+        Return a paginated style `Response` object for the given output data.
+        overridden from GenericAPIView to pass in additional parameters.
+        """
+        assert self.paginator is not None
+        return self.paginator.get_paginated_response(data, **kwargs)
 
 
 class AuthorViewset (viewsets.ReadOnlyModelViewSet):
@@ -28,36 +46,6 @@ class AuthorViewset (viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.filter(is_active=True, host=None)
     serializer_class = serializers.AuthorSerializer
 
-    @action(methods=["post", "get"], detail=True)
-    def friend(self, request, pk=None):
-        """
-        FIXME: return a url instead of uuid.
-        """
-        user = self.get_object()
-        friends = user.friends.all()
-
-        if request.method == "GET":
-            serializer = serializers.AuthorSerializer(friends, many=True, context={'request': request})
-            return Response(serializer.data)
-
-        else:
-            print(request.data)
-            # Parse the url to a uuid only.
-            # UUID regex pattern from
-            # https://stackoverflow.com/questions/7905929/how-to-test-valid-uuid-guid/13653180#13653180
-            # Taken March 12, 2018
-
-            p = "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"
-            pattern = re.compile(p, re.IGNORECASE)
-            author_query = [pattern.search(id).group() for id in request.data["authors"]]
-
-            are_friends = friends.filter(id__in=author_query).values_list("id", flat=True)
-
-            response_data = dict(request.data)
-            response_data["authors"] = [str(friend) for friend in are_friends]
-
-            return Response(response_data)
-
     @action(methods=["get"], detail=True)
     def posts(self, request, pk=None):
         if request.method == "GET":
@@ -65,21 +53,68 @@ class AuthorViewset (viewsets.ReadOnlyModelViewSet):
 
             # Not really meant to be used this way...but it works?
             post_filter = PostVisbilityMixin()
-            qs = post_filter.filter_user_visible(user, Post.objects.all())
+            qs = post_filter.filter_user_visible(self.request.user, user.posts.all())
 
-            print(qs)
+            page = self.paginate_queryset(qs)
+            if page is not None:
+                serializer = serializers.PostSerializer(page, many=True, context={'request': request})
+                return self.get_paginated_response(serializer.data, model="posts", query="posts")
+
             serializer = serializers.PostSerializer(qs, many=True, context={'request': request})
             return Response(serializer.data)
+
+    # def list(self, request):
+    #     qs = self.get_queryset()
+    #     page = self.paginate_queryset(qs)
+
+    #     if page is not None:
+    #         serializer = self.get_serializer(page, many=True, context={'request': request})
+    #         return self.get_paginated_response(serializer.data, model="authors", query="authors")
+
+    #     serializer = self.get_serializer(qs, many=True)
+    #     return Response(serializer.data)
+
+
+class FriendsView(APIView):
+    def get(self, request):
+        user = self.get_object()
+        friends = user.friends.all()
+
+        page = self.paginate_queryset(friends)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data, query="friends", model="authors")
+
+        serializer = self.get_serializer(friends, many=True, context={'request': request})
+        return Response(serializer.data)
+
+
+    def post(self, request):
+        # Parse the url to a uuid only.
+        # UUID regex pattern from
+        # https://stackoverflow.com/questions/7905929/how-to-test-valid-uuid-guid/13653180#13653180
+        # Taken March 12, 2018
+
+        p = "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"
+        pattern = re.compile(p, re.IGNORECASE)
+        author_query = [pattern.search(id).group() for id in request.data["authors"]]
+
+        are_friends = friends.filter(id__in=author_query).values_list("id", flat=True)
+
+        response_data = dict(request.data)
+        response_data["authors"] = [str(friend) for friend in are_friends]
+
+        return Response(response_data)
 
 
 class AuthorPostView(APIView):
     """
-    Gets a list of posts visible to currently authenticated used or
+    Gets a list of posts visible to currently authenticated user or
     creates new post for authenticated user.
-    /author/{author_id}/posts
+    /author/posts
     """
-    permission_classes = (permissions.IsAuthenticated)
-
+    permission_classes = (permissions.IsAuthenticated,)
     def get(self, request):
         return Response(status=501)
 
@@ -87,7 +122,7 @@ class AuthorPostView(APIView):
         return Response(status=501)
 
 
-class PostViewSet (viewsets.ReadOnlyModelViewSet):
+class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
     """API endpoint for reading posts and lists of posts.
     - gets single post
     - gets a list of posts.
@@ -96,24 +131,56 @@ class PostViewSet (viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.PostSerializer
 
 
-    @action(methods=["post", "get"], detail=True)
-    def comments(self, request, pk=None):
-        """ For getting and creating comments"""
-        post = self.get_object()
-
-        if request.method == "GET":
-            comments = post.comment_set.all()
-            serializer = serializers.CommentSerializer(comments, many=True, context={'request': request})
-
-            return Response(serializer.data)
-
-        if request.method == "POST":
-            return Response(status=501)
-
     def list(self, request):
         qs = Post.objects.filter(visibility=Visibility.PUBLIC)
+
+        page = self.paginate_queryset(qs)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data, query="posts", model="posts")
+
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
+
+class CommentView(APIView):
+
+    def get(self, request, pk):
+        post = get_object_or_404(Post, pk = pk)
+        comments = post.comment_set.all()
+
+        page = self.paginate_queryset(comments)
+        if page is not None:
+            serializer = serializers.CommentSerializer(page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data, query="comments", model="comments")
+
+        serializer = serializers.CommentSerializer(comments, many=True, context={'request': request})
+
+        return Response(serializer.data)
+
+    def post(self, request, pk):
+        print("data ", request.data['post'])
+
+        post = get_object_or_404(Post, pk=pk)
+
+        # check the user is valid
+        p = request.data['post']
+        a = p['author']['id']
+        # a = a['id']
+        a = a[:-1]
+        a = a.split('/')
+        id = a[-1]
+        commentUser = get_object_or_404(User, pk=uuid.UUID(id))
+        print("HERRRRRRRROOOO ", commentUser)
+
+        serializer = serializers.CommentPostSerializer(data = request.data['post'], context={'request':request})
+
+        if serializer.is_valid():
+            print("valid")
+            serializer.save(post_id=pk,author=commentUser)
+            return Response(serializer.data, status=201)
+        print("ERRROR ", serializer.errors)
+        return Response(serializer.errors, status=400)
 
 
 class AreFriendsView(APIView):
@@ -128,3 +195,16 @@ class AreFriendsView(APIView):
 
 class CreatePostView(CreateAPIView):
     serializer_class = serializers.PostSerializer
+
+    
+class FriendRequestView(APIView):
+    """
+    Makes a friend request
+    """
+    def post(self, request):
+        body_unicode = self.request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        friend_id = body['id']
+        print("added ", friend_id)
+        friend = get_object_or_404(User, id=friend_id)
+        friend.followers.add(self.request.user)
