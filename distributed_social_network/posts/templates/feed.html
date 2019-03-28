@@ -5,6 +5,9 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/feed.css' %}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="{% static 'js/feed.js' %}"></script>
+    <script>
+    
+    </script>
 {% endblock %}
 
 {% block content %}
@@ -51,96 +54,73 @@
 
 
     <div class="right_col">
-
-            <div class="post_content_types">
-                <button class="post_btn" onclick="openPostInterface('textPost')" style="background-color: #78cfa8">Text</button>
-                <button class="post_btn" onclick="openPostInterface('markdownPost')">MarkDown</button>
-                <button class="post_btn" onclick="openPostInterface('picturePost')">Local Picture</button>
-            </div>
-        
-            <div id="textPost" class='newPost'>
-                <h3 class='heading'>Add Text Post</h3>
-                <form id="createtextPost" class='new_post_form' onsubmit="event.preventDefault();">{% csrf_token %}
-                    <input name="type" type="hidden" value="TXT" id="plaintype">
-                    <input name="title" type="text" class="short" placeholder="Title" id="plaintitle">
-                    <input name="description" type="text" class="short" placeholder="Description" id="plaindescription">
-                    <textarea name="content" cols="50" rows="4" placeholder="Enter Text here..." id="plaincontent"></textarea>
-                    <div style="padding-top:20px; padding-bottom:20px;">
-                        Privacy: 
-                        <select name="visibility" id="plainvisibility">
-                            <option value="PUBL">Public</option>
-                            <option value="FRND">Friends Only</option>
-                            <option value="FOAF">Friends Of Friends Only</option>
-                            <option value="SERV">Friends on this host only</option>
-                            <option value="PRIV">Private</option>
-                            <option value="CUST">Custom</option>
-                            <option value="UNLS">Unlisted</option>                
-                        </select>
-                    </div>
-                    <input type="submit" value="Create" class='create_btn' onclick="createTextPost()">
-                </form>
+        <div class="posts_list">
+            <div class="tab">
+                <button class="post_tablinks active" onclick="openNewPost(event, 'new_txt_post')">Text</button>
+                <button class="post_tablinks" onclick="openNewPost(event, 'new_mkd_post')">Markdown</button>
+                <button class="post_tablinks" onclick="openNewPost(event, 'new_img_post')">Picture</button>
             </div>
 
-
-            <div id="markdownPost" class='newPost'>
-                <h3 class='heading'>Add Markdown Post</h3>
-                <form id="createmarkdownPost" class='new_post_form' onsubmit="event.preventDefault();">{% csrf_token %}
-                    <input name="type" type="hidden" value="MKD" id="mdtype">
-                    <input name="title" type="text" class="short" placeholder="Title" id="mdtitle">
-                    <input name="description" type="text" class="short" placeholder="Description" id="mddescription">
-                    <textarea name="content" cols="50" rows="4" placeholder="Enter Markdown here..." id="mdcontent"></textarea>
-                    <div style="padding-top:20px; padding-bottom:20px;">
-                        Privacy:
-                        <select name="visibility" id="mdvisibility">
-                            <option value="PUBL">Public</option>
-                            <option value="FRND">Friends Only</option>
-                            <option value="FOAF">Friends Of Friends Only</option>
-                            <option value="SERV">Friends on this host only</option>
-                            <option value="PRIV">Private</option>
-                            <option value="CUST">Custom</option>
-                            <option value="UNLS">Unlisted</option>                            </select>
-                    </div>
-                    <input type="submit" value="Create" class='create_btn' onclick="createMarkdownPost()">
-                </form>
-            </div>
-
-
-            <div id="picturePost" class='newPost'>
-                <h3 class='heading'>Add Picture</h3>
-                <form id="createpicturePost" class='new_post_form' onsubmit="event.preventDefault();">
+            <div id='new_txt_post' class='post_tabcontent' style="display:block;">
+                <form class='new_post_form' id='create_form' action={% url 'createpost' %} method="post">
                     {% csrf_token %}
-                    <input name="type" type="hidden" value="unknown" id="picture_type">
-                    <input name="title" type="text" class="short" placeholder="Title" id="imgtitle">
-                    <input name="description" type="text" class="short" placeholder="Description" id="imgdescription">
-                    <input name="fake-content" type="file" id="createPicturePostButton" onchange="getimageformat()" class="browse_btn">
-                    <input name="content" type="hidden" id="hiddencontent">
-                    <div style="padding-top:20px; padding-bottom:20px;">
-                        Privacy:
-                        <select name="visibility" id="imgvisibility">
-                            <option value="PUBL">Public</option>
-                            <option value="FRND">Friends Only</option>
-                            <option value="FOAF">Friends Of Friends Only</option>
-                            <option value="SERV">Friends on this host only</option>
-                            <option value="PRIV">Private</option>
-                            <option value="CUST">Custom</option>
-                            <option value="UNLS">Unlisted</option>                            </select>
-                    </div>
-                    <input type="submit" value="Create" class='create_btn' onclick="createPicturePost()">
+                    <label for="{{form.title.id_for_label}}" name='title'>Title</label> {{form.title}}
+                    <label for="{{form.description.id_for_label}}" name='description'>Description</label> {{form.description}}
+                    <label for="{{form.content.id_for_label}}" name='content'>Content</label>{{form.content}}
+                    <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}}
+                    <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>{{form.visibility}}
+                    <label for="{{form.unlisted.id_for_label}}" name='unlisted'>Unlisted</label>{{form.unlisted}}
+                    <label for="{{form.categories.id_for_label}}" name='categories'>Categories</label>{{form.categories}}
+                    <input name='content_type' type='hidden' value='TXT'>
+                    <input type="submit" value='Create'></input>
                 </form>
             </div>
 
-            
+            <div id='new_mkd_post' class='post_tabcontent'>
+                <form class='new_post_form' id='create_form' action={% url 'createpost' %} method="post">
+                    {% csrf_token %}
+                    <label for="{{form.title.id_for_label}}" name='title'>Title</label> {{form.title}}
+                    <label for="{{form.description.id_for_label}}" name='description'>Description</label> {{form.description}}
+                    <label for="{{form.content.id_for_label}}" name='content'>Content</label>{{form.content}}
+                    <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}}
+                    <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>{{form.visibility}}
+                    <label for="{{form.unlisted.id_for_label}}" name='unlisted'>Unlisted</label>{{form.unlisted}}
+                    <label for="{{form.categories.id_for_label}}" name='categories'>Categories</label>{{form.categories}}
+                    <input name='content_type' type='hidden' value='MKD'>
+                    <input type="submit" value='Create'></input>
+                </form>
+            </div>
+
+            <div id='new_img_post' class='post_tabcontent'>
+                <form class='new_post_form' id='create_form' action={% url 'createpost' %} method="post">
+                    {% csrf_token %}
+                    <label for="{{form.title.id_for_label}}" name='title'>Title</label> {{form.title}}
+                    <label for="{{form.description.id_for_label}}" name='description'>Description</label> {{form.description}}
+                    <input type="file" id="createPicturePostButton" onchange="getimageformat()" class="browse_btn">
+                    <input name="content" type="hidden" id="hiddencontent">
+                    <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}}
+                    <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>{{form.visibility}}
+                    <label for="{{form.unlisted.id_for_label}}" name='unlisted'>Unlisted</label>{{form.unlisted}}
+                    <label for="{{form.categories.id_for_label}}" name='categories'>Categories</label>{{form.categories}}
+                    <input id='image_upload' name='content_type' type='hidden' value='???'>
+                    <input type="submit" value='Create'></input> 
+                </form>
+            </div>
+        </div>
+
+
+
 
         
 
         <div class='posts_list'>
             <h3 class='heading'>Latest Posts</h3>
             <div class="tab">
-                <button class="tablinks active" onclick="openFeed(event, 'public_posts')">Public</button>
-                <button class="tablinks" onclick="openFeed(event, 'following_posts')">Following</button>
+                <button id="feed_default_open" class="feed_tablinks active" onclick="openFeed(event, 'public_posts')">Public</button>
+                <button class="feed_tablinks" onclick="openFeed(event, 'following_posts')">Following</button>
             </div>
 
-            <div id="public_posts" class="tabcontent">
+            <div id="public_posts" class="feed_tabcontent" style="display:block">
                 {% for post in object_list %}
                     {% if post.visibility != "UNLS" %}
                         {% include "post.html"%}
@@ -148,7 +128,7 @@
                 {% endfor %}
             </div>
             
-            <div id="following_posts" class="tabcontent">
+            <div id="following_posts" class="feed_tabcontent">
                 {% for post in following_posts %}
                     {% if post.visibility != "UNLS" %}
                         {% include "post.html"%}

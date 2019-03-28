@@ -5,11 +5,20 @@ from django.conf import settings
 import uuid
 
 
+
+# TODO: Add node authentication info
 class Node(models.Model):
+    # objects = NodeManager()
     hostname = models.URLField()
-
-    # TODO: Add node authentication info
-
+    user_auth = models.OneToOneField("User", on_delete=models.CASCADE)
+    prefix = models.CharField(max_length=20, blank=True)
+    send_username = models.CharField(max_length=100)
+    send_password = models.CharField(max_length=100)
+    active = False
+    
+    def __str__(self):
+        return self.user.username
+        
 
 class CustomUserManager(UserManager):
 
@@ -34,3 +43,6 @@ class User(AbstractUser):
 
     friends = models.ManyToManyField('self', blank=True)
     followers = models.ManyToManyField('self', blank=True, symmetrical=False)
+    following = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='following_list')
+    incomingRequests = models.ManyToManyField('self', blank=True, symmetrical=False, related_name="incoming_requests")
+    outgoingRequests = models.ManyToManyField('self', blank=True, symmetrical=False, related_name="outgoing_requests")
