@@ -170,15 +170,15 @@ class TestPosts(TestCase):
 
     def test_view_post_logout(self):
         #try to view public post detail without logging in
-        response = self.client.get(reverse('create', args=[self.post.id]))
+        response = self.client.get(reverse('postdetail', args=[self.post.id]))
         self.assertEqual(response.status_code, 302)
 
         #try to view public post detail without logging in
-        response = self.client.get(reverse('create', args=[self.private_post.id]))
+        response = self.client.get(reverse('postdetail', args=[self.private_post.id]))
         self.assertEqual(response.status_code, 302)
 
         #try to view public post detail without logging in
-        response = self.client.get(reverse('create', args=[self.foaf_post.id]))
+        response = self.client.get(reverse('postdetail', args=[self.foaf_post.id]))
         self.assertEqual(response.status_code, 302)
 
          #try to view feed
@@ -224,7 +224,7 @@ class TestPosts(TestCase):
         self.assertTrue(post in profile_posts)
 
         #check post detail
-        response = self.client.get(reverse('create', args=[post.id]))
+        response = self.client.get(reverse('postdetail', args=[post.id]))
         self.assertEqual(response.status_code, 200)
 
     def test_add_private_post(self):
