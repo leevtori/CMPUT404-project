@@ -1,6 +1,6 @@
 import json
 
-from django.shortcuts import HttpResponse, redirect
+from django.shortcuts import HttpResponse, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Post, Comment
