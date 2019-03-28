@@ -3,12 +3,12 @@ from django.contrib.auth.models import AnonymousUser
 
 def notifications(request):
     user = request.user
+
     if(user != AnonymousUser()):
-        followers= user.followers.all()
-        qs = set(user.followers.all()).difference(set(user.friends.all()))
-        q = len(list(qs))
+        q = request.user.incomingRequests.all()
+        count = len(q)
         return {
-            'friend_request_count': q
+            'friend_request_count': count
         }
     return {
             'friend_request_count': 0

@@ -7,10 +7,12 @@ from . import views
 
 urlpatterns = [
     
+    path("search/unfollow/", views.Unfollow.as_view(), name='unfolow'),
+    path("search/follow/", views.Follow.as_view(), name='follow'),
     path("search", views.UserList.as_view(), name='users'),
     path("friends/add/", views.SendFriendRequest.as_view()),
     path("friends/delete/", views.DeleteFriend.as_view()),
-    path("requests/confirm/", views.ConfirmRequest.as_view()),
+    path("requests/confirm/", views.ConfirmFriendRequest.as_view()),
     path("friends", views.FriendList.as_view(), name='friends'),
     path("followers", views.FollowerList.as_view() , name='followers'),
     path('logout/', auth_views.LogoutView.as_view(template_name="logout.html"), name='logout'),

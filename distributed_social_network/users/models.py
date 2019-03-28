@@ -43,3 +43,6 @@ class User(AbstractUser):
 
     friends = models.ManyToManyField('self', blank=True)
     followers = models.ManyToManyField('self', blank=True, symmetrical=False)
+    following = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='following_list')
+    incomingRequests = models.ManyToManyField('self', blank=True, symmetrical=False, related_name="incoming_requests")
+    outgoingRequests = models.ManyToManyField('self', blank=True, symmetrical=False, related_name="outgoing_requests")
