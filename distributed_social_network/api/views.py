@@ -20,7 +20,6 @@ import json
 User = get_user_model()
 
 
-
 class PaginateOverrideMixin:
     def get_paginated_response(self, data, **kwargs):
         """        body_unicode = self.request.body.decode('utf-8')
@@ -36,7 +35,7 @@ class PaginateOverrideMixin:
         return self.paginator.get_paginated_response(data, **kwargs)
 
 
-class AuthorViewset (viewsets.ReadOnlyModelViewSet):
+class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
     """API endpoint for getting users and user list
      - Gets profile
      - Gets a list of authors
@@ -61,16 +60,17 @@ class AuthorViewset (viewsets.ReadOnlyModelViewSet):
             serializer = serializers.PostSerializer(qs, many=True, context={'request': request})
             return Response(serializer.data)
 
-    # def list(self, request):
-    #     qs = self.get_queryset()
-    #     page = self.paginate_queryset(qs)
+    def list(self, request):
+        qs = self.get_queryset()
+        qs = qs.filter(host=None)
+        page = self.paginate_queryset(qs)
 
-    #     if page is not None:
-    #         serializer = self.get_serializer(page, many=True, context={'request': request})
-    #         return self.get_paginated_response(serializer.data, model="authors", query="authors")
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data, model="authors", query="authors")
 
-    #     serializer = self.get_serializer(qs, many=True)
-    #     return Response(serializer.data)
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
 
 
 class FriendsView(APIView):
@@ -113,6 +113,7 @@ class AuthorPostView(APIView):
     /author/posts
     """
     permission_classes = (permissions.IsAuthenticated,)
+
     def get(self, request):
         return Response(status=501)
 
