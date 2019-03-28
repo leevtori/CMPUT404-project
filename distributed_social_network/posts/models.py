@@ -18,7 +18,7 @@ class Post (models.Model):
 
     content_type = models.CharField(choices=ContentType.get_choices(), max_length=3, default=ContentType.PLAIN)
 
-    categories = models.ManyToManyField('Categories')
+    categories = models.ManyToManyField('Categories', blank=True)
 
     visibility = models.CharField(choices=Visibility.get_choices(), max_length=4, default=Visibility.PUBLIC)
     visible_to = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="visible_posts")
