@@ -172,7 +172,7 @@
             var source = "{{ post.content|escapejs }}";
             img_element.setAttribute('src', source);
         }
-        {% if post.content_type == "text/markdown" %}
+        {% if post.content_type == "MKD" %}
         window.onload = mkdown;
         {% else %}
         window.onload = imgsrc;
@@ -191,9 +191,9 @@
 </div>
     <h1>{{ post.title }}</h1>
     <p>{{ post.comment }}</p>
-    {% if post.content_type == 'text/plain' %}
+    {% if post.content_type == 'TXT' %}
         <p>{{post.content}}</p>
-    {% elif post.content_type == 'text/markdown' %}
+    {% elif post.content_type == 'MKD' %}
         <div id="mkdowndiv">
         </div>
         <br>

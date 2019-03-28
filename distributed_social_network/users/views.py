@@ -17,19 +17,15 @@ class UserList(LoginRequiredMixin, ListView):
     """Lists all users on the server."""
     model = User
     template_name = "user_list.html"
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['login_user'] = self.request.user
         context['friends'] = self.request.user.friends.all()
         context['followers'] = self.request.user.followers.all()
-        #get all users who have me in their followers list
-        followings = []
-        for user in User.objects.all():
-            if self.request.user in user.followers.all():
-                followings.append(user)
-        context['followings'] = followings
-
+        context['following'] = self.request.user.following.all()
+        context['incomingFriendRequest'] = self.request.user.incomingRequests.all()
+        context['sendFriendRequest'] = self.request.user.outgoingRequests.all()
         return context
 
     def get_queryset(self):
@@ -41,7 +37,7 @@ class FriendList(LoginRequiredMixin, ListView):
     """This view lists all friends of logged in user."""
     model = User
     template_name = "friends_list.html"
-    
+
     def get_queryset(self):
         return self.request.user.friends.all()
 
@@ -66,28 +62,31 @@ class SendFriendRequest(LoginRequiredMixin, View):
         friend_id = body['id']
         print("added ", friend_id)
         friend = get_object_or_404(User, id=friend_id)
+        friend.incomingRequests.add(self.request.user)
+        self.request.user.outgoingRequests.add(friend)
         friend.followers.add(self.request.user)
+        self.request.user.following.add(friend)
 
-        return HttpResponse('added')
+        return HttpResponse('sent')
 
 
-class ConfirmRequest(LoginRequiredMixin, View):
+class ConfirmFriendRequest(LoginRequiredMixin, View):
 
     def post(self, requst):
         body_unicode = self.request.body.decode('utf-8')
         body = json.loads(body_unicode)
         friend_id = body['id']
         friend = get_object_or_404(User, id=friend_id)
-        self.request.user.friends.add(friend)
-        friend.followers.add(self.request.user)
-        url = reverse('friends')
-        return HttpResponseRedirect(url)
 
+        if friend in self.request.user.incomingRequests.all():
+            self.request.user.friends.add(friend)
+            friend.followers.add(self.request.user)
+            self.request.user.following.add(friend)
+            friend.outgoingRequests.remove(self.request.user)
+            self.request.user.incomingRequests.remove(friend)
+            
+            return HttpResponse("added")
 
-class CustomUserCreationForm(UserCreationForm):
-    class Meta(UserCreationForm.Meta):
-        model = User
-        fields = ('first_name', 'last_name',) + UserCreationForm.Meta.fields
 
 class SignUp(generic.CreateView):
     form_class = CustomUserCreationForm
@@ -96,7 +95,7 @@ class SignUp(generic.CreateView):
     # fields = ['first_name','last_name', 'username', 'email', 'password', 'password']
     success_message = "Congratulations, you've successfully signed up! Wait to be approved."
 
-class DeleteFriend(LoginRequiredMixin, View):    
+class DeleteFriend(LoginRequiredMixin, View):
     model = User
 
     def delete(self, request):
@@ -104,11 +103,10 @@ class DeleteFriend(LoginRequiredMixin, View):
         body = json.loads(body_unicode)
         friend_id = body['id']
         friend = get_object_or_404(User, id=friend_id)
-        self.request.user.friends.remove(friend_id)
-        self.request.user.followers.remove(friend_id)
-        friend.followers.remove(self.request.user.id)
-        context = {'object_list': self.request.user.friends.all()}
-        return render(request, 'friends_list.html', context)
+        if friend:
+            self.request.user.friends.remove(friend_id)
+            context = {'object_list': self.request.user.friends.all()}
+            return render(request, 'friends_list.html', context)
 
 
 class AccountSettingsView(LoginRequiredMixin, UpdateView):
@@ -121,24 +119,43 @@ class AccountSettingsView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse('profile', kwargs={'username': self.request.user.username})
-        
+
 class FriendRequests(LoginRequiredMixin, ListView):
     """This view lists all the pending friend requests. """
     model = User
     template_name = 'pending_friend_requests.html'
 
     def get_queryset(self):
-        user = self.request.user
-        # qs = super().get_queryset()
-        # subtract my friends from my followers, to get the pending requests
-        qs = set(user.followers.all()).difference(set(user.friends.all()))
-        q = list(qs)
-        # print(q)
+        q = self.request.user.incomingRequests.all()
         return q
 
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     q = self.get_queryset() 
-    #     context['requestCount'] = len(q)
-    #     print("count ", q.count)
-    #     return context
+class Unfollow(LoginRequiredMixin, View):
+
+    model = User
+
+    def post(self, request):
+        body_unicode = self.request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        friend_id = body['id']
+        friend = get_object_or_404(User, id=friend_id)
+        friend.followers.remove(self.request.user.id)
+        self.request.user.following.remove(friend)
+        context = {'friends_list': self.request.user.friends.all(), 
+            'following_list': self.request.user.following.all()
+        }
+        return render(request, 'friends_list.html', context)
+
+class Follow(LoginRequiredMixin, View):
+    model = User
+
+    def post(self, request):
+        body_unicode = self.request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        friend_id = body['id']
+        friend = get_object_or_404(User, id=friend_id)
+        friend.followers.add(self.request.user)
+        self.request.user.following.add(friend)
+        context = {'friend_list': self.request.user.friends.all(),
+            'following_list': self.request.user.following.all()
+        }
+        return render(request, 'friends_list.html', context)

@@ -8,10 +8,10 @@
         <p class='date'>{{post.published}}</p>
     </div>
     <div class='post_bottom'>
-        <a href={% url 'create' rid=post.id %} class="post_title">{{post.title}}</a>
-        {% if post.content_type == 'text/plain' %}
+        <a href={% url 'postdetail' pk=post.id %} class="post_title">{{post.title}}</a>
+        {% if post.content_type == 'TXT' %}
             <p>{{post.content}}</p>
-        {% elif post.content_type == 'text/markdown' %}
+        {% elif post.content_type == 'MKD' %}
             <p>{{post.content}}</p>
         {% else %}
             <p>Picture Post, Click on link to see image</p>
