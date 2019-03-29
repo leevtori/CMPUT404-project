@@ -1,6 +1,10 @@
+{% load static %}
 
-<br>
------------------------------
-<p>{{comments.author.first_name}} {{comments.author.last_name}}</p><br>
-<p>{{ comments.author.username }}</p>
-<p>{{ comments.comment }}</p>
+<link rel="stylesheet" type="text/css" href="{% static 'css/post_detail.css' %}">
+
+<div class='comment'>
+    <p class='comment'>{{ comments.comment }}</p> 
+    <p class='comment'>-</p>
+    <h4 class='fullname' style='font-size:medium'><a href={% url 'profile' username=comments.author.username %} class='fullname'>{{comments.author.username}}</a></h4>
+    <p class='date'>{{comments.published}}</p>
+</div>

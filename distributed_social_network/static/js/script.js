@@ -48,3 +48,11 @@ function unfollow(friendId){
         body: JSON.stringify({'id':friendId})
     }).then(setTimeout(function(){window.location.reload()},500));
 };
+
+
+
+
+
+
+
+
