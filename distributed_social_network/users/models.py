@@ -38,6 +38,7 @@ class User(AbstractUser):
     host = models.ForeignKey("Node", null=True, blank=True, default=None, on_delete=models.CASCADE)
     github = models.URLField(null=True)
     bio = models.TextField(blank=True)
+    local= models.BooleanField(default=True)
 
     is_active = models.BooleanField(default=False)
 

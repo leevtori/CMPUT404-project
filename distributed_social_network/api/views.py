@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from posts.utils import Visibility
 from posts.models import Post, Comment
 from users.models import User, Node
+from django.http import JsonResponse
 from django.conf import settings
 from rest_framework.exceptions import ParseError
 
@@ -216,21 +217,23 @@ class CommentView(PaginateOverrideMixin, GenericAPIView):
         except KeyError:
             return Response(status=400)
 
-        post = get_object_or_404(Post, pk=pk)
+        # post = get_object_or_404(Post, pk=pk)
+        
 
-        # check the user is valid
-        p = request.data['post']
-        a = p['author']['id']
-        # a = a['id']
-        a = a[:-1]
-        a = a.split('/')
-        id = a[-1]
-        commentUser = get_object_or_404(User, pk=uuid.UUID(id))
+        id = request.data['post']['author']['id']
+        id = get_uuid_from_url(id)
+        print("PKK ", id)
 
-        serializer = serializers.CommentPostSerializer(data = request.data['post'], context={'request':request})
+ 
+        commentUser = get_object_or_404(User, pk=id)
+        print("USSSSS ", commentUser)
+        request.data['post'].pop('author')
+        print(request.data)
+        
+        serializer = serializers.CommentPostSerializer(data = r_data , context={'request':request})
 
         if serializer.is_valid():
-            serializer.save(post_id=pk,author=commentUser)
+            serializer.save(post_id=pk,author=commentUser,)
             return Response(serializer.data, status=201)
         print("ERRROR ", serializer.errors)
         return Response(serializer.errors, status=400)
@@ -243,7 +246,25 @@ class AreFriendsView(APIView):
     """
 
     def get(self, request, pk1, pk2):
-        return Response(status=501)
+        print("HEHRRHEHREHEHH")
+        author1 = get_object_or_404(pk=pk1)
+        author2 = get_object_or_404(pk=pk2)
+        author1_id = author1.host + author1.id #is this in the right format? idk lol
+        author2_id = author2.host + author2.id
+        print('auth1 id = ', author1_id)
+        print('auth2 id = ', author2_id)
+        are_friends = author2 in author1.friends.all()
+     
+        data = {
+            "query": "friends", 
+            "friends": are_friends,
+            "authors": [
+                author1_id,
+                author2_id,
+            ],
+        }
+        return JsonResponse(data, safe=False)
+
 
 
 class CreatePostView(CreateAPIView):
@@ -256,27 +277,45 @@ class FriendRequestView(APIView):
     """
     def post(self, request):
 
-        friend_id = uuid.UUID(request.data['friend']['id'].split('/')[-1])
+        friend_id = request.data['friend']['id']
+        friend_id = get_uuid_from_url(friend_id)
         friend =  get_object_or_404(User, pk=friend_id, host=None, is_active=True)
 
-        id = request.data['author']['id'].split('/')[-1]
-        pk = uuid.UUID(id)
-        request.data['author']['id'] = pk
-
+        author_id = request.data['author']['id']
+        author_id = get_uuid_from_url(author_id)
+        request.data['author']['id'] = author_id
+        
         host = request.data['author']['host']
-        node = get_object_or_404(Node, hostname=host)
+        node = get_object_or_404(Node, hostname__icontains=host)
         request.data['author']['host'] = node.id
 
         serializer = serializers.AuthorSerializer(data = request.data['author'], context={'request': request})
 
+        sucess = False
+
         if serializer.is_valid():
-            author = serializer.save(id=pk)
+            sucess = True
+            try:
+                author = User.objects.get(pk=author_id)
+            except User.DoesNotExist:
+                author = serializer.save(id=author_id)
 
             friend.incomingRequests.add(author)
             author.outgoingRequests.add(friend)
             friend.followers.add(author)
             author.following.add(friend)
-            return Response(serializer.data, status=201)
+            data = {
+                "query": "friendrequest",
+                "sucess": sucess,
+                "message": "Friend request sent"
+            }
+            return JsonResponse(data, safe=False, status=200)
+        
+        data = {
+            "query": "friendrequest",
+            "sucess": sucess,
+            "message": "Friend request sent"
+        }
 
-        return Response(serializer.errors, status=400)
+        return JsonResponse(data, safe=False, status=400)
 
