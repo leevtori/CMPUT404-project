@@ -4,7 +4,7 @@ from requests.auth import HTTPBasicAuth
 from rest_framework.parsers import JSONParser
 from rest_framework import serializers
 
-from posts.models import Post, Categories
+from posts.models import Post, Categories, Comment
 from users.models import User
 import requests
 
@@ -50,16 +50,16 @@ def requestPosts(node, ending, current_id):
 
 def requestSinglePost(link, current_id, node):
     a = requests.get(link, headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
-    print(a.text)
     stream = io.BytesIO(a.content)
     data = JSONParser().parse(stream)
     l = posts_request_deserializer(data=data)
     l.is_valid()
     for i in l.validated_data['posts']:
         #assumes we have the post alrdy
-        #post = post_detail_deserializer(data=i)
-        #if post.is_valid():
-        pass
+        post = post_detail_deserializer(data=i)
+        if post.is_valid():
+            post.create(post.validated_data)
+    return True
 
 
 
@@ -76,7 +76,6 @@ class post_detail_deserializer(serializers.Serializer):
     source = serializers.CharField(required=False, default='')
     description = serializers.CharField()
     contentType = serializers.CharField()
-    author = serializers.DictField()
     content = serializers.CharField()
     categories = serializers.ListField(required=False, default=[])
     published = serializers.DateTimeField()
@@ -86,11 +85,50 @@ class post_detail_deserializer(serializers.Serializer):
     comments = serializers.ListField()
 
     def create(self,validated_data):
-        existing_post=Post.objects.get(id=validated_data['id'])
+        print(validated_data)
+        existing_post=Post.objects.filter(id=validated_data['id'])
         existing_post.update(title=validated_data['title'],
-                             content_type=validated_data['contentType'],
+                             content_type=contentTypeDict[validated_data['contentType']],
                              description=validated_data['description'],
-                             content=validated_data['content'])
+                             content=validated_data['content'],)
+                             #unlisted=validated_data['unlisted'])
+        for comment in validated_data['comments']:
+            a=comment_deserializer(data=comment)
+            if a.is_valid():
+                the_comment=a.create(a.validated_data,existing_post)
+                if the_comment:
+                    the_comment.save()
+            else:
+                print(a.errors)
+        return True
+
+
+
+class comment_deserializer(serializers.Serializer):
+    contentType=serializers.CharField()
+    comment=serializers.CharField()
+    id=serializers.UUIDField()
+    published=serializers.DateTimeField()
+    author= serializers.DictField()
+
+    def create(self,validated_data, comment_post):
+        usr=user_deserializer(data=validated_data['author'])
+        if usr.is_valid():
+            comment_usr=usr.create(usr.validated_data)
+            try:
+                existing_comment=Comment.objects.get(id=validated_data['id'])
+                return None
+            except:
+                return Comment.objects.create(
+                    id=validated_data['id'],
+                    comment=validated_data['comment'],
+                    content_type=contentTypeDict[validated_data['contentType'].lower()],
+                    author=comment_usr,
+                    published=validated_data['published'],
+                    post=comment_post[0]
+            )
+
+
 
 # for single post with no comments
 class post_deserializer_no_comment(serializers.Serializer):
