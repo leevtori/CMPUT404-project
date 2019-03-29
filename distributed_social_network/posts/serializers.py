@@ -23,43 +23,51 @@ contentTypeDict={
 }
 
 def requestPosts(node, ending, current_id):
-    a = requests.get(node.hostname+node.prefix+ending, headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
-    stream = io.BytesIO(a.content)
-    data = JSONParser().parse(stream)
-    l = posts_request_deserializer(data=data)
-    l.is_valid()
-    for i in l.validated_data['posts']:
-        post = post_deserializer_no_comment(data=i)
-        if post.is_valid():
-            new_post = post.create(post.validated_data)
-            if new_post!=None:
-                if new_post.origin=='':
-                    new_post.origin = node.hostname+node.prefix+ 'posts/'+ str(new_post.id)
-                if new_post.source=='':
-                    new_post.source = node.hostname+node.prefix+ 'posts/'+ str(new_post.id)
-                new_post.author.host=node
-                new_post.author.save()
-                new_post.save()
-                print('saved new post id :'+str(new_post.id))
-            else:
-                print('passed')
-                pass
-        else:
-            print(post.errors)
-    return True
+    try:
+        a = requests.get(node.hostname+node.prefix+ending, headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
+        if requests.status_codes==200:
+            stream = io.BytesIO(a.content)
+            data = JSONParser().parse(stream)
+            l = posts_request_deserializer(data=data)
+            l.is_valid()
+            for i in l.validated_data['posts']:
+                post = post_deserializer_no_comment(data=i)
+                if post.is_valid():
+                    new_post = post.create(post.validated_data)
+                    if new_post!=None:
+                        if new_post.origin=='':
+                            new_post.origin = node.hostname+node.prefix+ 'posts/'+ str(new_post.id)
+                        if new_post.source=='':
+                            new_post.source = node.hostname+node.prefix+ 'posts/'+ str(new_post.id)
+                        new_post.author.host=node
+                        new_post.author.save()
+                        new_post.save()
+                        print('saved new post id :'+str(new_post.id))
+                    else:
+                        print('passed')
+                        pass
+                else:
+                    print(post.errors)
+            return True
+    except Exception as e:
+        print(e)
 
 def requestSinglePost(link, current_id, node):
-    a = requests.get(link, headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
-    stream = io.BytesIO(a.content)
-    data = JSONParser().parse(stream)
-    l = posts_request_deserializer(data=data)
-    l.is_valid()
-    for i in l.validated_data['posts']:
+    try:
+        a = requests.get(link, headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
+        if a.status_code==200:
+            stream = io.BytesIO(a.content)
+            data = JSONParser().parse(stream)
+            l = posts_request_deserializer(data=data)
+            l.is_valid()
+            for i in l.validated_data['posts']:
         #assumes we have the post alrdy
-        post = post_detail_deserializer(data=i)
-        if post.is_valid():
-            post.create(post.validated_data)
-    return True
+                post = post_detail_deserializer(data=i)
+                if post.is_valid():
+                    post.create(post.validated_data)
+            return True
+    except Exception as e:
+        print(e)
 
 
 
