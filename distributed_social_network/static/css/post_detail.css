@@ -1,3 +1,55 @@
 #post_image{
     max-width: 95%;
 }
+
+
+.comment_btn{
+    color: white;
+    border-width: 0;
+    border-radius: 3px;
+    background-color: #3D9970;
+    /* width:100px; */
+    height: 30px;
+    font-size: medium;
+}
+
+.comment_btn:hover{
+    background-color:#78cfa8;
+    cursor: pointer;
+}
+
+.delete_post_btn{
+    color: white;
+    border-width: 0;
+    border-radius: 3px;
+    background-color: #d46161;
+    /* width:100px; */
+    height: 30px;
+    font-size: medium;
+}
+
+.delete_post_btn:hover{
+    background-color:#e98a8a;
+    cursor: pointer;
+}
+
+div.comments{
+    padding: 10px;
+    display:flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    font-size: small;
+}
+
+div.comment{
+    /* padding: 10px; */
+    display:flex;
+    flex-direction: row;
+    align-items: baseline;
+    font-size: small;
+}
+
+p.comment{
+    font-size:medium;
+    padding:5px;
+}

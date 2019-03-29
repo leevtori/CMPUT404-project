@@ -60,20 +60,54 @@ class FollowerList(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return self.request.user.followers.all()
 
+class FollowingList(LoginRequiredMixin, ListView):
+    """This view lists all the followers of logged in user. """
+    model = User
+    template_name = "following_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['friends'] = self.request.user.friends.all()
+        # context['following'] = self.request.user.following.all()
+        return context
+
+    def get_queryset(self):
+        return self.request.user.following.all()
+
 class SendFriendRequest(LoginRequiredMixin, View):
 
-    def post(self, request):
+    def post(self, request): 
         body_unicode = self.request.body.decode('utf-8')
         body = json.loads(body_unicode)
         friend_id = body['id']
-        print("added ", friend_id)
+        print("friend_id ", friend_id)
         friend = get_object_or_404(User, id=friend_id)
-        friend.incomingRequests.add(self.request.user)
-        self.request.user.outgoingRequests.add(friend)
-        friend.followers.add(self.request.user)
-        self.request.user.following.add(friend)
+        #friend is on our host
+        if(friend.hostname is None):
+            friend.incomingRequests.add(self.request.user)
+            self.request.user.outgoingRequests.add(friend)
+            friend.followers.add(self.request.user)
+            self.request.user.following.add(friend)
+            return HttpResponse(200)
+        #friend is on another host
+        else:
+            friend_host = get_object_or_404(Node, hostname=friend.host)
+            #TODO
 
-        return HttpResponse('sent')
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
 
 
 class ConfirmFriendRequest(LoginRequiredMixin, View):

@@ -7,27 +7,34 @@
 {% endblock %}
 
 {% block content %}
-    <div class='banner'>
-        <div>
-            <img src={% static "img/profile.png"%} class='profile_pic_large' %}>
-        </div>
-        <div>
-            <h1 class='banner'>{{user.username}}</h1>
-            <h3 class='banner'>{{user.first_name}} {{user.last_name}}</h3>
-            {# <button class='add_friend_btn' type='submit' onclick="addFriend('{{user.id}}')">+ Add Friend</button> #}
-        </div>
-    </div>
+
    
-    <table class='content'>
-        <td class='left_col'>
+    <div class='content'>
+        <div class='left_col'>
+
+            <div class='left_box'>
+                <div>
+                    <img src={% static "img/profile.png"%} class='profile_pic_large' %}>
+                </div>
+                <div>
+                    <h1 class='banner'>{{user.username}}</h1>
+                    <h3 class='banner'>{{user.first_name}} {{user.last_name}}</h3>
+                    {% if user != request.user %}
+                    <button class='add_friend_btn' type='submit' onclick="addFriend('{{user.id}}')">+ Add Friend</button>
+                    {% endif %}
+                </div>
+            </div>
+
             <div class='left_box'>
                 <h3>About Me</h3>
                 <p>{{user.bio}}</p>
+                <p>{{post_count}} post(s)</p>
                 <a href={{user.github}}>Github</a>
+                <p>Host: {{user.hostname}}</p>
             </div>
+
             <div class='left_box'>
                 <h3>Stats</h3>
-
                 <table class='stats'>
                     <tr style="height: 60px;">
                         <td class='stats'>
@@ -38,25 +45,31 @@
                             </a>
                         </td>
                         <td class='stats'>
+                            <a href={% url 'following' %} class='stats'>
+                            <div style="height:100%;width:100%">
+                                {{following_count}}<br/>Following
+                            </div>
+                            </a>
+                        </td>
+                        <td class='stats'>
                             <a href={% url 'friends' %} class='stats'>
                             <div style="height:100%;width:100%">
                                     {{friend_count}}<br/>Friends
                             </div>
                             </a>
                         </td>
-                        <td class='stats'>{{post_count}}<br/>Posts</td>
+                        
                         
                     </tr>
                 </table>
-
-
             </div>
-        </td>
-        <td class='right_col'>
+
+        </div>
+        <div class='right_col'>
             {% for post in object_list %}
             {% include "post.html" %}
             {% endfor %}
-        </td>
-    </table>
+        </div>
+    </div>
 
 {% endblock%}
