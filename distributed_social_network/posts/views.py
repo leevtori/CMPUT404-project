@@ -14,7 +14,7 @@ import uuid
 
 from users.models import Node
 from posts.forms import PostForm
-from posts.serializers import requestPosts, user_deserializer
+from posts.serializers import requestPosts, requestSinglePost
 
 from django.db import connection
 from django.db.models import Q
@@ -134,6 +134,12 @@ class PostDetailView(PostVisbilityMixin, DetailView):
     model = Post
 
     def get_context_data(self, **kwargs):
+        post=kwargs['object']
+        if post.origin != '':
+            node_url1 = post.origin.split('posts')[0]
+            node_url = node_url1.split('api')[0]
+            node = Node.objects.get(hostname=node_url)
+            requestSinglePost(post.origin, self.request.user.id,node)
         context = super().get_context_data(**kwargs)
         context['post_comments'] = self.object.comment_set.all().order_by("-published")
         return context

@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.conf import settings
+from urllib.parse import urlparse
+from urllib.parse import urljoin
+
 
 import uuid
 
@@ -17,7 +20,7 @@ class Node(models.Model):
     active = False
     
     def __str__(self):
-        return self.hostname
+        return urljoin(self.hostname, self.prefix)
         
 
 class CustomUserManager(UserManager):
@@ -38,6 +41,7 @@ class User(AbstractUser):
     host = models.ForeignKey("Node", null=True, blank=True, default=None, on_delete=models.CASCADE)
     github = models.URLField(null=True)
     bio = models.TextField(blank=True)
+    local= models.BooleanField(default=True)
 
     is_active = models.BooleanField(default=False)
 
@@ -46,3 +50,10 @@ class User(AbstractUser):
     following = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='following_list')
     incomingRequests = models.ManyToManyField('self', blank=True, symmetrical=False, related_name="incoming_requests")
     outgoingRequests = models.ManyToManyField('self', blank=True, symmetrical=False, related_name="outgoing_requests")
+
+    def get_url(self):
+        host = self.host or settings.HOSTNAME
+        val = urljoin(str(host), 'author')
+        if val[-1] != '/': val+='/'
+        val= urljoin(val, str(self.id))
+        return val
