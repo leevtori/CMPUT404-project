@@ -1,4 +1,5 @@
 import json
+from urllib.parse import urljoin
 
 from django.shortcuts import HttpResponse, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView
@@ -7,6 +8,7 @@ from .models import Post, Comment
 from django.contrib.auth import get_user_model
 from django.views.generic.base import TemplateView
 from users.views import FriendRequests
+from django.conf import settings
 import uuid
 
 
@@ -142,6 +144,9 @@ def create_post(request):
         f = PostForm(request.POST)
         new_post = f.save(commit=False)
         new_post.author = request.user
+        new_post.source = urljoin(settings.HOSTNAME, '/api/posts/%s' % new_post.id)
+        new_post.origin = urljoin(settings.HOSTNAME, '/api/posts/%s' % new_post.id)
+
         new_post.save()
         return redirect('feed')
         
