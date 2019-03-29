@@ -4,7 +4,7 @@
 
     <div class='post_top'>
         <img src={% static "img/profile.png"%} class='profile_pic_small' %}>
-        <h4 class='fullname'><a href={% url 'profile' username=post.author.username %} class='fullname'>{{post.author.first_name}} {{post.author.last_name}}</a></h4>
+        <h4 class='fullname'><a href={% url 'profile' username=post.author.username %} class='fullname'>{{post.author.username}}</a></h4>
         <p class='date'>{{post.published}}</p>
     </div>
     <div class='post_bottom'>
