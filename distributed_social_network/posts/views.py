@@ -10,7 +10,7 @@ from users.views import FriendRequests
 import uuid
 
 
-
+from users.models import Node
 from posts.forms import PostForm
 from posts.serializers import requestPosts
 
@@ -102,7 +102,10 @@ class FeedView(PostVisbilityMixin, ListView):
 
     def get_context_data(self, **kwargs):
         # get public posts from other hosts, using https://connectifyapp.herokuapp.com/ as test
-        requestPosts('https://young-plains-33934.herokuapp.com/api/posts')
+        nodes = Node.objects.all()
+        for node in nodes:
+            requestPosts(node, 'posts',self.request.user.id)
+            requestPosts(node, 'author/posts', self.request.user.id)
 
         context = super().get_context_data(**kwargs)
         context['post_count'] = Post.objects.filter(author=self.request.user).count
