@@ -32,9 +32,12 @@ def requestPosts(link):
     for i in l.validated_data['posts']:
         post = post_deserializer_no_comment(data=i)
         if post.is_valid():
-            post.validated_data['source'] = link+str(post.validated_data['id'])
             new_post = post.create(post.validated_data)
             if new_post!=None:
+                if new_post.origin=='':
+                    new_post.origin = link+ '/'+ str(new_post.id)
+                if new_post.source=='':
+                    new_post.source = link+ '/'+ str(new_post.id)
                 new_post.save()
                 print('saved new post id :'+str(new_post.id))
             else:
