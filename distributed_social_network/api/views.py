@@ -75,41 +75,45 @@ class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class FriendsView(APIView):
-    def get(self, request):
-        user = self.get_object()
+class FriendsView(GenericAPIView):
+    """
+    Gets friends of a author specified in URL
+    /author/{author_id}/friends
+    """
+    serializer_class = serializers.FriendSerializer
+    queryset = User.objects.all()
+
+    def get(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
         friends = user.friends.all()
 
-
-        page = self.paginate_queryset(friends)
-
-        if page is not None:
-            serializer = self.get_serializer(page, many=True, context={'request': request})
-            return self.get_paginated_response(serializer.data, query="friends", model="authors")
-
         serializer = self.get_serializer(friends, many=True, context={'request': request})
-        return Response(serializer.data)
+        response = {"query": "friends"}
+        response["authors"] = [i["id"] for i in serializer.data]
+
+        return Response(response)
+
+    # def post(self, request):
+    #     # Parse the url to a uuid only.
+    #     # UUID regex pattern from
+    #     # https://stackoverflow.com/questions/7905929/how-to-test-valid-uuid-guid/13653180#13653180
+    #     # Taken March 12, 2018
+    #     user = get_object_or_404(User, pk=pk)
+    #     friends = user.friends.all()
+
+    #     p = "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"
+    #     pattern = re.compile(p, re.IGNORECASE)
+    #     author_query = [pattern.search(id).group() for id in request.data["authors"]]
+
+    #     are_friends = .friends.filter(id__in=author_query).values_list("id", flat=True)
+
+    #     response_data = dict(request.data)
+    #     response_data["authors"] = [str(friend) for friend in are_friends]
+
+    #     return Response(response_data)
 
 
-    def post(self, request):
-        # Parse the url to a uuid only.
-        # UUID regex pattern from
-        # https://stackoverflow.com/questions/7905929/how-to-test-valid-uuid-guid/13653180#13653180
-        # Taken March 12, 2018
-
-        p = "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"
-        pattern = re.compile(p, re.IGNORECASE)
-        author_query = [pattern.search(id).group() for id in request.data["authors"]]
-
-        are_friends = friends.filter(id__in=author_query).values_list("id", flat=True)
-
-        response_data = dict(request.data)
-        response_data["authors"] = [str(friend) for friend in are_friends]
-
-        return Response(response_data)
-
-
-class AuthorPostView(APIView):
+class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
     """
     Gets a list of posts visible to currently authenticated user or
     creates new post for authenticated user.
@@ -118,6 +122,7 @@ class AuthorPostView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request):
+        print
         return Response(status=501)
 
     def post(self, request):
@@ -163,7 +168,10 @@ class CommentView(PaginateOverrideMixin, GenericAPIView):
         return Response(serializer.data)
 
     def post(self, request, pk):
-        print("data ", request.data['post'])
+        try:
+            print("data ", request.data['post'])
+        except KeyError:
+            return Response(status=400)
 
         post = get_object_or_404(Post, pk=pk)
 
