@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from rest_framework.generics import CreateAPIView, UpdateAPIView
+from rest_framework.generics import GenericAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.views import APIView
 from rest_framework.mixins import RetrieveModelMixin
 from django.shortcuts import get_object_or_404
@@ -8,6 +8,8 @@ from posts.utils import Visibility
 from posts.models import Post, Comment
 from users.models import User, Node
 from django.http import JsonResponse
+from django.conf import settings
+
 
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -22,15 +24,15 @@ import json
 
 User = get_user_model()
 
+def get_uuid_from_url(url):
+    p = "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"
+    pattern = re.compile(p, re.IGNORECASE)
+    return pattern.search(url).group()
+
 
 class PaginateOverrideMixin:
     def get_paginated_response(self, data, **kwargs):
-        """        body_unicode = self.request.body.decode('utf-8')
-        body = json.loads(body_unicode)
-        friend_id = body['id']
-        print("added ", friend_id)
-        friend = get_object_or_404(User, id=friend_id)
-        friend.followers.add(self.request.user)
+        """
         Return a paginated style `Response` object for the given output data.
         overridden from GenericAPIView to pass in additional parameters.
         """
@@ -54,7 +56,7 @@ class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
             # Not really meant to be used this way...but it works?
             post_filter = PostVisbilityMixin()
             qs = post_filter.filter_user_visible(self.request.user, user.posts.all())
-
+            qs = qs.filter(unlisted=False)
             page = self.paginate_queryset(qs)
             if page is not None:
                 serializer = serializers.PostSerializer(page, many=True, context={'request': request})
@@ -76,48 +78,69 @@ class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class FriendsView(APIView):
-    def get(self, request):
-        user = self.get_object()
-        friends = user.friends.all()
+class FriendsView(GenericAPIView):
+    """
+    Gets friends of a author specified in URL
+    /author/{author_id}/friends
+    """
+    serializer_class = serializers.FriendSerializer
+    queryset = User.objects.all()
 
-        page = self.paginate_queryset(friends)
+    def get_friends(self, pk):
+        user = get_object_or_404(User, pk=pk)
+        return user.friends.all()
 
-        if page is not None:
-            serializer = self.get_serializer(page, many=True, context={'request': request})
-            return self.get_paginated_response(serializer.data, query="friends", model="authors")
-
+    def format_response(self, friends, request):
         serializer = self.get_serializer(friends, many=True, context={'request': request})
-        return Response(serializer.data)
+        response = {"query": "friends"}
 
+        if request.method == "POST":
+            response["author"] = "author_id"
 
-    def post(self, request):
+        response["authors"] = [i["id"] for i in serializer.data]
+
+        return response
+
+    def get(self, request, pk):
+        friends = self.get_friends(pk)
+        return Response(self.format_response(friends, request))
+
+    def post(self, request, pk):
         # Parse the url to a uuid only.
         # UUID regex pattern from
         # https://stackoverflow.com/questions/7905929/how-to-test-valid-uuid-guid/13653180#13653180
         # Taken March 12, 2018
+        friends = self.get_friends(pk)
 
-        p = "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"
-        pattern = re.compile(p, re.IGNORECASE)
-        author_query = [pattern.search(id).group() for id in request.data["authors"]]
+        author_query = [get_uuid_from_url(id) for id in request.data["authors"]]
 
-        are_friends = friends.filter(id__in=author_query).values_list("id", flat=True)
+        are_friends = friends.filter(id__in=author_query)
 
-        response_data = dict(request.data)
-        response_data["authors"] = [str(friend) for friend in are_friends]
+        response_data = self.format_response(are_friends, request)
 
         return Response(response_data)
 
 
-class AuthorPostView(APIView):
+class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
     """
     Gets a list of posts visible to currently authenticated user or
     creates new post for authenticated user.
     /author/posts
     """
     permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = serializers.PostSerializer
+    queryset = Post.objects.all()
 
     def get(self, request):
+        try:
+            user_id = request.META.get("X-User")
+            user = User.objects.get(id=user_id)
+        except (KeyError, User.DoesNotExist):
+            return Response(status=400)
+
+        post_filter = PostVisbilityMixin()
+        posts = post_filter.filter_user_visible(user)
+
         return Response(status=501)
 
     def post(self, request):
@@ -134,7 +157,7 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
 
 
     def list(self, request):
-        qs = Post.objects.filter(visibility=Visibility.PUBLIC)
+        qs = Post.objects.filter(visibility=Visibility.PUBLIC, origin="")
 
         page = self.paginate_queryset(qs)
 
@@ -145,7 +168,9 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
 
-class CommentView(APIView):
+
+class CommentView(PaginateOverrideMixin, GenericAPIView):
+    serializer_class = serializers.CommentPostSerializer
 
     def get(self, request, pk):
         post = get_object_or_404(Post, pk = pk)
@@ -166,37 +191,23 @@ class CommentView(APIView):
         except KeyError:
             return Response(status=400)
 
-        post = get_object_or_404(Post, pk=pk)
+        # post = get_object_or_404(Post, pk=pk)
+        
 
         id = request.data['post']['author']['id']
-        p = "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"
-        pattern = re.compile(p, re.IGNORECASE)
-      
-        id = pattern.search(id).group(0)
+        id = get_uuid_from_url(id)
         print("PKK ", id)
 
-        # id = pattern.search(id)
-        # author_query = [pattern.search(id), request.data['post']["author"]]
-        # print("AUTHOR ", author_query)
-
-        # # check the user is valid
-        # p = request.data['post']
-        # a = p['author']['id']
-        # # a = a['id']
-        # a = a[:-1]
-        # a = a.split('/')
-        # # id = a[-1]
-        # print("!!!!!!!! ", a)
-
-        # id = uuid.UUID(a)
-        # print("!!!!!!!! ", id)
+ 
         commentUser = get_object_or_404(User, pk=id)
         print("USSSSS ", commentUser)
+        request.data['post'].pop('author')
+        print(request.data)
         
-        serializer = serializers.CommentPostSerializer(data = request.data['post'], context={'request':request})
+        serializer = serializers.CommentPostSerializer(data = r_data , context={'request':request})
 
         if serializer.is_valid():
-            serializer.save(post_id=pk,author=commentUser)
+            serializer.save(post_id=pk,author=commentUser,)
             return Response(serializer.data, status=201)
         print("ERRROR ", serializer.errors)
         return Response(serializer.errors, status=400)
@@ -219,7 +230,7 @@ class AreFriendsView(APIView):
                 "query": "friends", 
                 "friends": are_friends,
                 "authors": [
-                    author1.host+author1
+                    author1.host
                 ],
             }
             return JsonResponse(data, safe=False)
@@ -229,34 +240,39 @@ class AreFriendsView(APIView):
 class CreatePostView(CreateAPIView):
     serializer_class = serializers.PostSerializer
 
-    
+
 class FriendRequestView(APIView):
     """
     Makes a friend request
     """
     def post(self, request):
-        
-        friend_id = uuid.UUID(request.data['friend']['id'].split('/')[-1])
+        print("IN POST")
+        friend_id = request.data['friend']['id']
+        friend_id = get_uuid_from_url(friend_id)
         friend =  get_object_or_404(User, pk=friend_id, host=None, is_active=True)
-
-        id = request.data['author']['id'].split('/')[-1]
-        pk = uuid.UUID(id)
-        request.data['author']['id'] = pk
-
+        print("AFTER FRIENDS")
+        author_id = request.data['author']['id']
+        author_id = get_uuid_from_url(author_id)
+        request.data['author']['id'] = author_id
+        
         host = request.data['author']['host']
         node = get_object_or_404(Node, hostname=host)
         request.data['author']['host'] = node.id
+        print("AFTER node")
 
         serializer = serializers.AuthorSerializer(data = request.data['author'], context={'request': request})
-            
+
         if serializer.is_valid():
-            author = serializer.save(id=pk)
+            try:
+                author = User.object.get(pk=author_id)
+            except User.DoesNotExist:
+                author = serializer.save(id=author_id)
 
             friend.incomingRequests.add(author)
             author.outgoingRequests.add(friend)
             friend.followers.add(author)
             author.following.add(friend)
             return Response(serializer.data, status=201)
-        
+
         return Response(serializer.errors, status=400)
-     
+

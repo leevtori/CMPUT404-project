@@ -7,7 +7,7 @@ from . import views
 
 urlpatterns = [
     
-    path("unfollow/", views.Unfollow.as_view(), name='unfolow'),
+    path("unfollow/", views.Unfollow.as_view(), name='unfollow'),
     path("follow/", views.Follow.as_view(), name='follow'),
     path("search", views.UserList.as_view(), name='users'),
     path("friends/add/", views.SendFriendRequest.as_view()),

@@ -8,6 +8,13 @@ from django.conf import settings
 User = get_user_model()
 
 
+class FriendSerializer(serializers.ModelSerializer):
+    id = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
+
+    class Meta:
+        model = User
+        fields = ("id",)
+
 class AuthorSerializer(serializers.ModelSerializer):
     id = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
     # firstName = serializers.CharField(source="first_name")
