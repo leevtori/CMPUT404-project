@@ -80,6 +80,8 @@
      connections that are not authenticated!
    - As an author, I want to be able to make posts that are unlisted,
      that are publicly shareable by URI alone (or for embedding images)
+   - As an author, I want to post posts to my "stream"
+
      
 ** User Stories NOT DONE
    + As a server admin, I can disable the node to node interfaces for
@@ -91,7 +93,6 @@
      my posts (CAN'T EDIT YET)
    + As an author, I want to befriend remote authors
    + As an author, I want to pull in my github activity to my "stream"
-   + As an author, I want to post posts to my "stream"
    + As a server admin, I want to share or not share posts with users
      on other servers.
    + As a server admin, I want to share or not share images with users
