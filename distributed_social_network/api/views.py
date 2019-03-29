@@ -49,7 +49,7 @@ class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
             # Not really meant to be used this way...but it works?
             post_filter = PostVisbilityMixin()
             qs = post_filter.filter_user_visible(self.request.user, user.posts.all())
-
+            qs = qs.filter(unlisted=False)
             page = self.paginate_queryset(qs)
             if page is not None:
                 serializer = serializers.PostSerializer(page, many=True, context={'request': request})
@@ -215,7 +215,7 @@ class FriendRequestView(APIView):
     Makes a friend request
     """
     def post(self, request):
-        
+
         friend_id = uuid.UUID(request.data['friend']['id'].split('/')[-1])
         friend =  get_object_or_404(User, pk=friend_id, host=None, is_active=True)
 
@@ -228,7 +228,7 @@ class FriendRequestView(APIView):
         request.data['author']['host'] = node.id
 
         serializer = serializers.AuthorSerializer(data = request.data['author'], context={'request': request})
-            
+
         if serializer.is_valid():
             author = serializer.save(id=pk)
 
@@ -237,6 +237,6 @@ class FriendRequestView(APIView):
             friend.followers.add(author)
             author.following.add(friend)
             return Response(serializer.data, status=201)
-        
+
         return Response(serializer.errors, status=400)
-     
+
