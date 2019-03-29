@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from posts.utils import Visibility
 from posts.models import Post, Comment
+from users.models import User, Node
 
 
 from rest_framework import permissions
@@ -20,7 +21,6 @@ import re, uuid
 import json
 
 User = get_user_model()
-
 
 
 class PaginateOverrideMixin:
@@ -38,7 +38,7 @@ class PaginateOverrideMixin:
         return self.paginator.get_paginated_response(data, **kwargs)
 
 
-class AuthorViewset (viewsets.ReadOnlyModelViewSet):
+class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
     """API endpoint for getting users and user list
      - Gets profile
      - Gets a list of authors
@@ -63,16 +63,17 @@ class AuthorViewset (viewsets.ReadOnlyModelViewSet):
             serializer = serializers.PostSerializer(qs, many=True, context={'request': request})
             return Response(serializer.data)
 
-    # def list(self, request):
-    #     qs = self.get_queryset()
-    #     page = self.paginate_queryset(qs)
+    def list(self, request):
+        qs = self.get_queryset()
+        qs = qs.filter(host=None)
+        page = self.paginate_queryset(qs)
 
-    #     if page is not None:
-    #         serializer = self.get_serializer(page, many=True, context={'request': request})
-    #         return self.get_paginated_response(serializer.data, model="authors", query="authors")
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data, model="authors", query="authors")
 
-    #     serializer = self.get_serializer(qs, many=True)
-    #     return Response(serializer.data)
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
 
 
 class FriendsView(APIView):
@@ -115,6 +116,7 @@ class AuthorPostView(APIView):
     /author/posts
     """
     permission_classes = (permissions.IsAuthenticated,)
+
     def get(self, request):
         return Response(status=501)
 
@@ -171,12 +173,10 @@ class CommentView(APIView):
         a = a.split('/')
         id = a[-1]
         commentUser = get_object_or_404(User, pk=uuid.UUID(id))
-        print("HERRRRRRRROOOO ", commentUser)
 
         serializer = serializers.CommentPostSerializer(data = request.data['post'], context={'request':request})
 
         if serializer.is_valid():
-            print("valid")
             serializer.save(post_id=pk,author=commentUser)
             return Response(serializer.data, status=201)
         print("ERRROR ", serializer.errors)
@@ -202,9 +202,28 @@ class FriendRequestView(APIView):
     Makes a friend request
     """
     def post(self, request):
-        body_unicode = self.request.body.decode('utf-8')
-        body = json.loads(body_unicode)
-        friend_id = body['id']
-        print("added ", friend_id)
-        friend = get_object_or_404(User, id=friend_id)
-        friend.followers.add(self.request.user)
+        
+        friend_id = uuid.UUID(request.data['friend']['id'].split('/')[-1])
+        friend =  get_object_or_404(User, pk=friend_id, host=None, is_active=True)
+
+        id = request.data['author']['id'].split('/')[-1]
+        pk = uuid.UUID(id)
+        request.data['author']['id'] = pk
+
+        host = request.data['author']['host']
+        node = get_object_or_404(Node, hostname=host)
+        request.data['author']['host'] = node.id
+
+        serializer = serializers.AuthorSerializer(data = request.data['author'], context={'request': request})
+            
+        if serializer.is_valid():
+            author = serializer.save(id=pk)
+
+            friend.incomingRequests.add(author)
+            author.outgoingRequests.add(friend)
+            friend.followers.add(author)
+            author.following.add(friend)
+            return Response(serializer.data, status=201)
+        
+        return Response(serializer.errors, status=400)
+     

@@ -9,19 +9,19 @@
         }
     </style>
     <script>
-        function delete_this(){
-            fetch("/posts/delete/",{
-	            method: "DELETE",
-                headers:{'X-CSRFToken':'{{ csrf_token }}','postid':'{{ post.id }}'},
-            }
-            ).then((response) => {
-                if (response.status === 200) {
-                    window.location.replace("/");
-                }else{
-                    alert('hmm, something went wrong');
-                }
-            });
-        }
+        // function delete_this(){
+        //     fetch("/posts/delete/",{
+	    //         method: "DELETE",
+        //         headers:{'X-CSRFToken':'{{ csrf_token }}','postid':'{{ post.id }}'},
+        //     }
+        //     ).then((response) => {
+        //         if (response.status === 200) {
+        //             window.location.replace("/");
+        //         }else{
+        //             alert('hmm, something went wrong');
+        //         }
+        //     });
+        // }
 
         function mkdown(){
             var node;
@@ -183,42 +183,39 @@
 {% endblock %}
 
 {% block content %}
-    <div style="width:50%; border:1px solid black">
-<div>
-    <h4 class='fullname'>{{post.author.first_name}} {{post.author.last_name}}</h4>
-    <p class='username'>@{{post.author.username}}</p>
 
-</div>
-    <h1>{{ post.title }}</h1>
-    <p>{{ post.comment }}</p>
-    {% if post.content_type == 'TXT' %}
-        <p>{{post.content}}</p>
-    {% elif post.content_type == 'MKD' %}
-        <div id="mkdowndiv">
-        </div>
-        <br>
-    {% else %}
-        <img id="post_image">
-    {% endif %}
-
-    {% if user.username == post.author.username %}
-        <a href="javascript:delete_this()">delete</a>
-    {% endif %}
-</div>
+<h4 class='fullname'>{{post.author.first_name}} {{post.author.last_name}}</h4>
+<p class='username'>@{{post.author.username}}</p>
 
 
-    {% for comments in post_comments %}
-        {% include "comment.html"%}
-    {% endfor %}
-
-<br>
-    <div border-style="solid";>
-
-        <form method="post" action="/newComment/" enctype="multipart/form-data">{% csrf_token %}
-            <input name="post" type="hidden" value={{ post.id }}>
-            <input name="comment" type="text">
-            <input type="submit" value="Comment">
-
-        </form>
+<h1>{{ post.title }}</h1>
+<p>{{ post.comment }}</p>
+{% if post.content_type == 'TXT' %}
+    <p>{{post.content}}</p>
+{% elif post.content_type == 'MKD' %}
+    <div id="mkdowndiv">
     </div>
+    <br>
+{% else %}
+    <img id="post_image">
+{% endif %}
+
+{% if user.username == post.author.username %}
+<form action={% url 'deletepost' pk=post.id %} method="get">
+    <input type='submit' value='Delete Post'>
+</form>
+{% endif %}
+
+
+<form method="post" action={% url 'comment' %} enctype="multipart/form-data">
+    {% csrf_token %}
+    <input name="post" type="hidden" value={{ post.id }}>
+    <input name="comment" type="text">
+    <input type="submit" value="Comment">
+</form>
+
+{% for comments in post_comments %}
+    {% include "comment.html"%}
+{% endfor %}
+<br>
 {% endblock%}

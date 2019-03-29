@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from posts.utils import content_type_str, visibility_str
 from posts.models import Post, Comment
+from django.conf import settings
 
 User = get_user_model()
 
@@ -12,7 +13,8 @@ class AuthorSerializer(serializers.ModelSerializer):
     # firstName = serializers.CharField(source="first_name")
     # lastName = serializers.CharField(source="last_name")
     # serializers.CharField(source="username")
-    displayName = serializers.CharField(source="display_name")
+
+    displayName = serializers.CharField(source="username")
     url = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
 
     class Meta:
@@ -20,11 +22,13 @@ class AuthorSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "host",
-            # "username",
             "displayName",
             "url",
             "github"
         )
+
+    def get_host(self, obj):
+        return obj.host or settings.HOSTNAME
 
 
 class CommentSerializer(serializers.ModelSerializer):

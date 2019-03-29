@@ -1,7 +1,6 @@
 import json
 
-from django.http import HttpResponseNotFound
-from django.shortcuts import render, HttpResponse, get_object_or_404, HttpResponseRedirect
+from django.shortcuts import HttpResponse, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Post, Comment
@@ -143,11 +142,32 @@ def create_post(request):
         new_post.author = request.user
         new_post.save()
         print("@@@@@@",new_post)
-        return HttpResponse(status=200)
+        return redirect('feed')
+        
     else:
         return HttpResponse(status=404)
 
+def delete_post(request, pk):
+    if (request.method == "GET"):
+        post = Post.objects.get(id=pk)
+        post.delete()
+        return redirect('feed')
+    else: 
+        return HttpResponse(status=404)
 
+def add_comment(request):
+    if request.method == "POST":
+        post_id=request.POST['post']
+        select_post = Post.objects.get(id=post_id)
+        new_comment = Comment(
+            post=select_post,
+            comment=request.POST['comment'],
+            author=request.user
+        )
+        new_comment.save()
+        return redirect('postdetail', pk=post_id)
+    else:
+        return HttpResponse(status=404)
 
 
 

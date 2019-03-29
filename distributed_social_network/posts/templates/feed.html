@@ -62,7 +62,7 @@
             </div>
 
             <div id='new_txt_post' class='post_tabcontent' style="display:block;">
-                <form class='new_post_form' id='create_form' action="/posts/create" method="post">
+                <form class='new_post_form' id='create_form' action={% url 'createpost' %} method="post">
                     {% csrf_token %}
                     <label for="{{form.title.id_for_label}}" name='title'>Title</label> {{form.title}}
                     <label for="{{form.description.id_for_label}}" name='description'>Description</label> {{form.description}}
@@ -77,7 +77,7 @@
             </div>
 
             <div id='new_mkd_post' class='post_tabcontent'>
-                <form class='new_post_form' id='create_form' action="/posts/create" method="post">
+                <form class='new_post_form' id='create_form' action={% url 'createpost' %} method="post">
                     {% csrf_token %}
                     <label for="{{form.title.id_for_label}}" name='title'>Title</label> {{form.title}}
                     <label for="{{form.description.id_for_label}}" name='description'>Description</label> {{form.description}}
@@ -92,7 +92,7 @@
             </div>
 
             <div id='new_img_post' class='post_tabcontent'>
-                <form class='new_post_form' id='create_form' action="/posts/create" method="post">
+                <form class='new_post_form' id='create_form' action={% url 'createpost' %} method="post">
                     {% csrf_token %}
                     <label for="{{form.title.id_for_label}}" name='title'>Title</label> {{form.title}}
                     <label for="{{form.description.id_for_label}}" name='description'>Description</label> {{form.description}}

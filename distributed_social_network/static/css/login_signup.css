@@ -14,9 +14,9 @@ html, body {
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
-    height: 100%;
+    /* height: 100%; */
     
-    /* padding-bottom: 100px; */
+    padding-bottom: 100px;
     /* background-color: blue; */
 }
 
@@ -99,6 +99,10 @@ a{
 
 .signup_form{
     width:600px;
+}
+
+.signup_form label{
+    font-size: small;
 }
 
 #signup_form_btn{

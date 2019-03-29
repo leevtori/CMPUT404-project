@@ -28,7 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-HOSTNAME = "localhost:8000"  # FIXME: update to server's hostname
+HOSTNAME = "http://frandzone.herokuapp.com/api/"  # FIXME: update to server's hostname
 
 # Application definition
 
