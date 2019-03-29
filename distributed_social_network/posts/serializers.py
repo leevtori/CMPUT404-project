@@ -25,7 +25,15 @@ contentTypeDict={
 def requestPosts(node, ending, current_id):
     try:
         a = requests.get(node.hostname+node.prefix+ending, headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
+
+        if a.status_code!=200:
+            print('pepega')
+            a = requests.get(node.hostname + node.prefix + ending, headers={"X-AUTHOR-ID": str(current_id)},
+                             auth=HTTPBasicAuth(node.send_username, node.send_password))
+
         if a.status_code==200:
+            print('200')
+
             stream = io.BytesIO(a.content)
             data = JSONParser().parse(stream)
             l = posts_request_deserializer(data=data)
@@ -55,8 +63,13 @@ def requestPosts(node, ending, current_id):
 
 def requestSinglePost(link, current_id, node):
     try:
+        print('getting:'+link)
         a = requests.get(link, headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
+        if a.status_code!=200:
+            print(a.status_code)
+            a = requests.get(link, headers={"X-AUTHOR-ID":str(current_id)},auth=HTTPBasicAuth(node.send_username, node.send_password))
         if a.status_code==200:
+            print('200')
             stream = io.BytesIO(a.content)
             data = JSONParser().parse(stream)
             l = posts_request_deserializer(data=data)
@@ -68,7 +81,7 @@ def requestSinglePost(link, current_id, node):
                     post.create(post.validated_data)
             return True
     except Exception as e:
-        print(e)
+        print('ERROR :',e)
 
 
 
