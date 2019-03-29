@@ -10,6 +10,12 @@
     <div style="padding:10px">
         {% csrf_token %}
         <button class='delete_friend_btn' type='submit' onclick="deleteFriend('{{user.id}}')">&#x2716 Delete Friend</button>
+        
+        {% if user in following %}
+            <button class='delete_friend_btn' type='submit' onclick="unfollow('{{user.id}}')">Unfllow</button>
+        {% else %}
+            <button class='add_friend_btn' type='submit' onclick="follow('{{user.id}}')">Follow</button>
+        {% endif %}
     </div>
 
 </div>

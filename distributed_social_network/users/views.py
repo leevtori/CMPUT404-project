@@ -38,6 +38,11 @@ class FriendList(LoginRequiredMixin, ListView):
     model = User
     template_name = "friends_list.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['following'] = self.request.user.following.all()
+        return context
+
     def get_queryset(self):
         return self.request.user.friends.all()
 
@@ -49,6 +54,7 @@ class FollowerList(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['friends'] = self.request.user.friends.all()
+        context['following'] = self.request.user.following.all()
         return context
 
     def get_queryset(self):
@@ -134,7 +140,6 @@ class FriendRequests(LoginRequiredMixin, ListView):
         return q
 
 class Unfollow(LoginRequiredMixin, View):
-
     model = User
 
     def post(self, request):

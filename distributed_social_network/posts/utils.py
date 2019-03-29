@@ -4,7 +4,7 @@ content_type_str = {
     "MKD": "text/markdown",
     "TXT": "text/plain",
     "APP": "application/base64",
-    "PNG": "imgage/png;base64",
+    "PNG": "image/png;base64",
     "JPG": "image/jpeg;base64"
     }
 
