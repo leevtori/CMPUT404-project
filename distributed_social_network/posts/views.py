@@ -76,6 +76,11 @@ class ProfileView(PostVisbilityMixin, ListView):
     template_name = 'profile.html'
 
     def get_context_data(self, **kwargs):
+        #updates the user from nodes if foreign:
+        desired_user=kwargs['object']
+        if desired_user.local==False:
+
+
         context = super().get_context_data(**kwargs)
         # get user object based on username in url
         user = get_object_or_404(User, username=self.kwargs['username'])
