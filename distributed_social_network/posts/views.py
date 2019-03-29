@@ -106,7 +106,7 @@ class FeedView(PostVisbilityMixin, ListView):
         nodes = Node.objects.all()
         for node in nodes:
             requestPosts(node, 'posts',self.request.user.id)
-            requestPosts(node, 'author/posts', self.request.user.id)
+            #requestPosts(node, 'author/posts', self.request.user.id)
 
         context = super().get_context_data(**kwargs)
         context['post_count'] = Post.objects.filter(author=self.request.user).count

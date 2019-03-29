@@ -169,6 +169,8 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
 
         post = request.data["post"]
 
+        serializer = serializers.PostSerializer(data=post)
+
 
         return Response(status=501)
 
@@ -242,16 +244,18 @@ class AreFriendsView(APIView):
 
     def get(self, request, pk1, pk2):
         print("HEHRRHEHREHEHH")
-        author1 = get_object_or_404(pk=pk1)
-        author2 = get_object_or_404(pk=pk2)
-        author1_id = author1.host + author1.id #is this in the right format? idk lol
-        author2_id = author2.host + author2.id
+        id1=get_uuid_from_url(pk1)
+        id2=get_uuid_from_url(pk2)
+        author1 = get_object_or_404(User,id=id1)
+        author2 = get_object_or_404(User,id=id2)
+        author1_id = author1.geturl() #is this in the right format? idk lol
+        author2_id = author2.geturl()
         print('auth1 id = ', author1_id)
         print('auth2 id = ', author2_id)
         are_friends = author2 in author1.friends.all()
-     
+
         data = {
-            "query": "friends", 
+            "query": "friends",
             "friends": are_friends,
             "authors": [
                 author1_id,
@@ -279,7 +283,7 @@ class FriendRequestView(APIView):
         author_id = request.data['author']['id']
         author_id = get_uuid_from_url(author_id)
         request.data['author']['id'] = author_id
-        
+
         host = request.data['author']['host']
         node = get_object_or_404(Node, hostname__icontains=host)
         request.data['author']['host'] = node.id
@@ -305,7 +309,7 @@ class FriendRequestView(APIView):
                 "message": "Friend request sent"
             }
             return JsonResponse(data, safe=False, status=200)
-        
+
         data = {
             "query": "friendrequest",
             "sucess": sucess,
