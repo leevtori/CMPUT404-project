@@ -4,7 +4,7 @@ content_type_str = {
     "MKD": "text/markdown",
     "TXT": "text/plain",
     "APP": "application/base64",
-    "PNG": "imgage/png;base64",
+    "PNG": "image/png;base64",
     "JPG": "image/jpeg;base64"
     }
 
@@ -59,8 +59,6 @@ class Visibility(Enum):
     PRIVATE = "PRIV"
     SERVERONLY = "SERV"
     FRIENDSONLY = "FRND"
-    CUSTOM = "CUST"
-    UNLISTED = "UNLS"
 
     @classmethod
     def get_choices(cls):
@@ -71,3 +69,4 @@ class Visibility(Enum):
 
     def get_readable_str(self):
         return visibility_str[self.value]
+

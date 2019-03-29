@@ -17,7 +17,7 @@ class Node(models.Model):
     active = False
     
     def __str__(self):
-        return self.user.username
+        return self.hostname
         
 
 class CustomUserManager(UserManager):

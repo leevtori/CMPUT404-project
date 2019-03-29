@@ -1,6 +1,6 @@
 import json
 
-from django.shortcuts import HttpResponse, redirect
+from django.shortcuts import HttpResponse, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Post, Comment
@@ -9,7 +9,10 @@ from django.views.generic.base import TemplateView
 from users.views import FriendRequests
 import uuid
 
+
+
 from posts.forms import PostForm
+from posts.serializers import requestPosts
 
 from django.db import connection
 from django.db.models import Q
@@ -51,9 +54,6 @@ class PostVisbilityMixin(LoginRequiredMixin):
         query_list.append(Q(author__id__in=foaf, visibility=Visibility.FOAF))
 
         visible = user.visible_posts.all()
-
-        # add unlisted, but don't show it in the feed
-        query_list.append(Q(visibility=Visibility.UNLISTED))
 
         qs = qs.filter(reduce(__or__, query_list))
         # qs = qs.union(visible).distinct()  # this doesn't filter properly afterwards
@@ -101,6 +101,9 @@ class FeedView(PostVisbilityMixin, ListView):
     ordering = '-published'
 
     def get_context_data(self, **kwargs):
+        # get public posts from other hosts, using https://connectifyapp.herokuapp.com/ as test
+        requestPosts('https://young-plains-33934.herokuapp.com/api/posts')
+
         context = super().get_context_data(**kwargs)
         context['post_count'] = Post.objects.filter(author=self.request.user).count
         context['friend_count'] = self.request.user.friends.count

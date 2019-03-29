@@ -21,10 +21,7 @@ class AuthorSerializer(serializers.ModelSerializer):
     # lastName = serializers.CharField(source="last_name")
     # serializers.CharField(source="username")
 
-    host = serializers.SerializerMethodField()
-
-
-    displayName = serializers.CharField(source="display_name")
+    displayName = serializers.CharField(source="username")
     url = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
 
     class Meta:
@@ -32,7 +29,6 @@ class AuthorSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "host",
-            # "username",
             "displayName",
             "url",
             "github"

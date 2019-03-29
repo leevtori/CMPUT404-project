@@ -122,17 +122,17 @@
 
             <div id="public_posts" class="feed_tabcontent" style="display:block">
                 {% for post in object_list %}
-                    {% if post.visibility != "UNLS" %}
+                    {% if not post.unlisted %}
                         {% include "post.html"%}
-                    {%  endif %}
+                    {% endif %}
                 {% endfor %}
             </div>
             
             <div id="following_posts" class="feed_tabcontent">
                 {% for post in following_posts %}
-                    {% if post.visibility != "UNLS" %}
+                    {% if not post.unlisted %}
                         {% include "post.html"%}
-                    {%  endif %}
+                    {% endif %}
                 {% endfor %}
             </div>
 

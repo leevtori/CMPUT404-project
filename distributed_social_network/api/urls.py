@@ -10,5 +10,6 @@ urlpatterns = [
     path('author/<uuid:pk>/friends', views.FriendsView.as_view(), name="api-author-friends"),
     path('posts/<uuid:pk>/comments', views.CommentView.as_view(), name="api-comments"),
     path('author/posts', views.AuthorPostView.as_view(), name="api-author-post"),
+    path('friendrequest', views.FriendRequestView.as_view()),
     path('', include(routers.urls)),
 ]

@@ -9,24 +9,24 @@
     {% csrf_token %}
     <div style="padding:10px">
         {% if user in friends %}
-            Friends &#x2713; <button class='unfollow_btn' type='submit' onclick="unfollow('{{user.id}}')">Unfllow</button>
+            Friends &#x2713; <button class='add_friend_btn' type='submit' onclick="unfollow('{{user.id}}')">Unfllow</button>
 
         {% elif user in sendFriendRequest%}
-            Friend Request Sent &#x2713; <button class='unfollow_btn' type='submit' onclick="unfollow('{{user.id}}')">Unfllow</button>
+            Friend Request Sent &#x2713; <button class='add_friend_btn' type='submit' onclick="unfollow('{{user.id}}')">Unfllow</button>
 
         {% elif user in incomingFriendRequest %}
             <button class='add_friend_btn' type='submit' onclick="confirmFriend('{{user.id}}')">+ Confirm Friend</button>
             {% if user in following %}
-                <button class='unfollow_btn' type='submit' onclick="unfollow('{{user.id}}')">Unfllow</button>
+                <button class='add_friend_btn' type='submit' onclick="unfollow('{{user.id}}')">Unfllow</button>
             {% else %}
-                <button class='follow_btn' type='submit' onclick="follow('{{user.id}}')">Follow</button>
+                <button class='add_friend_btn' type='submit' onclick="follow('{{user.id}}')">Follow</button>
             {% endif %}
         {% else %}
             <button class='add_friend_btn' type='submit' onclick="addFriend('{{user.id}}')">+ Add Friend</button>
             {% if user in following %}
-                <button class='unfollow_btn' type='submit' onclick="unfollow('{{user.id}}')">Unfllow</button>
+                <button class='add_friend_btn' type='submit' onclick="unfollow('{{user.id}}')">Unfllow</button>
             {% else %}
-                <button class='follow_btn' type='submit' onclick="follow('{{user.id}}')">Follow</button>
+                <button class='add_friend_btn' type='submit' onclick="follow('{{user.id}}')">Follow</button>
             {% endif %}
         {% endif %}
     </div>
