@@ -24,12 +24,7 @@ User = get_user_model()
 
 class PaginateOverrideMixin:
     def get_paginated_response(self, data, **kwargs):
-        """        body_unicode = self.request.body.decode('utf-8')
-        body = json.loads(body_unicode)
-        friend_id = body['id']
-        print("added ", friend_id)
-        friend = get_object_or_404(User, id=friend_id)
-        friend.followers.add(self.request.user)
+        """
         Return a paginated style `Response` object for the given output data.
         overridden from GenericAPIView to pass in additional parameters.
         """
@@ -83,34 +78,41 @@ class FriendsView(GenericAPIView):
     serializer_class = serializers.FriendSerializer
     queryset = User.objects.all()
 
-    def get(self, request, pk):
+    def get_friends(self, pk):
         user = get_object_or_404(User, pk=pk)
-        friends = user.friends.all()
+        return user.friends.all()
 
+    def format_response(self, friends, request):
         serializer = self.get_serializer(friends, many=True, context={'request': request})
         response = {"query": "friends"}
+
+        if request.method == "POST":
+            response["author"] = "author_id"
+
         response["authors"] = [i["id"] for i in serializer.data]
 
-        return Response(response)
+        return response
 
-    # def post(self, request):
-    #     # Parse the url to a uuid only.
-    #     # UUID regex pattern from
-    #     # https://stackoverflow.com/questions/7905929/how-to-test-valid-uuid-guid/13653180#13653180
-    #     # Taken March 12, 2018
-    #     user = get_object_or_404(User, pk=pk)
-    #     friends = user.friends.all()
+    def get(self, request, pk):
+        friends = self.get_friends(pk)
+        return Response(self.format_response(friends, request))
 
-    #     p = "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"
-    #     pattern = re.compile(p, re.IGNORECASE)
-    #     author_query = [pattern.search(id).group() for id in request.data["authors"]]
+    def post(self, request, pk):
+        # Parse the url to a uuid only.
+        # UUID regex pattern from
+        # https://stackoverflow.com/questions/7905929/how-to-test-valid-uuid-guid/13653180#13653180
+        # Taken March 12, 2018
+        friends = self.get_friends(pk)
 
-    #     are_friends = .friends.filter(id__in=author_query).values_list("id", flat=True)
+        p = "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"
+        pattern = re.compile(p, re.IGNORECASE)
+        author_query = [pattern.search(id).group() for id in request.data["authors"]]
 
-    #     response_data = dict(request.data)
-    #     response_data["authors"] = [str(friend) for friend in are_friends]
+        are_friends = friends.filter(id__in=author_query)
 
-    #     return Response(response_data)
+        response_data = self.format_response(are_friends, request)
+
+        return Response(response_data)
 
 
 class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
