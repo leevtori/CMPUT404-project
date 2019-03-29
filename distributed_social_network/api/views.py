@@ -169,6 +169,8 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
 
         post = request.data["post"]
 
+        serializer = serializers.PostSerializer(data=post)
+
 
         return Response(status=501)
 
@@ -218,18 +220,18 @@ class CommentView(PaginateOverrideMixin, GenericAPIView):
             return Response(status=400)
 
         # post = get_object_or_404(Post, pk=pk)
-        
+
 
         id = request.data['post']['author']['id']
         id = get_uuid_from_url(id)
         print("PKK ", id)
 
- 
+
         commentUser = get_object_or_404(User, pk=id)
         print("USSSSS ", commentUser)
         request.data['post'].pop('author')
         print(request.data)
-        
+
         serializer = serializers.CommentPostSerializer(data = r_data , context={'request':request})
 
         if serializer.is_valid():
@@ -254,9 +256,9 @@ class AreFriendsView(APIView):
         print('auth1 id = ', author1_id)
         print('auth2 id = ', author2_id)
         are_friends = author2 in author1.friends.all()
-     
+
         data = {
-            "query": "friends", 
+            "query": "friends",
             "friends": are_friends,
             "authors": [
                 author1_id,
@@ -284,7 +286,7 @@ class FriendRequestView(APIView):
         author_id = request.data['author']['id']
         author_id = get_uuid_from_url(author_id)
         request.data['author']['id'] = author_id
-        
+
         host = request.data['author']['host']
         node = get_object_or_404(Node, hostname__icontains=host)
         request.data['author']['host'] = node.id
@@ -310,7 +312,7 @@ class FriendRequestView(APIView):
                 "message": "Friend request sent"
             }
             return JsonResponse(data, safe=False, status=200)
-        
+
         data = {
             "query": "friendrequest",
             "sucess": sucess,
