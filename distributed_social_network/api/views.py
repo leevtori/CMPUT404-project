@@ -161,18 +161,28 @@ class CommentView(APIView):
         return Response(serializer.data)
 
     def post(self, request, pk):
-        print("data ", request.data['post'])
+        # print("data ", request.data['post'])
 
         post = get_object_or_404(Post, pk=pk)
 
-        # check the user is valid
-        p = request.data['post']
-        a = p['author']['id']
-        # a = a['id']
-        a = a[:-1]
-        a = a.split('/')
-        id = a[-1]
-        commentUser = get_object_or_404(User, pk=uuid.UUID(id))
+        id = request.data['post']['author']['id']
+        p = "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"
+        pattern = re.compile(p, re.IGNORECASE)
+      
+        id = pattern.search(id).group(0)
+        print("PKK ", id)
+        # id = pattern.search(id)
+        # author_query = [pattern.search(id), request.data['post']["author"]]
+        # print("AUTHOR ", author_query)
+
+        # # check the user is valid
+        # p = request.data['post']
+        # a = p['author']['id']
+        # # a = a['id']
+        # a = a[:-1]
+        # a = a.split('/')
+        # id = a[-1]
+        commentUser = get_object_or_404(User, pk=id)
 
         serializer = serializers.CommentPostSerializer(data = request.data['post'], context={'request':request})
 
