@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from posts.utils import Visibility
 from posts.models import Post, Comment
 from users.models import User, Node
+from django.conf import settings
 
 
 from rest_framework import permissions
@@ -21,6 +22,11 @@ import re, uuid
 import json
 
 User = get_user_model()
+
+def get_uuid_from_url(url):
+    p = "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"
+    pattern = re.compile(p, re.IGNORECASE)
+    return pattern.search(url).group()
 
 
 class PaginateOverrideMixin:
@@ -49,7 +55,7 @@ class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
             # Not really meant to be used this way...but it works?
             post_filter = PostVisbilityMixin()
             qs = post_filter.filter_user_visible(self.request.user, user.posts.all())
-
+            qs = qs.filter(unlisted=False)
             page = self.paginate_queryset(qs)
             if page is not None:
                 serializer = serializers.PostSerializer(page, many=True, context={'request': request})
@@ -105,9 +111,7 @@ class FriendsView(GenericAPIView):
         # Taken March 12, 2018
         friends = self.get_friends(pk)
 
-        p = "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"
-        pattern = re.compile(p, re.IGNORECASE)
-        author_query = [pattern.search(id).group() for id in request.data["authors"]]
+        author_query = [get_uuid_from_url(id) for id in request.data["authors"]]
 
         are_friends = friends.filter(id__in=author_query)
 
@@ -123,9 +127,19 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
     /author/posts
     """
     permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = serializers.PostSerializer
+    queryset = Post.objects.all()
 
     def get(self, request):
-        print
+        try:
+            user_id = request.META.get("X-User")
+            user = User.objects.get(id=user_id)
+        except (KeyError, User.DoesNotExist):
+            return Response(status=400)
+
+        post_filter = PostVisbilityMixin()
+        posts = post_filter.filter_user_visible(user)
+
         return Response(status=501)
 
     def post(self, request):
@@ -142,7 +156,7 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
 
 
     def list(self, request):
-        qs = Post.objects.filter(visibility=Visibility.PUBLIC)
+        qs = Post.objects.filter(visibility=Visibility.PUBLIC, origin="")
 
         page = self.paginate_queryset(qs)
 
@@ -215,7 +229,7 @@ class FriendRequestView(APIView):
     Makes a friend request
     """
     def post(self, request):
-        
+
         friend_id = uuid.UUID(request.data['friend']['id'].split('/')[-1])
         friend =  get_object_or_404(User, pk=friend_id, host=None, is_active=True)
 
@@ -228,7 +242,7 @@ class FriendRequestView(APIView):
         request.data['author']['host'] = node.id
 
         serializer = serializers.AuthorSerializer(data = request.data['author'], context={'request': request})
-            
+
         if serializer.is_valid():
             author = serializer.save(id=pk)
 
@@ -237,6 +251,6 @@ class FriendRequestView(APIView):
             friend.followers.add(author)
             author.following.add(friend)
             return Response(serializer.data, status=201)
-        
+
         return Response(serializer.errors, status=400)
-     
+

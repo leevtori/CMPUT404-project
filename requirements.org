@@ -39,44 +39,30 @@
    - You make collaborate/consult with other groups in order to get
      your webservices to integrate with each other
 
-** User Stories
-   
+** User Stories DONE  
    - As an author I want to make posts.
    - As an author, posts I create can link to images.
    - As a server admin, images can be hosted on my server.
    - As an author, posts I create be private to me
-   - As an author, posts I create be private to another author
    - As an author, posts I create be private to my friends
    - As an author, posts I create be private to friends of friends
-   - As an author, posts I create be private to only friends on my host
    - As an author, posts I create can be public
    - As an author, posts I make can be in simple plain text
    - As an author, posts I make can be in markdown (commonMark is good)
    - As an author, I want a consistent identity per server
    - As a server admin, I want to host multiple authors on my server
-   - As a server admin, I want to share or not share posts with users
-     on other servers.
-   - As a server admin, I want to share or not share images with users
-     on other servers.
-   - As an author, I want to pull in my github activity to my "stream"
-   - As an author, I want to post posts to my "stream"
    - As an author, I want to delete my own posts.
    - As an author, I want to befriend local authors
-   - As an author, I want to befriend remote authors
    - As an author, I want to feel safe about sharing images and
      posts with my friends -- images should not publicly accessible
      without authentication.
    - As an author, I want un-befriend local and remote authors
    - As an author, I want to be able to use my web-browser to manage
      my profile
-   - As an author, I want to be able to use my web-browser to manage/author
-     my posts
    - As a server admin, I want to be able add, modify, and remove
      authors.
    - As a server admin, I want to be able allow users to sign up but
      require my OK to finally be on my server
-   - As a server admin, I don't want to do heavy setup to get the
-     posts of my author's friends.
    - As a server admin, I want a restful interface for most operations
    - As an author, other authors cannot modify my data
    - As an author, I want to comment on posts that I can access
@@ -89,14 +75,31 @@
    - As a server admin, I want to be able to add nodes to share with
    - As a server admin, I want to be able to remove nodes and stop
      sharing with them.
-   - As a server admin, I can limit nodes connecting to me via
-     authentication.
    - As a server admin, node to node connections can be authenticated
      with HTTP Basic Auth
-   - As a server admin, I can disable the node to node interfaces for
      connections that are not authenticated!
    - As an author, I want to be able to make posts that are unlisted,
      that are publicly shareable by URI alone (or for embedding images)
+     
+** User Stories NOT DONE
+   + As a server admin, I can disable the node to node interfaces for
+   + As a server admin, I can limit nodes connecting to me via
+     authentication.
+   + As a server admin, I don't want to do heavy setup to get the
+     posts of my author's friends.
+   + As an author, I want to be able to use my web-browser to manage/author
+     my posts (CAN'T EDIT YET)
+   + As an author, I want to befriend remote authors
+   + As an author, I want to pull in my github activity to my "stream"
+   + As an author, I want to post posts to my "stream"
+   + As a server admin, I want to share or not share posts with users
+     on other servers.
+   + As a server admin, I want to share or not share images with users
+     on other servers.
+   + As an author, posts I create be private to only friends on my host
+   + As an author, posts I create be private to another author
+
+ 
 ** Main Concepts
    - Author
      - makes posts
@@ -122,20 +125,20 @@
 ** Requirements
 
    - [ ] Implement the webservice as described in the user stories
-   - [ ] Provide a webservice interface that is restful
-   - [ ] Provide a web UI interface that is usable
+   - [x] Provide a webservice interface that is restful
+   - [x] Provide a web UI interface that is usable
    - [ ] Prove your project by connecting with at least 2 other
      groups.
    - [ ] Make a video demo of your blog (desktop-recorder is ok)
    - [ ] Make a presentation about your blog
-   - [ ] Follow the guidelines in the example-article.json for the
+   - [x] Follow the guidelines in the example-article.json for the
      URLs and services
-   - [ ] friend querying via POSTs to http://service/friends/userid
-   - [ ] friend2friend querying via GETs to http://service/author/<userid>/friends/<userid>
-   - [ ] implement author profiles via http://service/author/userid
-   - [ ] Enforce some authentication
+   - [x] friend querying via POSTs to http://service/friends/userid
+   - [x] friend2friend querying via GETs to http://service/author/<userid>/friends/<userid>
+   - [x] implement author profiles via http://service/author/userid
+   - [x] Enforce some authentication
      - Consider HTTP Basic Auth
-   - [ ] implement a restful API for http://service/posts/postid
+   - [x] implement a restful API for http://service/posts/postid
      - a PUT should insert/update a post
      - a POST should insert the post 
      - a GET with a postfixed "postid" should return the post
@@ -143,25 +146,25 @@
      - implement an alias http://service/posts/postid for Winter 2015 term projects.
    - [ ] FOAF verification involves the 3 hosts of the 3 friends
      A->B->C assuming A B C reside on different hosts.
-   - [ ] Allow users to accept or reject friend requests
+   - [x] Allow users to accept or reject friend requests
    - [ ] friend requests can be made by POSTing a friend request to 
      http://service/friendrequest
    - [ ] http://service/author/posts (posts that are visible to the currently authenticated user)
-   - [ ] http://service/author/{AUTHOR_ID}/posts (all posts made by {AUTHOR_ID} visible to the currently authenticated user)
+   - [x] http://service/author/{AUTHOR_ID}/posts (all posts made by {AUTHOR_ID} visible to the currently authenticated user)
    - [ ] Images get the same protection that posts get as they are POSTS   
    - [ ] example-article.json is adhered to.
 ** Take-aways
-   - [ ] 1 Working Website
-   - [ ] 1 Github git repo
+   - [x] 1 Working Website
+   - [x] 1 Github git repo
    - [ ] 1 Presentation
    - [ ] 1 Video
  
 ** Restrictions
-   - [ ] Use Python 3.6 (otherwise get approval)
-   - [ ] Use Django or Flask (otherwise get approval)
-   - [ ] Must run on one of the following:
-     - [ ] provided VMs
-     - [ ] Heroku
+   - [x] Use Python 3.6 (otherwise get approval)
+   - [x] Use Django or Flask (otherwise get approval)
+   - [x] Must run on one of the following:
+     - [x] provided VMs
+     - [x] Heroku
    - [ ] License your code properly (use an OSI approved license)
      - Put your name on it!
 
@@ -184,8 +187,8 @@
 ** Marking
 *** Project Part 0
     - 1 mark
-    - [ ] 4-5 CCIDs
-    - [ ] 1 Github repo with a README and LICENSE
+    - [x] 4-5 CCIDs
+    - [x] 1 Github repo with a README and LICENSE
 *** Project Part 1
     - 10 Marks (scaled to 7 marks)
     - Code Base 3 marks
