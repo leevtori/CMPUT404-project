@@ -220,21 +220,25 @@ class AreFriendsView(APIView):
     """
 
     def get(self, request, pk1, pk2):
+        print("HEHRRHEHREHEHH")
         author1 = get_object_or_404(pk=pk1)
         author2 = get_object_or_404(pk=pk2)
-        are_friends = False
-        if author2 in author1.friends.all():
-            are_friends = True
+        author1_id = author1.host + author1.id #is this in the right format? idk lol
+        author2_id = author2.host + author2.id
+        print('auth1 id = ', author1_id)
+        print('auth2 id = ', author2_id)
+        are_friends = author2 in author1.friends.all()
+     
+        data = {
+            "query": "friends", 
+            "friends": are_friends,
+            "authors": [
+                author1_id,
+                author2_id,
+            ],
+        }
+        return JsonResponse(data, safe=False)
 
-            data = {
-                "query": "friends", 
-                "friends": are_friends,
-                "authors": [
-                    author1.host
-                ],
-            }
-            return JsonResponse(data, safe=False)
-        return Response(status=501)
 
 
 class CreatePostView(CreateAPIView):
