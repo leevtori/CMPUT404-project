@@ -23,7 +23,7 @@ contentTypeDict={
 }
 
 def requestPosts(node, ending, current_id):
-    a = requests.get(node.hostname+ending, headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
+    a = requests.get(node.hostname+node.prefix+ending, headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
     stream = io.BytesIO(a.content)
     data = JSONParser().parse(stream)
     l = posts_request_deserializer(data=data)
