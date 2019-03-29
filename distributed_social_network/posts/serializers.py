@@ -22,9 +22,9 @@ contentTypeDict={
     "image/jpeg;base64":"JPG"
 }
 
-def requestPosts(link):
+def requestPosts(node, ending, current_id):
+    a = requests.get(node.hostname+ending, headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
 
-    a = requests.get(link, auth=HTTPBasicAuth("frandzone","cmput404group10"))
     stream = io.BytesIO(a.content)
     data = JSONParser().parse(stream)
     l = posts_request_deserializer(data=data)
@@ -32,9 +32,12 @@ def requestPosts(link):
     for i in l.validated_data['posts']:
         post = post_deserializer_no_comment(data=i)
         if post.is_valid():
-            post.validated_data['source'] = link+str(post.validated_data['id'])
             new_post = post.create(post.validated_data)
             if new_post!=None:
+                if new_post.origin=='':
+                    new_post.origin = link+ '/'+ str(new_post.id)
+                if new_post.source=='':
+                    new_post.source = link+ '/'+ str(new_post.id)
                 new_post.save()
                 print('saved new post id :'+str(new_post.id))
             else:
