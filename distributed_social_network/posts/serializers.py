@@ -22,9 +22,9 @@ contentTypeDict={
     "image/jpeg;base64":"JPG"
 }
 
-def requestPosts(link):
+def requestPosts(node, ending, current_id):
+    a = requests.get(node.hostname+ending, headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
 
-    a = requests.get(link, auth=HTTPBasicAuth("frandzone","cmput404group10"))
     stream = io.BytesIO(a.content)
     data = JSONParser().parse(stream)
     l = posts_request_deserializer(data=data)
