@@ -1,17 +1,18 @@
 
-table.content{
+.content{
     padding-bottom: 2000px; 
-    width:100%;
 }
 
-td.left_col{
+.left_col{
     width:30%;
     vertical-align: top;
+    float:left;
 }
 
-td.right_col{
+.right_col{
     width: 70%;
     vertical-align: top;
+    float: right;
 }
 
 

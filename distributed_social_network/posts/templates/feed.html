@@ -28,19 +28,20 @@
                             </a>
                         </td>
                         <td class='stats'>
+                            <a href={% url 'following' %} class='stats'>
+                            <div style="height:100%;width:100%">
+                                {{following_count}}<br/>Following
+                            </div>
+                            </a>
+                        </td> 
+                        <td class='stats'>
                             <a href={% url 'friends' %} class='stats'>
                             <div style="height:100%;width:100%">
-                                    {{friend_count}}<br/>Friends
+                                {{friend_count}}<br/>Friends
                             </div>
                             </a>
                         </td>
-                        <td class='stats'>
-                            <a href={% url 'profile' username=request.user.username %} class='stats'>
-                            <div style="height:100%;width:100%">
-                                {{post_count}}<br/>Posts
-                            </div>
-                            </a>
-                        </td>                        
+                       
                     </tr>
                 </table>
         </div>

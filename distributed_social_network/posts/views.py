@@ -12,7 +12,7 @@ import uuid
 
 from users.models import Node
 from posts.forms import PostForm
-from posts.serializers import requestPosts
+from posts.serializers import requestPosts, user_deserializer
 
 from django.db import connection
 from django.db.models import Q
@@ -82,6 +82,7 @@ class ProfileView(PostVisbilityMixin, ListView):
         # put user object in context
         context['user'] = user
         context['post_count'] = Post.objects.filter(author=user).count
+        context['following_count']= user.following.count
         context['friend_count'] = user.friends.count
         context['follower_count'] = user.followers.count
 
@@ -111,6 +112,7 @@ class FeedView(PostVisbilityMixin, ListView):
         context['post_count'] = Post.objects.filter(author=self.request.user).count
         context['friend_count'] = self.request.user.friends.count
         context['follower_count'] = self.request.user.followers.count
+        context['following_count']= self.request.user.following.count
         q = list(set(self.request.user.followers.all()).difference(set(self.request.user.friends.all())))
         context['requestCount'] = len(q)
         context['form'] = PostForm()
@@ -141,7 +143,6 @@ def create_post(request):
         new_post = f.save(commit=False)
         new_post.author = request.user
         new_post.save()
-        print("@@@@@@",new_post)
         return redirect('feed')
         
     else:
