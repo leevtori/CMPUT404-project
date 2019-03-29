@@ -34,9 +34,11 @@ def requestPosts(node, ending, current_id):
             new_post = post.create(post.validated_data)
             if new_post!=None:
                 if new_post.origin=='':
-                    new_post.origin = node.hostname+ 'posts/'+ str(new_post.id)
+                    new_post.origin = node.hostname+node.prefix+ 'posts/'+ str(new_post.id)
                 if new_post.source=='':
-                    new_post.source = node.hostname+ 'posts/'+ str(new_post.id)
+                    new_post.source = node.hostname+node.prefix+ 'posts/'+ str(new_post.id)
+                new_post.author.host=node
+                new_post.author.save()
                 new_post.save()
                 print('saved new post id :'+str(new_post.id))
             else:
@@ -46,6 +48,21 @@ def requestPosts(node, ending, current_id):
             print(post.errors)
     return True
 
+def requestSinglePost(link, current_id, node):
+    a = requests.get(link, headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
+    print(a.text)
+    stream = io.BytesIO(a.content)
+    data = JSONParser().parse(stream)
+    l = posts_request_deserializer(data=data)
+    l.is_valid()
+    for i in l.validated_data['posts']:
+        #assumes we have the post alrdy
+        #post = post_detail_deserializer(data=i)
+        #if post.is_valid():
+        pass
+
+
+
 
 # for multiple posts that you don't need the comments
 class posts_request_deserializer(serializers.Serializer):
@@ -53,7 +70,27 @@ class posts_request_deserializer(serializers.Serializer):
 
 
 
+class post_detail_deserializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    title = serializers.CharField()
+    source = serializers.CharField(required=False, default='')
+    description = serializers.CharField()
+    contentType = serializers.CharField()
+    author = serializers.DictField()
+    content = serializers.CharField()
+    categories = serializers.ListField(required=False, default=[])
+    published = serializers.DateTimeField()
+    visibility = serializers.CharField()
+    visibleTo = serializers.ListField(required=False, default=[])
+    unlisted = serializers.BooleanField(required=False, default=False),
+    comments = serializers.ListField()
 
+    def create(self,validated_data):
+        existing_post=Post.objects.get(id=validated_data['id'])
+        existing_post.update(title=validated_data['title'],
+                             content_type=validated_data['contentType'],
+                             description=validated_data['description'],
+                             content=validated_data['content'])
 
 # for single post with no comments
 class post_deserializer_no_comment(serializers.Serializer):
