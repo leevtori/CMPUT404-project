@@ -27,7 +27,7 @@
                 <div class="dropdown-content">
                     <div id="menu_me">
                         <img src={% static "img/profile.png"%} class='profile_pic_large' %}>
-                        <h3>{{request.user.first_name}} {{request.user.last_name}}</h3>
+                        <h3>{{request.user.username}}</h3>
                     </div>
                     <a href={% url 'profile' username=request.user.username %}>My Profile</a>
                     <a href={% url 'account_settings' %}>Account Settings</a>

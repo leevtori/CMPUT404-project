@@ -4,12 +4,18 @@
 <div class='post' style="width:45%;">
     <div class='post_top'>
         <img src={% static "img/profile.png"%} class='profile_pic_small' %}>
-        <h4 class='fullname'>{{user.first_name}} {{user.last_name}}</h4>
+        <h4 class='fullname'>{{user.username}}</h4>
     </div>
     {% csrf_token %}
     <div style="padding:10px">
         {% csrf_token %}
         <button class='delete_friend_btn' type='submit' onclick="deleteFriend('{{user.id}}')">&#x2716 Delete Friend</button>
+        
+        {% if user in following %}
+            <button class='delete_friend_btn' type='submit' onclick="unfollow('{{user.id}}')">Unfllow</button>
+        {% else %}
+            <button class='add_friend_btn' type='submit' onclick="follow('{{user.id}}')">Follow</button>
+        {% endif %}
     </div>
 
 </div>
