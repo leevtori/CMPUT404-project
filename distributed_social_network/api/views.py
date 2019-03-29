@@ -246,25 +246,27 @@ class FriendRequestView(APIView):
     Makes a friend request
     """
     def post(self, request):
-        print("IN POST")
+
         friend_id = request.data['friend']['id']
         friend_id = get_uuid_from_url(friend_id)
         friend =  get_object_or_404(User, pk=friend_id, host=None, is_active=True)
-        print("AFTER FRIENDS")
+
         author_id = request.data['author']['id']
         author_id = get_uuid_from_url(author_id)
         request.data['author']['id'] = author_id
         
         host = request.data['author']['host']
-        node = get_object_or_404(Node, hostname=host)
+        node = get_object_or_404(Node, hostname__icontains=host)
         request.data['author']['host'] = node.id
-        print("AFTER node")
 
         serializer = serializers.AuthorSerializer(data = request.data['author'], context={'request': request})
 
+        sucess = False
+
         if serializer.is_valid():
+            sucess = True
             try:
-                author = User.object.get(pk=author_id)
+                author = User.objects.get(pk=author_id)
             except User.DoesNotExist:
                 author = serializer.save(id=author_id)
 
@@ -272,7 +274,18 @@ class FriendRequestView(APIView):
             author.outgoingRequests.add(friend)
             friend.followers.add(author)
             author.following.add(friend)
-            return Response(serializer.data, status=201)
+            data = {
+                "query": "friendrequest",
+                "sucess": sucess,
+                "message": "Friend request sent"
+            }
+            return JsonResponse(data, safe=False, status=200)
+        
+        data = {
+            "query": "friendrequest",
+            "sucess": sucess,
+            "message": "Friend request sent"
+        }
 
-        return Response(serializer.errors, status=400)
+        return JsonResponse(data, safe=False, status=400)
 
