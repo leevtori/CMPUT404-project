@@ -228,6 +228,7 @@ class user_deserializer(serializers.Serializer):
                 id=id,
                 #bio=validated_data['bio'],
                 display_name=validated_data['displayName'],
+                local=False
                 #host=validated_data['host'],
             )
             usr.set_unusable_password()
