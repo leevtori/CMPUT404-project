@@ -12,8 +12,8 @@
             <img src={% static "img/profile.png"%} class='profile_pic_large' %}>
         </div>
         <div>
-            <h1 class='banner'>{{user.first_name}} {{user.last_name}}</h1>
-            <h3 class='banner'>{{user.username}}</h3>      <button class='add_friend_btn' type='submit' onclick="addFriend('{{user.id}}')">+ Add Friend</button>
+            <h1 class='banner'>{{user.username}}</h1>
+            <h3 class='banner'>{{user.first_name}} {{user.last_name}}</h3>      <button class='add_friend_btn' type='submit' onclick="addFriend('{{user.id}}')">+ Add Friend</button>
         </div>
     </div>
    
