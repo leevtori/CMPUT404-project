@@ -70,13 +70,19 @@
                         listnode.appendChild(text);
                     }
 
-                } else if (original[i].startsWith("##")) {
-                    node = document.createElement("h1");
+                } else if (original[i].startsWith("###")) {
+                    node = document.createElement("h3");
+                    text = document.createTextNode(original[i].slice(3));
+                    node.appendChild(text);
+                    displayed_post.appendChild(node);
+                } 
+                else if (original[i].startsWith("##")) {
+                    node = document.createElement("h2");
                     text = document.createTextNode(original[i].slice(2));
                     node.appendChild(text);
                     displayed_post.appendChild(node);
                 } else if (original[i].startsWith("#")) {
-                    node = document.createElement("h2");
+                    node = document.createElement("h1");
                     text = document.createTextNode(original[i].slice(1));
                     node.appendChild(text);
                     displayed_post.appendChild(node);
@@ -185,8 +191,8 @@
             <input type='submit' value='Delete Post' class='delete_post_btn'>
         </form>
         {% endif %}
-
-
+        
+        <p style='font-size: small'>{{post.source}}</p>
         <h3>{{ post.title }}</h3>
         <hr>
         <div class='post_content'>
