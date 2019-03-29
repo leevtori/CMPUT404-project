@@ -59,8 +59,6 @@ class Visibility(Enum):
     PRIVATE = "PRIV"
     SERVERONLY = "SERV"
     FRIENDSONLY = "FRND"
-    CUSTOM = "CUST"
-    UNLISTED = "UNLS"
 
     @classmethod
     def get_choices(cls):

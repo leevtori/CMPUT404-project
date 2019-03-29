@@ -52,9 +52,6 @@ class PostVisbilityMixin(LoginRequiredMixin):
 
         visible = user.visible_posts.all()
 
-        # add unlisted, but don't show it in the feed
-        query_list.append(Q(visibility=Visibility.UNLISTED))
-
         qs = qs.filter(reduce(__or__, query_list))
         # qs = qs.union(visible).distinct()  # this doesn't filter properly afterwards
         qs = (qs | visible).distinct()  # But this works... somehow?
