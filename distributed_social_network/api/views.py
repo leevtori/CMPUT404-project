@@ -134,7 +134,7 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
 
     def get_author_id(self, request):
         try:
-            user_id = request.META.get("HTTP_X_USER")
+            user_id = request.META["HTTP_X_USER"]
             user_id = get_uuid_from_url(user_id)
         except (KeyError, User.DoesNotExist):
             raise ParseError(detail="Missing X-User Header Field")
@@ -171,6 +171,7 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
 
         serializer = serializers.PostSerializer(data=post)
 
+        print(serializer.is_valid())
 
         return Response(status=501)
 
