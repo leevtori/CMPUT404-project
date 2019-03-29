@@ -10,7 +10,10 @@ from django.views.generic.base import TemplateView
 from users.views import FriendRequests
 import uuid
 
+
+
 from posts.forms import PostForm
+from posts.serializers import requestPosts
 
 from django.db import connection
 from django.db.models import Q
@@ -102,6 +105,9 @@ class FeedView(PostVisbilityMixin, ListView):
     ordering = '-published'
 
     def get_context_data(self, **kwargs):
+        # get public posts from other hosts, using https://connectifyapp.herokuapp.com/ as test
+        requestPosts('https://young-plains-33934.herokuapp.com/api/posts')
+
         context = super().get_context_data(**kwargs)
         context['post_count'] = Post.objects.filter(author=self.request.user).count
         context['friend_count'] = self.request.user.friends.count

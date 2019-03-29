@@ -71,3 +71,4 @@ class Visibility(Enum):
 
     def get_readable_str(self):
         return visibility_str[self.value]
+
