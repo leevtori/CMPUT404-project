@@ -247,10 +247,12 @@ class AreFriendsView(APIView):
 
     def get(self, request, pk1, pk2):
         print("HEHRRHEHREHEHH")
-        author1 = get_object_or_404(pk=pk1)
-        author2 = get_object_or_404(pk=pk2)
-        author1_id = author1.host + author1.id #is this in the right format? idk lol
-        author2_id = author2.host + author2.id
+        id1=get_uuid_from_url(pk1)
+        id2=get_uuid_from_url(pk2)
+        author1 = get_object_or_404(User,id=id1)
+        author2 = get_object_or_404(User,id=id2)
+        author1_id = author1.geturl() #is this in the right format? idk lol
+        author2_id = author2.geturl()
         print('auth1 id = ', author1_id)
         print('auth2 id = ', author2_id)
         are_friends = author2 in author1.friends.all()

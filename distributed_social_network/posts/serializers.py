@@ -25,7 +25,7 @@ contentTypeDict={
 def requestPosts(node, ending, current_id):
     try:
         a = requests.get(node.hostname+node.prefix+ending, headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
-        if requests.status_codes==200:
+        if a.status_code==200:
             stream = io.BytesIO(a.content)
             data = JSONParser().parse(stream)
             l = posts_request_deserializer(data=data)
@@ -50,6 +50,7 @@ def requestPosts(node, ending, current_id):
                     print(post.errors)
             return True
     except Exception as e:
+        print()
         print(e)
 
 def requestSinglePost(link, current_id, node):
