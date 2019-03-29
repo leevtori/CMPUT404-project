@@ -178,7 +178,7 @@
         </div>
 
 
-        <hr>
+        
 
         {% if user.username == post.author.username %}
         <form action={% url 'deletepost' pk=post.id %} method="get" style='float:right'>
@@ -188,17 +188,18 @@
 
 
         <h3>{{ post.title }}</h3>
-        <p>{{ post.comment }}</p>
-        {% if post.content_type == 'TXT' %}
-            <p>{{post.content}}</p>
-        {% elif post.content_type == 'MKD' %}
-            <div id="mkdowndiv">
-            </div>
-            <br>
-        {% else %}
-            <img id="post_image">
-        {% endif %}
-
+        <hr>
+        <div class='post_content'>
+            {% if post.content_type == 'TXT' %}
+                <p>{{post.content}}</p>
+            {% elif post.content_type == 'MKD' %}
+                <div id="mkdowndiv">
+                </div>
+                <br>
+            {% else %}
+                <img id="post_image">
+            {% endif %}
+        </div>
 
         
         <hr>
