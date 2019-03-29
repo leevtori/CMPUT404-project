@@ -10,20 +10,6 @@
         }
     </style>
     <script>
-        // function delete_this(){
-        //     fetch("/posts/delete/",{
-	    //         method: "DELETE",
-        //         headers:{'X-CSRFToken':'{{ csrf_token }}','postid':'{{ post.id }}'},
-        //     }
-        //     ).then((response) => {
-        //         if (response.status === 200) {
-        //             window.location.replace("/");
-        //         }else{
-        //             alert('hmm, something went wrong');
-        //         }
-        //     });
-        // }
-
         function mkdown(){
             var node;
             var text;
@@ -184,40 +170,53 @@
 {% endblock %}
 
 {% block content %}
+    <div class="post">
+        <div class='post_top'>
+            <img src={% static "img/profile.png"%} class='profile_pic_small' %}>
+            <h4 class='fullname'><a href={% url 'profile' username=post.author.username %} class='fullname'>{{post.author.username}}</a></h4>
+            <p class='date'>{{post.published}}</p>
+        </div>
 
-<h4 class='fullname'>{{post.author.first_name}} {{post.author.last_name}}</h4>
-<p class='username'>{{post.author.username}}</p>
-<p>Host: {{post.source}}</p>
+
+        <hr>
+
+        {% if user.username == post.author.username %}
+        <form action={% url 'deletepost' pk=post.id %} method="get" style='float:right'>
+            <input type='submit' value='Delete Post' class='delete_post_btn'>
+        </form>
+        {% endif %}
 
 
-<h1>{{ post.title }}</h1>
-<p>{{ post.comment }}</p>
-{% if post.content_type == 'TXT' %}
-    <p>{{post.content}}</p>
-{% elif post.content_type == 'MKD' %}
-    <div id="mkdowndiv">
+        <h3>{{ post.title }}</h3>
+        <p>{{ post.comment }}</p>
+        {% if post.content_type == 'TXT' %}
+            <p>{{post.content}}</p>
+        {% elif post.content_type == 'MKD' %}
+            <div id="mkdowndiv">
+            </div>
+            <br>
+        {% else %}
+            <img id="post_image">
+        {% endif %}
+
+
+        
+        <hr>
+        <h4>Comments</h4>
+        <div class='comments'>
+        <form method="post" action={% url 'comment' %} enctype="multipart/form-data">
+            {% csrf_token %}
+            <input name="post" type="hidden" value={{ post.id }}>
+            <input name="comment" type="text">
+            <input type="submit" value="Comment" class='comment_btn'>
+        </form>
+        
+        
+        {% for comments in post_comments %}
+            {% include "comment.html"%}
+            <hr>
+        {% endfor %}
+        
+        </div>
     </div>
-    <br>
-{% else %}
-    <img id="post_image">
-{% endif %}
-
-{% if user.username == post.author.username %}
-<form action={% url 'deletepost' pk=post.id %} method="get">
-    <input type='submit' value='Delete Post'>
-</form>
-{% endif %}
-
-
-<form method="post" action={% url 'comment' %} enctype="multipart/form-data">
-    {% csrf_token %}
-    <input name="post" type="hidden" value={{ post.id }}>
-    <input name="comment" type="text">
-    <input type="submit" value="Comment">
-</form>
-
-{% for comments in post_comments %}
-    {% include "comment.html"%}
-{% endfor %}
-<br>
 {% endblock%}

@@ -16,6 +16,7 @@ div.user_list{
 
 .add_friend_btn:hover{
     background-color:#78cfa8;
+    cursor: pointer;
 }
 
 .delete_friend_btn{
@@ -30,5 +31,6 @@ div.user_list{
 
 .delete_friend_btn:hover{
     background-color:#e98a8a;
+    cursor: pointer;
 }
 

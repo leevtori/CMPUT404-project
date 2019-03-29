@@ -9,6 +9,7 @@ from posts.models import Post, Comment
 from users.models import User, Node
 from django.http import JsonResponse
 from django.conf import settings
+from rest_framework.exceptions import ParseError
 
 
 from rest_framework import permissions
@@ -131,19 +132,44 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
     serializer_class = serializers.PostSerializer
     queryset = Post.objects.all()
 
-    def get(self, request):
+    def get_author_id(self, request):
         try:
-            user_id = request.META.get("X-User")
-            user = User.objects.get(id=user_id)
+            user_id = request.META.get("HTTP_X_USER")
+            user_id = get_uuid_from_url(user_id)
         except (KeyError, User.DoesNotExist):
-            return Response(status=400)
+            raise ParseError(detail="Missing X-User Header Field")
 
-        post_filter = PostVisbilityMixin()
-        posts = post_filter.filter_user_visible(user)
+        return user_id
 
-        return Response(status=501)
+    def get(self, request):
+        author_id = self.get_author_id(request)
+
+        if User.objects.filter(pk=author_id).exists():
+            user = User.objects.get(pk=author_id)
+
+            post_filter = PostVisbilityMixin()
+            posts = post_filter.filter_user_visible(user, self.get_queryset())
+
+        else:
+            posts = Post.objects.filter(visibility=Visibility.PUBLIC, unlisted=False)
+
+        page = self.paginate_queryset(posts)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data, model="posts", query="posts")
+
+        serializer = self.get_serializer(posts, many=True)
+        return Response(serializer.data)
 
     def post(self, request):
+        author_id = self.get_author_id()
+
+        user = get_object_or_404(User, pk=author_id)
+
+        post = request.data["post"]
+
+
         return Response(status=501)
 
 
