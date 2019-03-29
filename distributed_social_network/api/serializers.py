@@ -9,20 +9,23 @@ User = get_user_model()
 
 
 class FriendSerializer(serializers.ModelSerializer):
-    id = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
+    id = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ("id",)
 
+    def get_id(self, obj):
+        return obj.get_url()
+
 class AuthorSerializer(serializers.ModelSerializer):
-    id = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
+    id = serializers.SerializerMethodField()
     # firstName = serializers.CharField(source="first_name")
     # lastName = serializers.CharField(source="last_name")
     # serializers.CharField(source="username")
 
     displayName = serializers.CharField(source="username")
-    url = serializers.HyperlinkedIdentityField(view_name="api-author-detail")
+    url = serializers.SerializerMethodField(method_name="get_id")
 
     class Meta:
         model = User
@@ -37,6 +40,8 @@ class AuthorSerializer(serializers.ModelSerializer):
     def get_host(self, obj):
         return obj.host or settings.HOSTNAME
 
+    def get_id(self, obj):
+        return obj.get_url()
 
 class CommentSerializer(serializers.ModelSerializer):
     contentType = serializers.SerializerMethodField()

@@ -83,7 +83,7 @@ class SendFriendRequest(LoginRequiredMixin, View):
         print("friend_id ", friend_id)
         friend = get_object_or_404(User, id=friend_id)
         #friend is on our host
-        if(friend.hostname is None):
+        if(friend.host is None):
             friend.incomingRequests.add(self.request.user)
             self.request.user.outgoingRequests.add(friend)
             friend.followers.add(self.request.user)
