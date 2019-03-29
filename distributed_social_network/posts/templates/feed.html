@@ -16,34 +16,46 @@
 <div class="feed_container">
     <div class="left_col">
         <div class='left_box'>
-            <h3>{{request.user.username}}</h3>
-            <h5>{{request.user.first_name}} {{request.user.last_name}}</h5>
-                <table class='stats'>
-                    <tr style="height: 60px;">
-                        <td class='stats'>
-                            <a href={% url 'followers' %} class='stats'>
-                            <div style="height:100%;width:100%">
-                                {{follower_count}}<br/>Followers
-                            </div>
-                            </a>
-                        </td>
-                        <td class='stats'>
-                            <a href={% url 'following' %} class='stats'>
-                            <div style="height:100%;width:100%">
-                                {{following_count}}<br/>Following
-                            </div>
-                            </a>
-                        </td> 
-                        <td class='stats'>
-                            <a href={% url 'friends' %} class='stats'>
-                            <div style="height:100%;width:100%">
-                                {{friend_count}}<br/>Friends
-                            </div>
-                            </a>
-                        </td>
-                       
-                    </tr>
-                </table>
+            <div>
+                <img src={% static "img/profile.png"%} class='profile_pic_large' %}>
+            </div>
+            <div>
+                <h1 class='banner'>{{request.user.username}}</h1>
+                <h3 class='banner'>{{request.user.first_name}} {{request.user.last_name}}</h3>
+                {% if user != request.user %}
+                <button class='add_friend_btn' type='submit' onclick="addFriend('{{user.id}}')">+ Add Friend</button>
+                {% endif %}
+            </div>
+            <hr>
+
+            <table class='stats'>
+                <tr style="height: 60px;">
+                    <td class='stats'>
+                        <a href={% url 'followers' %} class='stats'>
+                        <div style="height:100%;width:100%">
+                            {{follower_count}}<br/>Followers
+                        </div>
+                        </a>
+                    </td>
+                    <td class='stats'>
+                        <a href={% url 'following' %} class='stats'>
+                        <div style="height:100%;width:100%">
+                            {{following_count}}<br/>Following
+                        </div>
+                        </a>
+                    </td> 
+                    <td class='stats'>
+                        <a href={% url 'friends' %} class='stats'>
+                        <div style="height:100%;width:100%">
+                            {{friend_count}}<br/>Friends
+                        </div>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+
+            
         </div>
         <div class='left_box'>
             <h3>Users</h3>
