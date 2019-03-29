@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from posts.utils import Visibility
 from posts.models import Post, Comment
 from users.models import User, Node
-
+from django.http import JsonResponse
 
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -161,7 +161,10 @@ class CommentView(APIView):
         return Response(serializer.data)
 
     def post(self, request, pk):
-        # print("data ", request.data['post'])
+        try:
+            print("data ", request.data['post'])
+        except KeyError:
+            return Response(status=400)
 
         post = get_object_or_404(Post, pk=pk)
 
@@ -171,6 +174,7 @@ class CommentView(APIView):
       
         id = pattern.search(id).group(0)
         print("PKK ", id)
+
         # id = pattern.search(id)
         # author_query = [pattern.search(id), request.data['post']["author"]]
         # print("AUTHOR ", author_query)
@@ -181,9 +185,14 @@ class CommentView(APIView):
         # # a = a['id']
         # a = a[:-1]
         # a = a.split('/')
-        # id = a[-1]
-        commentUser = get_object_or_404(User, pk=id)
+        # # id = a[-1]
+        # print("!!!!!!!! ", a)
 
+        # id = uuid.UUID(a)
+        # print("!!!!!!!! ", id)
+        commentUser = get_object_or_404(User, pk=id)
+        print("USSSSS ", commentUser)
+        
         serializer = serializers.CommentPostSerializer(data = request.data['post'], context={'request':request})
 
         if serializer.is_valid():
@@ -200,6 +209,20 @@ class AreFriendsView(APIView):
     """
 
     def get(self, request, pk1, pk2):
+        author1 = get_object_or_404(pk=pk1)
+        author2 = get_object_or_404(pk=pk2)
+        are_friends = False
+        if author2 in author1.friends.all():
+            are_friends = True
+
+            data = {
+                "query": "friends", 
+                "friends": are_friends,
+                "authors": [
+                    author1.host+author1
+                ],
+            }
+            return JsonResponse(data, safe=False)
         return Response(status=501)
 
 
