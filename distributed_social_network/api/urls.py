@@ -12,4 +12,5 @@ urlpatterns = [
     path('author/posts', views.AuthorPostView.as_view(), name="api-author-post"),
     path('friendrequest', views.FriendRequestView.as_view()),
     path('', include(routers.urls)),
+    path('author/<str:pk1>/friends/<str:pk2>',views.AreFriendsView.as_view(),name='api-check-friends')
 ]
