@@ -122,20 +122,20 @@
 ** Requirements
 
    - [ ] Implement the webservice as described in the user stories
-   - [ ] Provide a webservice interface that is restful
-   - [ ] Provide a web UI interface that is usable
+   - [x] Provide a webservice interface that is restful
+   - [x] Provide a web UI interface that is usable
    - [ ] Prove your project by connecting with at least 2 other
      groups.
    - [ ] Make a video demo of your blog (desktop-recorder is ok)
    - [ ] Make a presentation about your blog
-   - [ ] Follow the guidelines in the example-article.json for the
+   - [x] Follow the guidelines in the example-article.json for the
      URLs and services
-   - [ ] friend querying via POSTs to http://service/friends/userid
-   - [ ] friend2friend querying via GETs to http://service/author/<userid>/friends/<userid>
+   - [x] friend querying via POSTs to http://service/friends/userid
+   - [x] friend2friend querying via GETs to http://service/author/<userid>/friends/<userid>
    - [ ] implement author profiles via http://service/author/userid
-   - [ ] Enforce some authentication
+   - [x] Enforce some authentication
      - Consider HTTP Basic Auth
-   - [ ] implement a restful API for http://service/posts/postid
+   - [x] implement a restful API for http://service/posts/postid
      - a PUT should insert/update a post
      - a POST should insert the post 
      - a GET with a postfixed "postid" should return the post
@@ -143,25 +143,25 @@
      - implement an alias http://service/posts/postid for Winter 2015 term projects.
    - [ ] FOAF verification involves the 3 hosts of the 3 friends
      A->B->C assuming A B C reside on different hosts.
-   - [ ] Allow users to accept or reject friend requests
+   - [x] Allow users to accept or reject friend requests
    - [ ] friend requests can be made by POSTing a friend request to 
      http://service/friendrequest
    - [ ] http://service/author/posts (posts that are visible to the currently authenticated user)
-   - [ ] http://service/author/{AUTHOR_ID}/posts (all posts made by {AUTHOR_ID} visible to the currently authenticated user)
+   - [x] http://service/author/{AUTHOR_ID}/posts (all posts made by {AUTHOR_ID} visible to the currently authenticated user)
    - [ ] Images get the same protection that posts get as they are POSTS   
    - [ ] example-article.json is adhered to.
 ** Take-aways
-   - [ ] 1 Working Website
-   - [ ] 1 Github git repo
+   - [x] 1 Working Website
+   - [x] 1 Github git repo
    - [ ] 1 Presentation
    - [ ] 1 Video
  
 ** Restrictions
-   - [ ] Use Python 3.6 (otherwise get approval)
-   - [ ] Use Django or Flask (otherwise get approval)
-   - [ ] Must run on one of the following:
-     - [ ] provided VMs
-     - [ ] Heroku
+   - [x] Use Python 3.6 (otherwise get approval)
+   - [x] Use Django or Flask (otherwise get approval)
+   - [x] Must run on one of the following:
+     - [x] provided VMs
+     - [x] Heroku
    - [ ] License your code properly (use an OSI approved license)
      - Put your name on it!
 
@@ -184,8 +184,8 @@
 ** Marking
 *** Project Part 0
     - 1 mark
-    - [ ] 4-5 CCIDs
-    - [ ] 1 Github repo with a README and LICENSE
+    - [x] 4-5 CCIDs
+    - [x] 1 Github repo with a README and LICENSE
 *** Project Part 1
     - 10 Marks (scaled to 7 marks)
     - Code Base 3 marks
