@@ -8,9 +8,10 @@ body,html{
 
 .header{
     height: 50px;
+    width:100%;
     box-shadow: 0 1px 0 rgba(32, 29, 36, 0.2),0 6px 6px rgba(65, 59, 69, 0.2);
     z-index:9;
-    position:sticky;
+    position:fixed;
     top:0;
     text-align: center;
     color: white;

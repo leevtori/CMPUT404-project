@@ -9,12 +9,7 @@ h3.heading{
 }
 
 div.feed_container{
-    /* display: flex; 
-    flex-direction: row; 
-    justify-content: flex-end; */
-    padding-bottom: 2000px; 
-
-
+    padding-bottom: 1000px; 
 }
 
 div.left_col{
@@ -36,8 +31,7 @@ div.new_post{
 }
 
 div.posts_list{
-    padding:10px; 
-    padding-top:15px;
+    padding: 0px 5px; 
 }
 
 
@@ -122,7 +116,7 @@ a.stats {
     color: #3D9970;
 }
 .heading{
-    margin:0px;
+    margin-bottom:0px;
 }
 
 
@@ -163,42 +157,28 @@ a.stats {
     justify-content: flex-start;
 }
 
-input.short{
+.new_post_form input{
     width: 50%;
-    border: none;
+    border: 1px solid #ddd;
     font-size: small;
     margin-top: 5px;
     margin-bottom:5px;
     padding: 5px;
 }
 
-input.long{
-    width: 100%;
-    border: none;
+.new_post_form textarea{
+    /* width: 50%; */
+    border: 1px solid #ddd;
     font-size: small;
     margin-top: 5px;
     margin-bottom:5px;
     padding: 5px;
-}
-
-.browse_btn{
-    width:30%;
-    height: 30px;
-    font-size: small; 
-}
-
-textarea{
-    width: 100%;
-    border:none;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: small;
-    margin-top: 5px;
-    margin-bottom:5px;
-    padding: 5px;
 }
-select{
+
+.new_post_form select{
     width:30%;
-    border: none;
+    border: 1px solid #ddd;
     background-color: white;
     font-size: small;
     font-family: Arial, Helvetica, sans-serif;
@@ -207,7 +187,19 @@ select{
     white-space: nowrap;
 }
 
+div.visible_to_field{
+    display:none;
+}
 
+#id_unlisted{
+    width:10px;
+}
+
+
+.browse_btn{
+    width:30%;
+    font-size: small; 
+}
 
 
 .create_btn{
@@ -223,5 +215,4 @@ select{
 .create_btn:hover{
     background-color:#5eb68e;
 }
-
 
