@@ -41,7 +41,7 @@ class AuthorSerializer(serializers.ModelSerializer):
         )
 
     def get_host(self, obj):
-        return obj.host or settings.HOSTNAME
+        return str(obj.host) or settings.HOSTNAME
 
     def get_id(self, obj):
         return obj.get_url()
@@ -111,6 +111,13 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_visibility(self, obj):
         return visibility_str[obj.visibility]
+
+
+class PostCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = "__all__"
+
 
 
 # FIXME: have the correct fields.
