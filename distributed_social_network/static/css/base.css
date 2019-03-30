@@ -3,7 +3,7 @@ body,html{
     margin:0;
     padding:0;
     font-family: Arial, Helvetica, sans-serif;
-    background-color: rgb(235, 252, 245);
+    background-color: rgb(234, 247, 238);
 }
 
 .header{
@@ -49,6 +49,10 @@ div.page{
     justify-content: center;
     font-weight: bold;
     font-size: 20px;
+}
+
+#logo_white{
+    height:25px;
 }
 
 a.header_link{
