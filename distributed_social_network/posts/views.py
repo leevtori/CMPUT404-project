@@ -14,10 +14,11 @@ import uuid
 
 from users.models import Node
 from posts.forms import PostForm
-from posts.serializers import requestPosts, requestSinglePost
+from posts.serializers import requestPosts, requestSinglePost, request_single_user
 
 from django.db import connection
 from django.db.models import Q
+from django.conf import settings
 from .utils import Visibility
 
 from functools import reduce
@@ -85,6 +86,7 @@ class ProfileView(PostVisbilityMixin, ListView):
         # updates the user from nodes if foreign:
         if user.local == False:
             print('not local user, hope its not boom')
+            request_single_user(user.host, user, self.request.user.id)
 
 
 
@@ -145,7 +147,8 @@ class PostDetailView(PostVisbilityMixin, DetailView):
     def get_context_data(self, **kwargs):
         post=kwargs['object']
         #fetch the post
-        if post.origin != '':
+
+        if settings.HOSTNAME not in post.origin:
             node_url1 = post.origin.split('posts')[0]
             node_url = node_url1.split('api')[0]
             print(node_url)

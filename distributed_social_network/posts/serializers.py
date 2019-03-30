@@ -85,6 +85,17 @@ def requestSinglePost(link, current_id, node):
 
 
 
+def request_single_user(node,user, current_id):
+    a=requests.get(user.get_url(),headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
+    if a.status_code!=200:
+        a = requests.get(user.get_url(), headers={"X-AUTHOR-ID": str(current_id)},
+                         auth=HTTPBasicAuth(node.send_username, node.send_password))
+    if a.status_code==200:
+        print(a.text)
+    else:
+        print(a.status_code)
+        print('its boom')
+
 
 # for multiple posts that you don't need the comments
 class posts_request_deserializer(serializers.Serializer):
