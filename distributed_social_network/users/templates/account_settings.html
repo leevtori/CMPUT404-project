@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-<div style="padding:10px">
+<div class='page'>
     <h2>Account Settings</h2>
     <form method="post" id='account_settings_form'>{% csrf_token %}
         {{ form.as_p }}
