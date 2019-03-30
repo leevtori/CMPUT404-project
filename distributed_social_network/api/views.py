@@ -186,7 +186,7 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
 
 
     def list(self, request):
-        qs = Post.objects.filter(visibility=Visibility.PUBLIC, origin="")
+        qs = Post.objects.filter(visibility=Visibility.PUBLIC, origin__icontains=settings.HOSTNAME)
 
         page = self.paginate_queryset(qs)
 
@@ -220,20 +220,15 @@ class CommentView(PaginateOverrideMixin, GenericAPIView):
         except KeyError:
             return Response(status=400)
 
-        # post = get_object_or_404(Post, pk=pk)
-
+        post = get_object_or_404(Post, pk=pk)
 
         id = request.data['post']['author']['id']
         id = get_uuid_from_url(id)
-        print("PKK ", id)
-
 
         commentUser = get_object_or_404(User, pk=id)
-        print("USSSSS ", commentUser)
-        request.data['post'].pop('author')
-        print(request.data)
+        # request.data['post'].pop('author')
 
-        serializer = serializers.CommentPostSerializer(data = r_data , context={'request':request})
+        serializer = serializers.CommentPostSerializer(data = request.data['post'] , context={'request':request})
 
         if serializer.is_valid():
             serializer.save(post_id=pk,author=commentUser,)

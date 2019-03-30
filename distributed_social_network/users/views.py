@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import get_object_or_404, render, HttpResponse, HttpResponseRedirect
-from .models import User
+from .models import User, Node
 from .forms import CustomUserCreationForm, UserCreationForm
 from django.views.generic import ListView
 from django.views.generic.edit import UpdateView
@@ -93,6 +93,7 @@ class SendFriendRequest(LoginRequiredMixin, View):
         else:
             friend_host = get_object_or_404(Node, hostname=friend.host)
             #TODO
+            return HttpResponse(500)
 
         
 
@@ -126,6 +127,7 @@ class ConfirmFriendRequest(LoginRequiredMixin, View):
             self.request.user.incomingRequests.remove(friend)
             
             return HttpResponse("added")
+
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):

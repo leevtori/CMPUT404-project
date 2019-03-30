@@ -1,4 +1,5 @@
 import json
+from urllib.parse import urljoin
 
 from django.shortcuts import HttpResponse, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView
@@ -7,6 +8,7 @@ from .models import Post, Comment
 from django.contrib.auth import get_user_model
 from django.views.generic.base import TemplateView
 from users.views import FriendRequests
+from django.conf import settings
 import uuid
 
 
@@ -79,6 +81,15 @@ class ProfileView(PostVisbilityMixin, ListView):
         context = super().get_context_data(**kwargs)
         # get user object based on username in url
         user = get_object_or_404(User, username=self.kwargs['username'])
+
+        # updates the user from nodes if foreign:
+        if user.local == False:
+            print('not local user, hope its not boom')
+
+
+
+
+
         # put user object in context
         context['user'] = user
         context['post_count'] = Post.objects.filter(author=user).count
@@ -133,11 +144,15 @@ class PostDetailView(PostVisbilityMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         post=kwargs['object']
+        #fetch the post
         if post.origin != '':
             node_url1 = post.origin.split('posts')[0]
             node_url = node_url1.split('api')[0]
+            print(node_url)
             node = Node.objects.get(hostname=node_url)
             requestSinglePost(post.origin, self.request.user.id,node)
+
+
         context = super().get_context_data(**kwargs)
         context['post_comments'] = self.object.comment_set.all().order_by("-published")
         return context
@@ -148,6 +163,9 @@ def create_post(request):
         f = PostForm(request.POST)
         new_post = f.save(commit=False)
         new_post.author = request.user
+        new_post.source = urljoin(settings.HOSTNAME, '/api/posts/%s' % new_post.id)
+        new_post.origin = urljoin(settings.HOSTNAME, '/api/posts/%s' % new_post.id)
+
         new_post.save()
         return redirect('feed')
         
