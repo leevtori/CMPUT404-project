@@ -135,10 +135,14 @@ class PostDetailView(PostVisbilityMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         post=kwargs['object']
+        print("ORIGININ", post.origin)
         if post.origin != '':
             node_url1 = post.origin.split('posts')[0]
             node_url = node_url1.split('api')[0]
-            node = Node.objects.get(hostname=node_url)
+            print("NODEURLLL", node_url)
+            print("ALL NODES",Node.objects.all())
+            node= get_object_or_404(Node, hostname=node_url)
+            # node = Node.objects.get(hostname=node_url)
             requestSinglePost(post.origin, self.request.user.id,node)
         context = super().get_context_data(**kwargs)
         context['post_comments'] = self.object.comment_set.all().order_by("-published")
