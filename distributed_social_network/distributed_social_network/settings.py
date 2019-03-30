@@ -28,7 +28,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-HOSTNAME = "http://frandzone.herokuapp.com/api/"  # FIXME: update to server's hostname
+prod = os.environ.get("PRODUCTION")
+if prod is not None:
+    HOSTNAME = "http://frandzone.herokuapp.com/api/"
+
+else:
+    HOSTNAME = "http://localhost:8000/api/"
 
 # Application definition
 
