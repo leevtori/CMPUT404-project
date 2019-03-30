@@ -25,6 +25,7 @@ import json
 
 User = get_user_model()
 
+
 def get_uuid_from_url(url):
     p = "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"
     pattern = re.compile(p, re.IGNORECASE)
@@ -68,7 +69,7 @@ class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
 
     def list(self, request):
         qs = self.get_queryset()
-        qs = qs.filter(host=None)
+        qs = qs.filter(local=True)
         page = self.paginate_queryset(qs)
 
         if page is not None:
@@ -141,6 +142,13 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
 
         return user_id
 
+    def create_status_responses(self, statusType=True, message="Post created"):
+        return {
+            "query": "createPost",
+            "type": statusType,
+            "message": message
+        }
+
     def get(self, request):
         author_id = self.get_author_id(request)
 
@@ -163,16 +171,24 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
         return Response(serializer.data)
 
     def post(self, request):
-        author_id = self.get_author_id()
+        author_id = self.get_author_id(request)
 
         user = get_object_or_404(User, pk=author_id)
 
-        post = request.data["post"]
+        try:
+            post = request.data["post"]
+        except KeyError:
+            return Response(
+                self.create_status_responses(statusType=False, message="Malformed request"),
+                status=400
+                )
 
-        serializer = serializers.PostSerializer(data=post)
+        serializer = serializers.PostCreateSerializer(data=post)
 
         print(serializer.is_valid())
-
+        print(serializer.errors)
+        if serializer.is_valid():
+            serializer.save()
         return Response(status=501)
 
 
@@ -267,8 +283,8 @@ class AreFriendsView(APIView):
 
 
 
-class CreatePostView(CreateAPIView):
-    serializer_class = serializers.PostSerializer
+# class CreatePostView(CreateAPIView):
+#     serializer_class = serializers.PostSerializer
 
 
 class FriendRequestView(APIView):

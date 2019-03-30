@@ -11,7 +11,7 @@ content_type_str = {
 
 visibility_str = {
     "PUBL": "Public",
-    "FOAF": "Friend of a Friend",
+    "FOAF": "Friend Of A Friend",
     "PRIV": "Private",
     "SERV": "Home Server Only",
     "FRND": "Friends Only"
