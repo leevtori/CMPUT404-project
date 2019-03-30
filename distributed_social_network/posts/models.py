@@ -21,7 +21,7 @@ class Post (models.Model):
     categories = models.ManyToManyField('Categories', blank=True)
 
     visibility = models.CharField(choices=Visibility.get_choices(), max_length=4, default=Visibility.PUBLIC)
-    visible_to = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="visible_posts")
+    visible_to = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="visible_posts", blank=True)
 
     unlisted = models.BooleanField(default=False)
 

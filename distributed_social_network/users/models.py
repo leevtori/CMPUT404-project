@@ -18,10 +18,10 @@ class Node(models.Model):
     send_username = models.CharField(max_length=100)
     send_password = models.CharField(max_length=100)
     active = False
-    
+
     def __str__(self):
         return urljoin(self.hostname, self.prefix)
-        
+
 
 class CustomUserManager(UserManager):
 
