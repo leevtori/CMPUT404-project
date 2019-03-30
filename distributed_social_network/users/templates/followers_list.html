@@ -12,11 +12,15 @@
     
     <h2>Followers</h2>
     <div class='user_list'>
-    {% for user in object_list %} 
-        {% if user != login_user %}
-        {% include "includes/followers_list_item.html" with user=user %}
-        {% endif %} 
-    {% endfor %}
+    {% if object_list %}
+        {% for user in object_list %} 
+            {% if user != login_user %}
+            {% include "includes/followers_list_item.html" with user=user %}
+            {% endif %} 
+        {% endfor %}
+    {% else %}
+        <p class='date'>No followers yet.</p>
+    {% endif %}
     </div>
     </div>
 

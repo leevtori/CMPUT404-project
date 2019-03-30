@@ -31,21 +31,21 @@
             <table class='stats'>
                 <tr style="height: 60px;">
                     <td class='stats'>
-                        <a href={% url 'followers' %} class='stats'>
+                        <a href={% url 'followers' username=request.user.username%} class='stats'>
                         <div style="height:100%;width:100%">
                             {{follower_count}}<br/>Followers
                         </div>
                         </a>
                     </td>
                     <td class='stats'>
-                        <a href={% url 'following' %} class='stats'>
+                        <a href={% url 'following' username=request.user.username%} class='stats'>
                         <div style="height:100%;width:100%">
                             {{following_count}}<br/>Following
                         </div>
                         </a>
                     </td> 
                     <td class='stats'>
-                        <a href={% url 'friends' %} class='stats'>
+                        <a href={% url 'friends' username=request.user.username%} class='stats'>
                         <div style="height:100%;width:100%">
                             {{friend_count}}<br/>Frands
                         </div>
@@ -67,8 +67,9 @@
 
 
     <div class="right_col">
+        <h3 class='heading'>Add New Post</h3>
         <div class="posts_list">
-            <h3 class='heading'>Add New Post</h3>
+            
             <div class="tab">
                 <button class="post_tablinks active" onclick="openNewPost(event, 'new_txt_post')">Text</button>
                 <button class="post_tablinks" onclick="openNewPost(event, 'new_mkd_post')">Markdown</button>
@@ -150,28 +151,36 @@
 
 
         
-
+        <h3 class='heading'>Latest Posts</h3>
         <div class='posts_list'>
-            <h3 class='heading'>Latest Posts</h3>
+            
             <div class="tab">
                 <button id="feed_default_open" class="feed_tablinks active" onclick="openFeed(event, 'public_posts')">Public</button>
                 <button class="feed_tablinks" onclick="openFeed(event, 'following_posts')">Following</button>
             </div>
 
             <div id="public_posts" class="feed_tabcontent" style="display:block">
-                {% for post in object_list %}
-                    {% if not post.unlisted %}
-                        {% include "post.html"%}
-                    {% endif %}
-                {% endfor %}
+                {% if object_list %}
+                    {% for post in object_list %}
+                        {% if not post.unlisted %}
+                            {% include "post.html"%}
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <p class='date'>No posts yet.</p>
+                {% endif %}
             </div>
             
             <div id="following_posts" class="feed_tabcontent">
-                {% for post in following_posts %}
-                    {% if not post.unlisted %}
-                        {% include "post.html"%}
-                    {% endif %}
-                {% endfor %}
+                {% if following_posts %}
+                    {% for post in following_posts %}
+                        {% if not post.unlisted %}
+                            {% include "post.html"%}
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <p class='date'>No posts yet.</p>
+                {% endif %}
             </div>
 
             

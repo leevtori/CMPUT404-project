@@ -67,16 +67,21 @@ a.header_link{
     text-decoration: none;
 }
 
+
+.header_link:hover{
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
 a{
     text-decoration: none;
     outline: none;
     color: #3D9970;
 }
 
-.header_link:hover{
-    background-color: rgba(255, 255, 255, 0.3);
+h3.heading{
+    padding-left:10px;
+    color: #2b0f4d;
 }
-
 
 /* Dropdown Button */
 .dropbtn {

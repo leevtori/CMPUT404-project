@@ -40,11 +40,15 @@ class FriendList(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['following'] = self.request.user.following.all()
+        user = get_object_or_404(User, username=self.kwargs['username'])
+        context['following'] = user.following.all()
+
         return context
 
     def get_queryset(self):
-        return self.request.user.friends.all()
+        qs = super().get_queryset()
+        user = get_object_or_404(User, username=self.kwargs['username'])
+        return user.friends.all()
 
 class FollowerList(LoginRequiredMixin, ListView):
     """This view lists all the followers of logged in user. """
@@ -53,12 +57,15 @@ class FollowerList(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['friends'] = self.request.user.friends.all()
-        context['following'] = self.request.user.following.all()
+        user = get_object_or_404(User, username=self.kwargs['username'])
+        context['friends'] = user.friends.all()
+        context['following'] = user.following.all()
         return context
 
     def get_queryset(self):
-        return self.request.user.followers.all()
+        qs = super().get_queryset()
+        user = get_object_or_404(User, username=self.kwargs['username'])
+        return user.followers.all()
 
 class FollowingList(LoginRequiredMixin, ListView):
     """This view lists all the followers of logged in user. """
@@ -67,12 +74,14 @@ class FollowingList(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['friends'] = self.request.user.friends.all()
-        # context['following'] = self.request.user.following.all()
+        user = get_object_or_404(User, username=self.kwargs['username'])
+        context['friends'] = user.friends.all()
         return context
 
     def get_queryset(self):
-        return self.request.user.following.all()
+        qs = super().get_queryset()
+        user = get_object_or_404(User, username=self.kwargs['username'])
+        return user.following.all()
 
 class SendFriendRequest(LoginRequiredMixin, View):
 
@@ -92,24 +101,10 @@ class SendFriendRequest(LoginRequiredMixin, View):
         #friend is on another host
         else:
             friend_host = get_object_or_404(Node, hostname=friend.host)
-            #TODO
+            #TODO######################################
             return HttpResponse(500)
 
         
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
 
 class ConfirmFriendRequest(LoginRequiredMixin, View):
 
@@ -157,7 +152,7 @@ class DeleteFriend(LoginRequiredMixin, View):
 
 class AccountSettingsView(LoginRequiredMixin, UpdateView):
     model = User
-    fields = ['first_name','last_name', 'display_name', 'github', 'bio', 'is_active']
+    fields = ['display_name', 'github', 'bio', 'is_active']
     template_name = 'account_settings.html'
 
     def get_object(self):

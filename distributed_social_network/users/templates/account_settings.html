@@ -7,10 +7,18 @@
 
 {% block content %}
 <div class='page'>
-    <h2>Account Settings</h2>
-    <form method="post" id='account_settings_form'>{% csrf_token %}
-        {{ form.as_p }}
+    <h3>Account Settings</h3>
+    <div class ='post'>
+    <form method="post" class='account_settings_form'>{% csrf_token %}
+        <label for="{{form.display_name.id_for_label}}" name="display_name">Display name</label>{{form.display_name}}
+        <label for="{{form.github.id_for_label}}" name="github">Github URL</label>{{form.github}}
+        <label for="{{form.bio.id_for_label}}" name="bio">Bio</label>{{form.bio}}
+        <div style="padding-bottom:20px;">
+            <label for="{{form.is_active.id_for_label}}" name="is_active">Active</label>{{form.is_active}} 
+            <p class='date'> *unchecking this box will deactivate your account</p>
+        </div>
         <input type="Submit" value="Update" id="submit_btn">
     </form>
+    </div>
 </div>
 {% endblock %}
