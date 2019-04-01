@@ -9,21 +9,19 @@ User = get_user_model()
 
 
 class FriendSerializer(serializers.ModelSerializer):
-    id = serializers.CharField()
+    id = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ("id",
-                  "host",
-                  "displayName")
+        fields = ("id",)
 
     def get_id(self, obj):
         return obj.get_url()
 
 class AuthorSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
-    firstName = serializers.CharField(source="first_name")
-    lastName = serializers.CharField(source="last_name")
+    firstName = serializers.CharField(source="first_name",allow_null=True, allow_blank=True)
+    lastName = serializers.CharField(source="last_name",allow_null=True, allow_blank=True)
     # serializers.CharField(source="username")
     host = serializers.SerializerMethodField()
 
