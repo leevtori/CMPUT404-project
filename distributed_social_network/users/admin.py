@@ -5,16 +5,22 @@ from .models import User, Node
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
+from django.db.models import Q
 
 
 class CustomUserAdmin(UserAdmin):
-    # inlines = (ProfileInline, )
 
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = User
     list_display = ['username', 'email']
     UserAdmin.fieldsets += ('Important stats', {'fields': ('friends', 'followers')}),
+
+    def get_queryset(self, request):
+        nodes = Node.objects.values_list('user_auth', flat=True)
+        qs = User.objects.all().exclude(id__in=nodes)
+        # print(qs)
+        return qs
  
 
 # Register your models here.
