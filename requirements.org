@@ -81,12 +81,13 @@
    - As an author, I want to be able to make posts that are unlisted,
      that are publicly shareable by URI alone (or for embedding images)
    - As an author, I want to post posts to my "stream"
+   - As a server admin, I can disable the node to node interfaces for
+   - As a server admin, I can limit nodes connecting to me via
+     authentication.
+   - As an author, posts I create be private to only friends on my host
 
      
 ** User Stories NOT DONE
-   + As a server admin, I can disable the node to node interfaces for
-   + As a server admin, I can limit nodes connecting to me via
-     authentication.
    + As a server admin, I don't want to do heavy setup to get the
      posts of my author's friends.
    + As an author, I want to be able to use my web-browser to manage/author
@@ -97,7 +98,6 @@
      on other servers.
    + As a server admin, I want to share or not share images with users
      on other servers.
-   + As an author, posts I create be private to only friends on my host
    + As an author, posts I create be private to another author
 
  
