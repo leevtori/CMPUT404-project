@@ -33,8 +33,13 @@
     cursor: pointer;
 }
 
-div.post_content{
+#post_content{
     padding:10px;
+    display:block;
+}
+
+#edit_post_content{
+    display:block;
 }
 
 div.comments{

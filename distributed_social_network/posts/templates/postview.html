@@ -188,6 +188,12 @@
         
 
         {% if user.username == post.author.username %}
+        <button value="Edit" onclick="show_edit_form()"></button>
+        <form id="edit_post_content" action={% url 'editpost' pk=post.id %} method="post">
+            {% csrf_token %}
+            {{form.as_p}}
+            <input type='submit' value='Save' class='comment_btn'>      
+        </form>
         <form action={% url 'deletepost' pk=post.id %} method="get" style='float:right'>
             <input type='submit' value='Delete Post' class='delete_post_btn'>
         </form>
@@ -197,7 +203,7 @@
 
         <h3>{{ post.title }}</h3>
         <hr>
-        <div class='post_content'>
+        <div id="post_content">
             {% if post.content_type == 'TXT' %}
                 <p>{{post.content}}</p>
             {% elif post.content_type == 'MKD' %}
