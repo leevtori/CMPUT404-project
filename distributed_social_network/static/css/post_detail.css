@@ -73,3 +73,7 @@ p.comment{
     font-size:medium;
     padding:5px;
 }
+
+.visible_to_field{
+    display:none;
+}

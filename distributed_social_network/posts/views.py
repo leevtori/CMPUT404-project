@@ -184,12 +184,10 @@ def create_post(request):
         return HttpResponse(status=404)
 
 def delete_post(request, pk):
-    if (request.method == "POST"):
-        post = Post.objects.get(id=pk)
-        post.delete()
-        return redirect('feed')
-    else: 
-        return HttpResponse(status=404)
+    post = Post.objects.get(id=pk)
+    post.delete()
+    return redirect('feed')
+
 
 def edit_post(request, pk):
     if (request.method == "POST"):
