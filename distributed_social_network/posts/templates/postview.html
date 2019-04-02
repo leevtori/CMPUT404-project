@@ -9,6 +9,8 @@
             display:block;
         }
     </style>
+    <script src=" {% static 'js/script.js' %}"></script>
+    <script src=" {% static 'js/feed.js' %}"></script>
     <script>
         function mkdown(){
             var node;
@@ -173,6 +175,7 @@
 
 
     </script>
+
 {% endblock %}
 
 {% block content %}
@@ -184,26 +187,51 @@
             <p class='date'>{{post.published}}</p>
         </div>
 
-
-        
+        <p style='font-size: small'>{{post.source}}</p>
 
         {% if user.username == post.author.username %}
-        <button value="Edit" onclick="show_edit_form()"></button>
-        <form id="edit_post_content" action={% url 'editpost' pk=post.id %} method="post">
+        <a href={% url 'deletepost' pk=post.id %}><img src={% static "img/delete.png"%} class='profile_pic_small' style='float:right'></a>
+        <img src={% static "img/edit.png"%} class='profile_pic_small' onclick=show_edit_form() style='float:right; cursor:pointer;'>
+        <form id="edit_post_content" class='post_form' action={% url 'editpost' pk=post.id %} method="post">
             {% csrf_token %}
-            {{form.as_p}}
-            <input type='submit' value='Save' class='comment_btn'>      
-        </form>
-        <form action={% url 'deletepost' pk=post.id %} method="get" style='float:right'>
-            <input type='submit' value='Delete Post' class='delete_post_btn'>
+            <label for="{{form.title.id_for_label}}" name='title'>Title</label> {{form.title}}
+            <label for="{{form.description.id_for_label}}" name='description'>Description</label> {{form.description}}
+            {% if post.content_type == 'MKD' or post.content_type == 'TXT'%}
+                <label for="{{form.content.id_for_label}}" name='content'>Content</label>{{form.content}}
+            {% endif %}
+            <div>
+                <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>
+                <select name='visibility' onchange="show_visible_to(this.options[this.selectedIndex].value, 'new_txt_post')">
+                    <option value='PUB'>Public</option>
+                    <option value='FOAF'>Friend of a Friend</option>
+                    <option value='PRIV'>Private</option>
+                    <option value='SERV'>Home Server Only</option>
+                    <option value='FRND'>Friends Only</option>
+                </select>
+                <div class='visible_to_field'>
+                    <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}} 
+                </div>
+            </div>
+            
+            <div>
+                <label for="{{form.unlisted.id_for_label}}" name='unlisted'>Unlisted</label>{{form.unlisted}}
+            </div>
+            <div>
+                <label for="{{form.categories.id_for_label}}" name='categories'>Categories</label>{{form.categories}}
+            </div>
+            <div>
+                <input type='submit' value='Save' class='comment_btn'>
+                <input type='button' value='Cancel' class='cancel_btn' onclick="hide_edit_form()">
+            </div>
+            
         </form>
         {% endif %}
 
-        <p style='font-size: small'>{{post.source}}</p>
-
         <h3>{{ post.title }}</h3>
-        <hr>
+
+        
         <div id="post_content">
+        <hr>
             {% if post.content_type == 'TXT' %}
                 <p>{{post.content}}</p>
             {% elif post.content_type == 'MKD' %}

@@ -184,7 +184,7 @@ def create_post(request):
         return HttpResponse(status=404)
 
 def delete_post(request, pk):
-    if (request.method == "GET"):
+    if (request.method == "POST"):
         post = Post.objects.get(id=pk)
         post.delete()
         return redirect('feed')

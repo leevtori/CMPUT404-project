@@ -220,3 +220,40 @@ hr{
 }
 
 
+
+
+.post_form{
+    padding:10px;
+    display:flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.post_form input{
+    width: 50%;
+    border: 1px solid #ddd;
+    font-size: small;
+    margin-top: 5px;
+    margin-bottom:5px;
+    padding: 5px;
+}
+
+.post_form textarea{
+    border: 1px solid #ddd;
+    font-size: small;
+    margin-top: 5px;
+    margin-bottom:5px;
+    padding: 5px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.post_form select{
+    width:30%;
+    border: 1px solid #ddd;
+    background-color: white;
+    font-size: small;
+    font-family: Arial, Helvetica, sans-serif;
+    height: 30px;
+    padding: 5px;
+    white-space: nowrap;
+}

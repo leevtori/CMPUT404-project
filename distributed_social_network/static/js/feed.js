@@ -90,12 +90,20 @@ function openNewPost(evt, newPostType) {
     evt.currentTarget.className += " active";
 }
 
-function show_visible_to(option) {
+function show_visible_to(option, form_id) {
     if(option == 'PRIV'){
-        document.getElementById('visible_to_field').style.display = 'block';
+        var form = document.querySelector("#"+form_id);
+        console.log(form);
+        var picker=form.querySelector(".visible_to_field");
+        console.log(picker);
+        picker.style.display = 'block';
     }
     else{
-        document.getElementById('visible_to_field').style.display = 'none';
+        var form = document.querySelector("#"+form_id);
+        console.log(form);
+        var picker=form.querySelector(".visible_to_field");
+        console.log(picker);
+        picker.style.display = 'none';
     }
 };
 
