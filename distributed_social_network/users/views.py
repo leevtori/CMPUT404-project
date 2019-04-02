@@ -30,7 +30,11 @@ class UserList(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        return qs.filter(is_active=True).order_by("username")
+        qs = qs.filter(is_active=True).order_by("username")
+        n = Node.objects.all().values_list('user_auth', flat=True)
+        qs = qs.exclude(id__in=n)
+        return qs
+
 
 
 class FriendList(LoginRequiredMixin, ListView):
