@@ -20,8 +20,8 @@ class FriendSerializer(serializers.ModelSerializer):
 
 class AuthorSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
-    firstName = serializers.CharField(source="first_name")
-    lastName = serializers.CharField(source="last_name")
+    firstName = serializers.CharField(source="first_name",allow_null=True, allow_blank=True)
+    lastName = serializers.CharField(source="last_name",allow_null=True, allow_blank=True)
     # serializers.CharField(source="username")
     host = serializers.SerializerMethodField()
 
