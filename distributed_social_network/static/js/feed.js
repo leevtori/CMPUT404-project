@@ -42,26 +42,6 @@ function openPostInterface(post_type){
         }
     }
 
-    //highlight selected post type
-    //gives illusion of tabs
-    // var all_post_btns = document.getElementsByClassName("post_btn");
-    // all_post_btns[0].style.backgroundColor = '#3D9970';
-    // all_post_btns[1].style.backgroundColor = '#3D9970';
-    // all_post_btns[2].style.backgroundColor = '#3D9970';
-    // all_post_btns[3].style.backgroundColor = '#3D9970';
-    // if(post_type == 'textPost'){
-    //     all_post_btns[0].style.backgroundColor = '#78cfa8';
-    // }
-    // else if(post_type == 'markdownPost'){
-    //     all_post_btns[1].style.backgroundColor = '#78cfa8';
-    // }
-    // else if(post_type == 'picturePost'){
-    //     all_post_btns[2].style.backgroundColor = '#78cfa8';
-    // }
-    // else if(post_type == 'urlPicturePost'){
-    //     all_post_btns[3].style.backgroundColor = '#78cfa8';
-    // }
-
 
 }
 
@@ -110,6 +90,22 @@ function openNewPost(evt, newPostType) {
     evt.currentTarget.className += " active";
 }
 
+function show_visible_to(option, form_id) {
+    if(option == 'PRIV'){
+        var form = document.querySelector("#"+form_id);
+        console.log(form);
+        var picker=form.querySelector(".visible_to_field");
+        console.log(picker);
+        picker.style.display = 'block';
+    }
+    else{
+        var form = document.querySelector("#"+form_id);
+        console.log(form);
+        var picker=form.querySelector(".visible_to_field");
+        console.log(picker);
+        picker.style.display = 'none';
+    }
+};
 
 
   //taken from https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript

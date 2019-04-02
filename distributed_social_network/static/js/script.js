@@ -49,7 +49,19 @@ function unfollow(friendId){
     }).then(setTimeout(function(){window.location.reload()},500));
 };
 
+function show_edit_form(){
+    form = document.getElementById('edit_post_content');
+    form.style.display = 'block';
+    post_content = document.getElementById('post_content');
+    post_content.style.display = 'none';
+}
 
+function hide_edit_form(){
+    form = document.getElementById('edit_post_content');
+    form.style.display = 'none';
+    post_content = document.getElementById('post_content');
+    post_content.style.display = 'block';
+}
 
 
 

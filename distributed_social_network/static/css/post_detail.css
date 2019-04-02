@@ -33,8 +33,24 @@
     cursor: pointer;
 }
 
-div.post_content{
+.cancel_btn{
+    color: white;
+    border-width: 0;
+    border-radius: 3px;
+    background-color: #aaa;
+    /* width:100px; */
+    height: 30px;
+    font-size: medium;
+}
+
+#post_content{
     padding:10px;
+    display:block;
+}
+
+#edit_post_content{
+    padding:10px;
+    display:none;
 }
 
 div.comments{
