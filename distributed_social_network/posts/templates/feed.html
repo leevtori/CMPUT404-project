@@ -83,11 +83,19 @@
                     <label for="{{form.description.id_for_label}}" name='description'>Description</label> {{form.description}}
                     <label for="{{form.content.id_for_label}}" name='content'>Content</label>{{form.content}}
                     <div>
-                        <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>{{form.visibility}}
+                        <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>
+                        <select name='visibility' onchange="show_visible_to(this.options[this.selectedIndex].value)">
+                            <option value='PUB'>Public</option>
+                            <option value='FOAF'>Friend of a Friend</option>
+                            <option value='PRIV'>Private</option>
+                            <option value='SERV'>Home Server Only</option>
+                            <option value='FRND'>Friends Only</option>
+                        </select>
+                        <div id='visible_to_field'>
+                            <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}} 
+                        </div>
                     </div>
-                    <div class='visible_to_field'>
-                        <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}} 
-                    </div>
+                    
                     <div>
                         <label for="{{form.unlisted.id_for_label}}" name='unlisted'>Unlisted</label>{{form.unlisted}}
                     </div>

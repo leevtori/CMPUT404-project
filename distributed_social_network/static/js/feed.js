@@ -42,26 +42,6 @@ function openPostInterface(post_type){
         }
     }
 
-    //highlight selected post type
-    //gives illusion of tabs
-    // var all_post_btns = document.getElementsByClassName("post_btn");
-    // all_post_btns[0].style.backgroundColor = '#3D9970';
-    // all_post_btns[1].style.backgroundColor = '#3D9970';
-    // all_post_btns[2].style.backgroundColor = '#3D9970';
-    // all_post_btns[3].style.backgroundColor = '#3D9970';
-    // if(post_type == 'textPost'){
-    //     all_post_btns[0].style.backgroundColor = '#78cfa8';
-    // }
-    // else if(post_type == 'markdownPost'){
-    //     all_post_btns[1].style.backgroundColor = '#78cfa8';
-    // }
-    // else if(post_type == 'picturePost'){
-    //     all_post_btns[2].style.backgroundColor = '#78cfa8';
-    // }
-    // else if(post_type == 'urlPicturePost'){
-    //     all_post_btns[3].style.backgroundColor = '#78cfa8';
-    // }
-
 
 }
 
@@ -110,6 +90,14 @@ function openNewPost(evt, newPostType) {
     evt.currentTarget.className += " active";
 }
 
+function show_visible_to(option) {
+    if(option == 'PRIV'){
+        document.getElementById('visible_to_field').style.display = 'block';
+    }
+    else{
+        document.getElementById('visible_to_field').style.display = 'none';
+    }
+};
 
 
   //taken from https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript

@@ -188,8 +188,12 @@ a.stats {
     white-space: nowrap;
 }
 
-div.visible_to_field{
+#visible_to_field{
     display:none;
+}
+
+#id_visible_to{
+    height:100px;
 }
 
 #id_unlisted{
