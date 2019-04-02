@@ -58,8 +58,7 @@ class User(AbstractUser):
         val= urljoin(val, str(self.id))
         return val
 
-    def get_friends_posts_readonly(self):
-        print("in getting ", self.id)        
+    def get_friends_posts(self):
         p = Post.objects.all().filter(author__in=self.friends)
         print("OISTS ", p)
         posts = p.values_list("title", flat=True)
