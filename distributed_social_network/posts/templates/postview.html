@@ -10,7 +10,6 @@
         }
     </style>
     <script src=" {% static 'js/script.js' %}"></script>
-    <script src=" {% static 'js/feed.js' %}"></script>
     <script>
         function mkdown(){
             var node;
@@ -207,6 +206,7 @@
             {% endif %}
             <div>
                 <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>
+                {% comment %}
                 <select name='visibility' onchange="show_visible_to(this.options[this.selectedIndex].value, 'edit_post_content')">
                     <option value='PUBL'>Public</option>
                     <option value='FOAF'>Friend of a Friend</option>
@@ -214,6 +214,8 @@
                     <option value='SERV'>Home Server Only</option>
                     <option value='FRND'>Friends Only</option>
                 </select>
+                {% endcomment %}
+                {{form.visibility}}
                 <div class='visible_to_field'>
                     <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}} 
                 </div>
