@@ -151,45 +151,12 @@ a.stats {
     padding-bottom:0;
 }
 
-.new_post_form{
-    padding:10px;
-    display:flex;
-    flex-direction: column;
-    justify-content: flex-start;
-}
-
-.new_post_form input{
-    width: 50%;
-    border: 1px solid #ddd;
-    font-size: small;
-    margin-top: 5px;
-    margin-bottom:5px;
-    padding: 5px;
-}
-
-.new_post_form textarea{
-    /* width: 50%; */
-    border: 1px solid #ddd;
-    font-size: small;
-    margin-top: 5px;
-    margin-bottom:5px;
-    padding: 5px;
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-.new_post_form select{
-    width:30%;
-    border: 1px solid #ddd;
-    background-color: white;
-    font-size: small;
-    font-family: Arial, Helvetica, sans-serif;
-    height: 30px;
-    padding: 5px;
-    white-space: nowrap;
-}
-
-div.visible_to_field{
+.visible_to_field{
     display:none;
+}
+
+#id_visible_to{
+    height:100px;
 }
 
 #id_unlisted{
