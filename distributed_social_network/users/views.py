@@ -37,7 +37,11 @@ class UserList(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        return qs.filter(is_active=True).order_by("username")
+        qs = qs.filter(is_active=True).order_by("username")
+        n = Node.objects.all().values_list('user_auth', flat=True)
+        qs = qs.exclude(id__in=n)
+        return qs
+
 
 
 class FriendList(LoginRequiredMixin, ListView):
@@ -94,11 +98,10 @@ class FollowingList(LoginRequiredMixin, ListView):
 class SendFriendRequest(LoginRequiredMixin, View):
 
     def post(self, request):
-        print('reeeeeeeeeeee')
         body_unicode = self.request.body.decode('utf-8')
         body = json.loads(body_unicode)
         friend_id = body['id']
-        print("friend_id ", friend_id)
+        # print("friend_id ", friend_id)
         friend = get_object_or_404(User, id=friend_id)
         #friend is on our host
         print(str(friend.host))
@@ -111,12 +114,14 @@ class SendFriendRequest(LoginRequiredMixin, View):
             return HttpResponse(200)
         #friend is on another host
         else:
-            #i hope this works
             friend_host = get_object_or_404(Node, hostname=friend.host.hostname)
             link = str(friend_host)+'friendrequest'
-            print(link)
+            print("LINK ", link)
             validated_friend=FriendRequestUsers(friend)
             validated_user=FriendRequestUsers(self.request.user)
+
+            self.request.user.following.add(friend)
+            self.request.user.outgoingRequests.add(friend)
 
             returnDict = dict()
             returnDict['query'] = 'friendrequest'
@@ -124,7 +129,7 @@ class SendFriendRequest(LoginRequiredMixin, View):
             returnDict['friend']=validated_friend.data
             print(json.dumps(returnDict))
             friend_request = requests.post(link,auth=HTTPBasicAuth("cmput404team10","qwertypoiu"),json=json.dumps(returnDict))
-            print(friend_request.status_code)
+            print("CODE", friend_request.status_code)
             print(friend_request.content)
 
 
