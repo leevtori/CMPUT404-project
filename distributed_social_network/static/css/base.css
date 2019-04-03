@@ -206,11 +206,12 @@ img.profile_pic_large{
 
 .tiny_tag{
     margin-left: 5px;
-    font-size: smaller;
-    color: white;
-    background-color: #bbb;
+    font-size: x-small;
+    color:  rgb(131, 130, 130);
+    /* background-color: rgb(170, 169, 169); */
     padding: 2px 5px;
     border-radius: 5px;
+    border: 1px solid  rgb(170, 169, 169);
 }
 
 .post_title{
