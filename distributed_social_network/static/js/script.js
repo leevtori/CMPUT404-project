@@ -1,5 +1,5 @@
 function addFriend(friendId){
-    fetch("friends/add/", {
+    fetch(window.location.origin+"/users/friends/add/", {
         method: 'post',
         headers: {
             'X-CSRFToken': document.cookie.split("=")[1]
