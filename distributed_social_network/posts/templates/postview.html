@@ -167,14 +167,8 @@
             var img_element = document.getElementById("post_image");
             var source = "{{ post.content|escapejs }}";
             img_element.setAttribute('src', source);
-
-            var vis = document.getElementById('edit_post_content');
-            console.log("fasdfa");
-            console.log(vis);
-            vis.onchange = function(){
-                vis_to = vis.querySelector("#id_visible_to");
-                console.log(vis_to);
-            }
+            
+            add_visible_to_listener();
         }
         {% if post.content_type == "MKD" %}
         window.onload = mkdown;
