@@ -223,6 +223,7 @@ class post_deserializer_no_comment(serializers.Serializer):
                 unlisted=validated_data['unlisted']
             )
         else:
+            print(validated_data['author'])
             print(usr.errors)
 
 
