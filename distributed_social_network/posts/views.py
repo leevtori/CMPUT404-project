@@ -96,6 +96,8 @@ class ProfileView(PostVisbilityMixin, ListView):
         context['following_count']= user.following.count
         context['friend_count'] = user.friends.count
         context['follower_count'] = user.followers.count
+        context['friendRequests'] = self.request.user.outgoingRequests.all()
+        context['friends'] = self.request.user.friends.all()
 
         # pass context to template
         return context
