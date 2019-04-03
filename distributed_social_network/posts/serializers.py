@@ -54,7 +54,7 @@ def requestPosts(node, ending, current_id):
                         new_post.save()
                         print('saved new post id :'+str(new_post.id))
                     else:
-                        print('passed')
+                        # print('passed')
                         pass
                 else:
                     print(post.errors)
@@ -89,7 +89,7 @@ def requestSinglePost(link, current_id, node):
 
 def request_single_user(node,user, current_id):
     a=requests.get(user.get_url(),headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
-    print("GETTING USER? ", a.status_code)
+    # print( a.status_code)
     if a.status_code!=200:
         a = requests.get(user.get_url(), headers={"X-AUTHOR-ID": str(current_id)},
                          auth=HTTPBasicAuth(node.send_username, node.send_password))

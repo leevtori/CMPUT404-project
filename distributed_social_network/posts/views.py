@@ -57,14 +57,8 @@ class PostVisbilityMixin(LoginRequiredMixin):
         query_list.append(Q(author__id__in=foaf, visibility=Visibility.FOAF))
 
         visible = user.visible_posts.all()
-        print("visible!!!!!!", visible)
 
-        #Server Only Posts
         query_list.append(Q(visibility=Visibility.SERVERONLY))
-
-        #TODO:Private posts with custom visible_to
-        # query_list.append(Q(visible_to__in=[user]))#WHY U NO WORK????!!!!!
-        # print("QWUERY LSIT", query_list)
 
         qs = qs.filter(reduce(__or__, query_list))
         # qs = qs.union(visible).distinct()  # this doesn't filter properly afterwards
@@ -95,10 +89,6 @@ class ProfileView(PostVisbilityMixin, ListView):
         if user.local == False:
             print('not local user, hope its not boom')
             request_single_user(user.host, user, self.request.user.id)
-
-
-
-
 
         # put user object in context
         context['user'] = user
@@ -136,7 +126,10 @@ class FeedView(PostVisbilityMixin, ListView):
         context['following_count']= self.request.user.following.count
         q = list(set(self.request.user.followers.all()).difference(set(self.request.user.friends.all())))
         context['requestCount'] = len(q)
-        context['form'] = PostForm()
+        p = PostForm()
+        p.fields['visible_to'].queryset = self.request.user.friends.all()
+        context['form'] = p
+
 
         following_posts = []
         qs = super().get_queryset()
@@ -178,6 +171,8 @@ def create_post(request):
         new_post.origin = urljoin(settings.HOSTNAME, '/api/posts/%s' % new_post.id)
 
         new_post.save()
+        new_post = f.save_m2m()
+
         return redirect('feed')
         
     else:
