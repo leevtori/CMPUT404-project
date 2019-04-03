@@ -178,6 +178,8 @@ def create_post(request):
         new_post.origin = urljoin(settings.HOSTNAME, '/api/posts/%s' % new_post.id)
 
         new_post.save()
+        new_post = f.save_m2m()
+
         return redirect('feed')
         
     else:
