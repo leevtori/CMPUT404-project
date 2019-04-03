@@ -128,7 +128,7 @@ class SendFriendRequest(LoginRequiredMixin, View):
             returnDict['author']=validated_user.data
             returnDict['friend']=validated_friend.data
             print(json.dumps(returnDict))
-            friend_request = requests.post(link,auth=HTTPBasicAuth("cmput404team10","qwertypoiu"),json=json.dumps(returnDict))
+            friend_request = requests.post(link,auth=HTTPBasicAuth(friend_host.send_username,friend_host.send_password),json=json.dumps(returnDict))
             print("CODE", friend_request.status_code)
             print(friend_request.content)
 

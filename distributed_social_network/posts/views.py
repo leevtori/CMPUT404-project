@@ -116,7 +116,8 @@ class FeedView(PostVisbilityMixin, ListView):
         # get public posts from other hosts, using https://connectifyapp.herokuapp.com/ as test
         nodes = Node.objects.all()
         for node in nodes:
-            requestPosts(node, 'posts',self.request.user.id)
+            if node.active:
+                requestPosts(node, 'posts',self.request.user.id)
             #requestPosts(node, 'author/posts', self.request.user.id)
 
         context = super().get_context_data(**kwargs)
