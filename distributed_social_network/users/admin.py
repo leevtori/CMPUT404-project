@@ -23,11 +23,13 @@ class CustomUserAdmin(UserAdmin):
             'friends', 'followers'
     )}),)
 
-    # def get_queryset(self, request):
-    #     nodes = Node.objects.values_list('user_auth', flat=True)
-    #     qs = User.objects.all().exclude(id__in=nodes)
-    #     return qs
+    def get_queryset(self, request):
+        nodes = Node.objects.values_list('user_auth', flat=True)
+        qs = User.objects.all().exclude(id__in=nodes)
+        return qs
 
+class CustomNodeAdmin(UserAdmin):
+    pass
 
 # Register your models here.
 admin.site.register(User, CustomUserAdmin)
