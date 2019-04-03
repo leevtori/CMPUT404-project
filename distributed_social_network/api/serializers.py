@@ -26,8 +26,9 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     host = serializers.SerializerMethodField()
 
-    displayName = serializers.CharField(source="username")
+    displayName = serializers.CharField(source="username",required=False)
     url = serializers.SerializerMethodField(method_name="get_id")
+    github=serializers.CharField(allow_blank=True)
 
     class Meta:
         model = User
