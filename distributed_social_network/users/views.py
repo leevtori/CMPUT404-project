@@ -147,7 +147,8 @@ class ConfirmFriendRequest(LoginRequiredMixin, View):
             friend.outgoingRequests.remove(self.request.user)
             self.request.user.incomingRequests.remove(friend)
             
-            return HttpResponse("added")
+            return HttpResponse(status=200)
+        return HttpResponse(status=404)
 
 
 class CustomUserCreationForm(UserCreationForm):

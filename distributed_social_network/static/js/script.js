@@ -10,7 +10,7 @@ function addFriend(friendId){
 
 
 function deleteFriend(friendId){
-    fetch("friends/delete/", {
+    fetch(window.location.origin+"/users/friends/delete/", {
         method: 'delete', 
         headers: {
             'X-CSRFToken': document.cookie.split("=")[1]
@@ -20,7 +20,7 @@ function deleteFriend(friendId){
 };
 
 function confirmFriend(friendId){
-    fetch("confirm/", {
+    fetch("/users/requests/confirm/", {
         method: 'post',
         headers: {
             'X-CSRFToken': document.cookie.split("=")[1]

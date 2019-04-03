@@ -4,12 +4,13 @@
 <div class='post' style="width:45%;">
     <div class='post_top'>
         <img src={% static "img/profile.png"%} class='profile_pic_small' %}>
-        <h4 class='fullname'>{{user.username}}</h4>
+        <h4 class='fullname'><a href={% url 'profile' username=user.username %} class='fullname'>{{user.username}}</a></h4>
+
     </div>
     {% csrf_token %}
     <div style="padding:10px">
         {% if user in friends %}
-            Friends &#x2713; 
+            <button disabled class='inactive_btn'>Friends &#x2713;</button>
         {% endif %}
 
         {% if user in following %}
