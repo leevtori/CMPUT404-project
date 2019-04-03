@@ -54,7 +54,7 @@ def requestPosts(node, ending, current_id):
                         new_post.save()
                         print('saved new post id :'+str(new_post.id))
                     else:
-                        print('passed')
+                        # print('passed')
                         pass
                 else:
                     print(post.errors)
@@ -89,6 +89,7 @@ def requestSinglePost(link, current_id, node):
 
 def request_single_user(node,user, current_id):
     a=requests.get(user.get_url(),headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
+    # print( a.status_code)
     if a.status_code!=200:
         a = requests.get(user.get_url(), headers={"X-AUTHOR-ID": str(current_id)},
                          auth=HTTPBasicAuth(node.send_username, node.send_password))
@@ -208,7 +209,7 @@ class post_deserializer_no_comment(serializers.Serializer):
                 return None
             except:
                 print(validated_data['visibility'])
-                print(validated_data['contentType'])
+                print(validated_data['published'])
                 return Post.objects.create(
                 id=validated_data['id'],
                 title=validated_data['title'],

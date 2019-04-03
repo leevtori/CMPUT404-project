@@ -57,14 +57,8 @@ class PostVisbilityMixin(LoginRequiredMixin):
         query_list.append(Q(author__id__in=foaf, visibility=Visibility.FOAF))
 
         visible = user.visible_posts.all()
-        print("visible!!!!!!", visible)
 
-        #Server Only Posts
         query_list.append(Q(visibility=Visibility.SERVERONLY))
-
-        #TODO:Private posts with custom visible_to
-        # query_list.append(Q(visible_to__in=[user]))#WHY U NO WORK????!!!!!
-        # print("QWUERY LSIT", query_list)
 
         qs = qs.filter(reduce(__or__, query_list))
         # qs = qs.union(visible).distinct()  # this doesn't filter properly afterwards
@@ -96,10 +90,6 @@ class ProfileView(PostVisbilityMixin, ListView):
             print('not local user, hope its not boom')
             request_single_user(user.host, user, self.request.user.id)
 
-
-
-
-
         # put user object in context
         context['user'] = user
         context['post_count'] = Post.objects.filter(author=user).count
@@ -130,7 +120,8 @@ class FeedView(PostVisbilityMixin, ListView):
         # get public posts from other hosts, using https://connectifyapp.herokuapp.com/ as test
         nodes = Node.objects.all()
         for node in nodes:
-            requestPosts(node, 'posts',self.request.user.id)
+            if node.active:
+                requestPosts(node, 'posts',self.request.user.id)
             #requestPosts(node, 'author/posts', self.request.user.id)
 
         context = super().get_context_data(**kwargs)
@@ -140,7 +131,10 @@ class FeedView(PostVisbilityMixin, ListView):
         context['following_count']= self.request.user.following.count
         q = list(set(self.request.user.followers.all()).difference(set(self.request.user.friends.all())))
         context['requestCount'] = len(q)
-        context['form'] = PostForm()
+        p = PostForm()
+        p.fields['visible_to'].queryset = self.request.user.friends.all()
+        context['form'] = p
+
 
         following_posts = []
         qs = super().get_queryset()
@@ -182,6 +176,8 @@ def create_post(request):
         new_post.origin = urljoin(settings.HOSTNAME, '/api/posts/%s' % new_post.id)
 
         new_post.save()
+        new_post = f.save_m2m()
+
         return redirect('feed')
         
     else:
@@ -218,147 +214,3 @@ def add_comment(request):
         return HttpResponse(status=404)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def postapi(request, rid):
-#     # creates a post and redirects back to main page
-#     if request.method == "POST":
-#         data = json.loads(request.body.decode("utf-8"))
-#         if Post.objects.filter(id=data["id"]).count() != 0:
-#             return HttpResponse(status=400)
-#         if data["id"] != str(rid):
-#             return HttpResponse(status=400)
-#         new_post = Post(id=data["id"],
-#                         author=request.user,
-#                         title=data["title"],
-#                         content=data['content'],
-#                         description=data['description'],
-#                         content_type=data['type'],
-#                         visibility=data['visibility'])
-
-#         new_post.source = 'http://127.0.0.1:8000/posts/' + str(getattr(new_post, 'id'))
-#         new_post.origin = new_post.source
-
-#         new_post.save()
-#         return HttpResponse(status=200)
-#     elif request.method == "GET":
-#         if "python" in request.META['HTTP_USER_AGENT'].lower():
-#             # TODO:
-#             # if the node is authenticated
-#             if True:
-#                 desired_post = get_object_or_404(Post, id=rid)
-#                 post_author = desired_post.author
-#                 post_comments=Comment.objects.filter(post_id=rid).order_by('-published')
-#                 send_comments=[]
-#                 #counter=5
-#                 for comment in post_comments:
-#                     #if counter==0:
-#                         #break
-#                     #TODO:
-#                     #add the url back once we get that, also our host
-#                     comment_data={
-#                         "author": {
-#                             "id": str(comment.author.id),
-#                             #"url": comment.author.url,
-#                             "host": comment.author.host,
-#                             "displayName": comment.author.display_name,
-#                             "github": comment.author.github
-#                         },
-#                         "comment": comment.comment,
-#                         "contentType": comment.content_type,
-#                         "published": str(comment.published),
-#                         "id": str(comment.id)
-#                     }
-#                     send_comments.append(comment_data)
-#                     #counter=counter-1
-
-
-#                 #TODO:
-#                 #when users get an url, add url here
-#                 response = {
-#                     "title": desired_post.title,
-#                     "source": desired_post.source,
-#                     "origin": desired_post.origin,
-#                     "description": desired_post.description,
-#                     "contentType":"text/plain",
-#                     "author":{
-#                         "id": str(post_author.id),
-#                         "host":post_author.host,
-#                         "displayName":post_author.display_name,
-#                         #"url":,
-#                         "github":post_author.github
-#                     },
-#                     "count":post_comments.count(),
-#                     "size":5,
-#                     #"next":"",
-#                     "comments":send_comments,
-#                     "published":str(desired_post.published),
-#                     "id":str(desired_post.id),
-#                     "visibility":desired_post.visibility,
-#                     #"visibleTo":desired_post.visibleTo,
-#                     "unlisted":desired_post.unlisted,
-#                 }
-#                 return HttpResponse(json.dumps(response),content_type="application/json")
-
-#             else:
-#                 return HttpResponse(status=404)
-
-#         else:
-#             # browser
-#             # leaving space for visibility checks
-#             if True:
-#                 post = get_object_or_404(Post, id=rid)
-#                 postcomments = Comment.objects.filter(post_id=rid).order_by('-published')
-#                 return render(request, "postview.html", {'post': post, 'post_comments': postcomments})
-
-
-# def create_comment(request):
-#     if request.method == "POST":
-#         select_post = get_object_or_404(Post, id=request.POST['post'])
-#         new_comment = Comment(
-#             post=select_post,
-#             comment=request.POST['comment'],
-#             author=request.user
-#         )
-#         new_comment.save()
-#     return HttpResponseRedirect(select_post.source)
-
-
-# def delete_comment(request):
-#     if request.method == "DELETE":
-#         post_id = request.META['HTTP_POSTID']
-#         to_be_deleted = get_object_or_404(Post, id=post_id)
-#         post_author = get_object_or_404(User, id=to_be_deleted.author.id)
-#         if post_author.id == request.user.id:
-#             to_be_deleted.delete()
-#             return HttpResponse('')
-
-#     return HttpResponseNotFound("hello")
-
-# def visible_to_user(request):
-#     pass

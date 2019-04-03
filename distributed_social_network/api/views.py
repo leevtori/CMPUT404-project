@@ -25,10 +25,21 @@ import json
 
 User = get_user_model()
 
+
 def get_uuid_from_url(url):
     p = "([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})"
     pattern = re.compile(p, re.IGNORECASE)
     return pattern.search(url).group()
+
+
+def get_author_id(request):
+    try:
+        user_id = request.META["HTTP_X_USER"]
+        user_id = get_uuid_from_url(user_id)
+    except (KeyError, User.DoesNotExist):
+        raise ParseError(detail="Missing X-User Header Field")
+
+    return user_id
 
 
 class PaginateOverrideMixin:
@@ -51,12 +62,14 @@ class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
 
     @action(methods=["get"], detail=True)
     def posts(self, request, pk=None):
+
         if request.method == "GET":
             user = self.get_object()
+            auth_user = get_author_id(request)
 
             # Not really meant to be used this way...but it works?
             post_filter = PostVisbilityMixin()
-            qs = post_filter.filter_user_visible(self.request.user, user.posts.all())
+            qs = post_filter.filter_user_visible(auth_user, user.posts.all())
             qs = qs.filter(unlisted=False)
             page = self.paginate_queryset(qs)
             if page is not None:
@@ -68,7 +81,7 @@ class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
 
     def list(self, request):
         qs = self.get_queryset()
-        qs = qs.filter(host=None)
+        qs = qs.filter(local=True)
         page = self.paginate_queryset(qs)
 
         if page is not None:
@@ -128,21 +141,18 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
     creates new post for authenticated user.
     /author/posts
     """
-    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = serializers.PostSerializer
     queryset = Post.objects.all()
 
-    def get_author_id(self, request):
-        try:
-            user_id = request.META.get("HTTP_X_USER")
-            user_id = get_uuid_from_url(user_id)
-        except (KeyError, User.DoesNotExist):
-            raise ParseError(detail="Missing X-User Header Field")
-
-        return user_id
+    def create_status_responses(self, statusType=True, message="Post created"):
+        return {
+            "query": "createPost",
+            "type": statusType,
+            "message": message
+        }
 
     def get(self, request):
-        author_id = self.get_author_id(request)
+        author_id = get_author_id(request)
 
         if User.objects.filter(pk=author_id).exists():
             user = User.objects.get(pk=author_id)
@@ -151,7 +161,7 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
             posts = post_filter.filter_user_visible(user, self.get_queryset())
 
         else:
-            posts = Post.objects.filter(visibility=Visibility.PUBLIC, unlisted=False)
+            posts = Post.objects.filter(visibility=Visibility.PUBLIC, unlisted=False, order_by="-published")
 
         page = self.paginate_queryset(posts)
 
@@ -163,15 +173,24 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
         return Response(serializer.data)
 
     def post(self, request):
-        author_id = self.get_author_id()
+        author_id = get_author_id(request)
 
         user = get_object_or_404(User, pk=author_id)
 
-        post = request.data["post"]
+        try:
+            post = request.data["post"]
+        except KeyError:
+            return Response(
+                self.create_status_responses(statusType=False, message="Malformed request"),
+                status=400
+                )
 
-        serializer = serializers.PostSerializer(data=post)
+        serializer = serializers.PostCreateSerializer(data=post)
 
-
+        print(serializer.is_valid())
+        print(serializer.errors)
+        if serializer.is_valid():
+            serializer.save()
         return Response(status=501)
 
 
@@ -185,7 +204,7 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
 
 
     def list(self, request):
-        qs = Post.objects.filter(visibility=Visibility.PUBLIC, origin__icontains=settings.HOSTNAME)
+        qs = Post.objects.filter(visibility=Visibility.PUBLIC)
 
         page = self.paginate_queryset(qs)
 
@@ -221,22 +240,15 @@ class CommentView(PaginateOverrideMixin, GenericAPIView):
 
         post = get_object_or_404(Post, pk=pk)
 
-        print(1)
         id = request.data['post']['author']['id']
         id = get_uuid_from_url(id)
-        print(2)
-
-        # request.data['post'].pop('author')
 
         serializer = serializers.CommentPostSerializer(data = request.data['post'] , context={'request':request})
-        print(3)
         commentUser = get_object_or_404(User, pk=id)
 
         if serializer.is_valid():
-            print(4)
             serializer.save(post_id=pk,author=commentUser,)
-            print(5)
-            return Response(status=201)
+            return Response(serializer.data, status=201)
         print("ERRROR ", serializer.errors)
         return Response(serializer.errors, status=400)
 
@@ -271,8 +283,8 @@ class AreFriendsView(APIView):
 
 
 
-class CreatePostView(CreateAPIView):
-    serializer_class = serializers.PostSerializer
+# class CreatePostView(CreateAPIView):
+#     serializer_class = serializers.PostSerializer
 
 
 class FriendRequestView(APIView):
