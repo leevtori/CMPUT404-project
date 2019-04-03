@@ -10,12 +10,8 @@ function addFriend(friendId){
 
 
 function deleteFriend(friendId){
-<<<<<<< HEAD
-    fetch(window.location.origin+"/users/friends/delete/", {
-=======
     console.log(window.location.origin)
     fetch("/users/friends/delete/", {
->>>>>>> development
         method: 'delete', 
         headers: {
             'X-CSRFToken': document.cookie.split("=")[1]
