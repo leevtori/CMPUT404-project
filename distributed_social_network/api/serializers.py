@@ -48,7 +48,8 @@ class AuthorSerializer(serializers.ModelSerializer):
         )
 
     def get_host(self, obj):
-        return str(obj.host) or settings.HOSTNAME
+        host = obj.host or settings.HOSTNAME
+        return str(host)
 
     def get_id(self, obj):
         return obj.get_url()
