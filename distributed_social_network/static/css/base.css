@@ -3,14 +3,15 @@ body,html{
     margin:0;
     padding:0;
     font-family: Arial, Helvetica, sans-serif;
-    background-color: rgb(235, 252, 245);
+    background-color: rgb(234, 247, 238);
 }
 
 .header{
     height: 50px;
+    width:100%;
     box-shadow: 0 1px 0 rgba(32, 29, 36, 0.2),0 6px 6px rgba(65, 59, 69, 0.2);
     z-index:9;
-    position:sticky;
+    position:fixed;
     top:0;
     text-align: center;
     color: white;
@@ -24,6 +25,13 @@ body,html{
     position:fixed;
     top:0;
 }
+
+div.page{
+    margin-top:50px;
+    padding:10px;
+}
+
+
 
 .notify_bubble{
     margin-left:5px;
@@ -43,6 +51,10 @@ body,html{
     font-size: 20px;
 }
 
+#logo_white{
+    height:25px;
+}
+
 a.header_link{
     float: left;
     padding-left: 15px;
@@ -55,16 +67,21 @@ a.header_link{
     text-decoration: none;
 }
 
+
+.header_link:hover{
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
 a{
     text-decoration: none;
     outline: none;
     color: #3D9970;
 }
 
-.header_link:hover{
-    background-color: rgba(255, 255, 255, 0.3);
+h3.heading{
+    padding-left:10px;
+    color: #2b0f4d;
 }
-
 
 /* Dropdown Button */
 .dropbtn {
@@ -187,6 +204,16 @@ img.profile_pic_large{
     padding-left: 5px;
 }
 
+.tiny_tag{
+    margin-left: 5px;
+    font-size: x-small;
+    color:  rgb(131, 130, 130);
+    /* background-color: rgb(170, 169, 169); */
+    padding: 2px 5px;
+    border-radius: 5px;
+    border: 1px solid  rgb(170, 169, 169);
+}
+
 .post_title{
     color: black;
     font-weight: bold;
@@ -203,3 +230,40 @@ hr{
 }
 
 
+
+
+.post_form{
+    padding:10px;
+    display:flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.post_form input{
+    width: 50%;
+    border: 1px solid #ddd;
+    font-size: small;
+    margin-top: 5px;
+    margin-bottom:5px;
+    padding: 5px;
+}
+
+.post_form textarea{
+    border: 1px solid #ddd;
+    font-size: small;
+    margin-top: 5px;
+    margin-bottom:5px;
+    padding: 5px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.post_form select{
+    width:30%;
+    border: 1px solid #ddd;
+    background-color: white;
+    font-size: small;
+    font-family: Arial, Helvetica, sans-serif;
+    height: 30px;
+    padding: 5px;
+    white-space: nowrap;
+}

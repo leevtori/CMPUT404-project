@@ -4,6 +4,7 @@
 
 {% block styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/profile.css' %}">
+    <script src="{% static 'js/script.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -19,7 +20,7 @@
                     <h1 class='banner'>{{user.username}}</h1>
                     <h3 class='banner'>{{user.first_name}} {{user.last_name}}</h3>
                     {% if user != request.user %}
-                    <button class='add_friend_btn' type='submit' onclick="addFriend('{{user.id}}')">+ Add Friend</button>
+                        <button class='add_friend_btn' type='submit' onclick="addFriend('{{user.id}}')">+ Add Friend</button>
                     {% endif %}
                 </div>
                 <hr>
@@ -27,23 +28,23 @@
                 <table class='stats'>
                     <tr style="height: 60px;">
                         <td class='stats'>
-                            <a href={% url 'followers' %} class='stats'>
+                            <a href={% url 'followers' username=user.username %} class='stats'>
                             <div style="height:100%;width:100%">
                                 {{follower_count}}<br/>Followers
                             </div>
                             </a>
                         </td>
                         <td class='stats'>
-                            <a href={% url 'following' %} class='stats'>
+                            <a href={% url 'following' username=user.username %} class='stats'>
                             <div style="height:100%;width:100%">
                                 {{following_count}}<br/>Following
                             </div>
                             </a>
                         </td>
                         <td class='stats'>
-                            <a href={% url 'friends' %} class='stats'>
+                            <a href={% url 'friends' username=user.username %} class='stats'>
                             <div style="height:100%;width:100%">
-                                    {{friend_count}}<br/>Friends
+                                    {{friend_count}}<br/>Frands
                             </div>
                             </a>
                         </td>      
@@ -53,18 +54,24 @@
 
                 <h3>Bio</h3>
                 <p>{{user.bio}}</p>
+                <hr>
                 <p>{{post_count}} post(s)</p>
-                <a href={{user.github}}>Github</a>
-                <p>Host: {{user.hostname}}</p>
+                <a href="{{user.github}}">Github</a>
+                <p>Host: {{user.host}}</p>
             </div>
         </div>
 
 
 
         <div class='right_col'>
-            {% for post in object_list %}
-            {% include "post.html" %}
-            {% endfor %}
+            <h3 class='heading'>Posts</h3>
+            {% if object_list %}
+                {% for post in object_list %}
+                {% include "post.html" %}
+                {% endfor %}
+            {% else %}
+                <p class='date'>No posts yet.</p>
+            {% endif %}
         </div>
     </div>
 

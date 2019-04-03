@@ -4,9 +4,13 @@
 {% block styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/feed.css' %}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="{% static 'js/feed.js' %}"></script>
+    <script src="{% static 'js/script.js' %}"></script>
     <script>
-    
+        window.onload = function(){
+            add_visible_to_listener('new_txt_post');
+            add_visible_to_listener('new_mkd_post');
+            add_visible_to_listener('new_img_post');
+        }
     </script>
 {% endblock %}
 
@@ -31,23 +35,23 @@
             <table class='stats'>
                 <tr style="height: 60px;">
                     <td class='stats'>
-                        <a href={% url 'followers' %} class='stats'>
+                        <a href={% url 'followers' username=request.user.username%} class='stats'>
                         <div style="height:100%;width:100%">
                             {{follower_count}}<br/>Followers
                         </div>
                         </a>
                     </td>
                     <td class='stats'>
-                        <a href={% url 'following' %} class='stats'>
+                        <a href={% url 'following' username=request.user.username%} class='stats'>
                         <div style="height:100%;width:100%">
                             {{following_count}}<br/>Following
                         </div>
                         </a>
                     </td> 
                     <td class='stats'>
-                        <a href={% url 'friends' %} class='stats'>
+                        <a href={% url 'friends' username=request.user.username%} class='stats'>
                         <div style="height:100%;width:100%">
-                            {{friend_count}}<br/>Friends
+                            {{friend_count}}<br/>Frands
                         </div>
                         </a>
                     </td>
@@ -67,7 +71,9 @@
 
 
     <div class="right_col">
+        <h3 class='heading'>Add New Post</h3>
         <div class="posts_list">
+            
             <div class="tab">
                 <button class="post_tablinks active" onclick="openNewPost(event, 'new_txt_post')">Text</button>
                 <button class="post_tablinks" onclick="openNewPost(event, 'new_mkd_post')">Markdown</button>
@@ -75,48 +81,73 @@
             </div>
 
             <div id='new_txt_post' class='post_tabcontent' style="display:block;">
-                <form class='new_post_form' id='create_form' action={% url 'createpost' %} method="post">
+                <form class='post_form' id='create_form' action={% url 'createpost' %} method="post">
                     {% csrf_token %}
                     <label for="{{form.title.id_for_label}}" name='title'>Title</label> {{form.title}}
                     <label for="{{form.description.id_for_label}}" name='description'>Description</label> {{form.description}}
                     <label for="{{form.content.id_for_label}}" name='content'>Content</label>{{form.content}}
-                    <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}}
-                    <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>{{form.visibility}}
-                    <label for="{{form.unlisted.id_for_label}}" name='unlisted'>Unlisted</label>{{form.unlisted}}
-                    <label for="{{form.categories.id_for_label}}" name='categories'>Categories</label>{{form.categories}}
+                    <div>
+                        <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>{{form.visibility}}
+                        <div class='visible_to_field'>
+                            <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}} 
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="{{form.unlisted.id_for_label}}" name='unlisted'>Unlisted</label>{{form.unlisted}}
+                    </div>
+                    <div>
+                        <label for="{{form.categories.id_for_label}}" name='categories'>Categories</label>{{form.categories}}
+                    </div>
                     <input name='content_type' type='hidden' value='TXT'>
-                    <input type="submit" value='Create'></input>
+                    <input type="submit" value='Create' class="create_btn"></input> 
                 </form>
             </div>
 
             <div id='new_mkd_post' class='post_tabcontent'>
-                <form class='new_post_form' id='create_form' action={% url 'createpost' %} method="post">
+                <form class='post_form' id='create_form' action={% url 'createpost' %} method="post">
                     {% csrf_token %}
                     <label for="{{form.title.id_for_label}}" name='title'>Title</label> {{form.title}}
                     <label for="{{form.description.id_for_label}}" name='description'>Description</label> {{form.description}}
                     <label for="{{form.content.id_for_label}}" name='content'>Content</label>{{form.content}}
-                    <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}}
-                    <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>{{form.visibility}}
-                    <label for="{{form.unlisted.id_for_label}}" name='unlisted'>Unlisted</label>{{form.unlisted}}
-                    <label for="{{form.categories.id_for_label}}" name='categories'>Categories</label>{{form.categories}}
+                    <div>
+                        <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>{{form.visibility}}
+                        <div class='visible_to_field'>
+                            <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}} 
+                        </div>
+                    </div>
+                    <div>
+                        <label for="{{form.unlisted.id_for_label}}" name='unlisted'>Unlisted</label>{{form.unlisted}}
+                    </div>
+                    <div>
+                        <label for="{{form.categories.id_for_label}}" name='categories'>Categories</label>{{form.categories}}
+                    </div>
                     <input name='content_type' type='hidden' value='MKD'>
-                    <input type="submit" value='Create'></input>
+                    <input type="submit" value='Create' class="create_btn"></input> 
                 </form>
             </div>
 
             <div id='new_img_post' class='post_tabcontent'>
-                <form class='new_post_form' id='create_form' action={% url 'createpost' %} method="post">
+                <form class='post_form' id='create_form' action={% url 'createpost' %} method="post">
                     {% csrf_token %}
                     <label for="{{form.title.id_for_label}}" name='title'>Title</label> {{form.title}}
                     <label for="{{form.description.id_for_label}}" name='description'>Description</label> {{form.description}}
-                    <input type="file" id="createPicturePostButton" onchange="getimageformat()" class="browse_btn">
+                    <input type="file" id="createPicturePostButton" onchange="getimageformat()" class="browse_btn" style="border:none;">
                     <input name="content" type="hidden" id="hiddencontent">
-                    <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}}
-                    <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>{{form.visibility}}
-                    <label for="{{form.unlisted.id_for_label}}" name='unlisted'>Unlisted</label>{{form.unlisted}}
-                    <label for="{{form.categories.id_for_label}}" name='categories'>Categories</label>{{form.categories}}
+                    <div>
+                        <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>{{form.visibility}}
+                        <div class='visible_to_field'>
+                            <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}} 
+                        </div>
+                    </div>
+                    <div>
+                        <label for="{{form.unlisted.id_for_label}}" name='unlisted'>Unlisted</label>{{form.unlisted}}
+                    </div>
+                    <div>
+                        <label for="{{form.categories.id_for_label}}" name='categories'>Categories</label>{{form.categories}}
+                    </div>
                     <input id='image_upload' name='content_type' type='hidden' value='???'>
-                    <input type="submit" value='Create'></input> 
+                    <input type="submit" value='Create' class="create_btn"></input> 
                 </form>
             </div>
         </div>
@@ -125,28 +156,36 @@
 
 
         
-
+        <h3 class='heading'>Latest Posts</h3>
         <div class='posts_list'>
-            <h3 class='heading'>Latest Posts</h3>
+            
             <div class="tab">
                 <button id="feed_default_open" class="feed_tablinks active" onclick="openFeed(event, 'public_posts')">Public</button>
                 <button class="feed_tablinks" onclick="openFeed(event, 'following_posts')">Following</button>
             </div>
 
             <div id="public_posts" class="feed_tabcontent" style="display:block">
-                {% for post in object_list %}
-                    {% if not post.unlisted %}
-                        {% include "post.html"%}
-                    {% endif %}
-                {% endfor %}
+                {% if object_list %}
+                    {% for post in object_list %}
+                        {% if not post.unlisted %}
+                            {% include "post.html"%}
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <p class='date'>No posts yet.</p>
+                {% endif %}
             </div>
             
             <div id="following_posts" class="feed_tabcontent">
-                {% for post in following_posts %}
-                    {% if not post.unlisted %}
-                        {% include "post.html"%}
-                    {% endif %}
-                {% endfor %}
+                {% if following_posts %}
+                    {% for post in following_posts %}
+                        {% if not post.unlisted %}
+                            {% include "post.html"%}
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <p class='date'>No posts yet.</p>
+                {% endif %}
             </div>
 
             

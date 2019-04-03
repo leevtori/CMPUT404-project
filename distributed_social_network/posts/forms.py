@@ -7,4 +7,3 @@ class PostForm(ModelForm):
         model = Post
         fields = ['title', 'description', 'content', 'visible_to', 'visibility', 'unlisted', 'categories', 'content_type']
         widgets = {'content_type': widgets.HiddenInput}
-        

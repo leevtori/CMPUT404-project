@@ -9,6 +9,7 @@
             display:block;
         }
     </style>
+    <script src=" {% static 'js/script.js' %}"></script>
     <script>
         function mkdown(){
             var node;
@@ -159,44 +160,78 @@
             if (ordered == true || unordered == true || block == true|| codeblock == true){
                 displayed_post.appendChild(listnode);
             }
+
+            add_visible_to_listener('edit_post_content');
         }
         function imgsrc(){
             var img_element = document.getElementById("post_image");
             var source = "{{ post.content|escapejs }}";
             img_element.setAttribute('src', source);
+
+            add_visible_to_listener('edit_post_content');
         }
         {% if post.content_type == "MKD" %}
         window.onload = mkdown;
         {% else %}
         window.onload = imgsrc;
         {% endif %}
-
-
     </script>
+
 {% endblock %}
 
 {% block content %}
+<div style="margin-top:50px">
     <div class="post">
         <div class='post_top'>
             <img src={% static "img/profile.png"%} class='profile_pic_small' %}>
             <h4 class='fullname'><a href={% url 'profile' username=post.author.username %} class='fullname'>{{post.author.username}}</a></h4>
             <p class='date'>{{post.published}}</p>
+            <p class='tiny_tag'>{{ post.visibility }}</p>
         </div>
-
-
-        
-
-        {% if user.username == post.author.username %}
-        <form action={% url 'deletepost' pk=post.id %} method="get" style='float:right'>
-            <input type='submit' value='Delete Post' class='delete_post_btn'>
-        </form>
-        {% endif %}
 
         <p style='font-size: small'>{{post.source}}</p>
 
+        {% if user.username == post.author.username %}
+        <a href={% url 'deletepost' pk=post.id %}><img src={% static "img/delete.png"%} class='profile_pic_small' style='float:right'></a>
+        <img src={% static "img/edit.png"%} class='profile_pic_small' onclick=show_edit_form() style='float:right; cursor:pointer;'>
+        <form id="edit_post_content" class='post_form' action={% url 'editpost' pk=post.id %} method="post">
+            {% csrf_token %}
+            <div>
+                <label for="{{form.title.id_for_label}}" name='title'>Title</label> {{form.title}}
+            </div>
+            <div>
+                <label for="{{form.description.id_for_label}}" name='description'>Description</label> {{form.description}}
+            </div>
+            {% if post.content_type == 'MKD' or post.content_type == 'TXT'%}
+                <label for="{{form.content.id_for_label}}" name='content'>Content</label>{{form.content}}
+            {% else %}
+                <div style="display:none;">{{form.content}}</div>
+            {% endif %}
+            <div>
+                <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>{{form.visibility}}
+                <div class='visible_to_field'>
+                    <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}} 
+                </div>
+            </div> 
+            <div>
+                <label for="{{form.unlisted.id_for_label}}" name='unlisted'>Unlisted</label>{{form.unlisted}}
+            </div>
+            <div>
+                <label for="{{form.categories.id_for_label}}" name='categories'>Categories</label>{{form.categories}}
+            </div>
+            {{form.content_type}}
+            <div style='display: flex; flex-direction: row; align-items:baseline'>
+                <input type='submit' value='Save' class='comment_btn'>
+                <input type='button' value='Cancel' class='cancel_btn' onclick="hide_edit_form()">
+            </div>
+            
+        </form>
+        {% endif %}
+            
+        
         <h3>{{ post.title }}</h3>
+        <div id="post_content">
         <hr>
-        <div class='post_content'>
             {% if post.content_type == 'TXT' %}
                 <p>{{post.content}}</p>
             {% elif post.content_type == 'MKD' %}
@@ -227,4 +262,5 @@
         
         </div>
     </div>
+</div>
 {% endblock%}

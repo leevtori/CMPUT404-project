@@ -14,10 +14,11 @@ import uuid
 
 from users.models import Node
 from posts.forms import PostForm
-from posts.serializers import requestPosts, requestSinglePost
+from posts.serializers import requestPosts, requestSinglePost, request_single_user
 
 from django.db import connection
 from django.db.models import Q
+from django.conf import settings
 from .utils import Visibility
 
 from functools import reduce
@@ -56,6 +57,14 @@ class PostVisbilityMixin(LoginRequiredMixin):
         query_list.append(Q(author__id__in=foaf, visibility=Visibility.FOAF))
 
         visible = user.visible_posts.all()
+        print("visible!!!!!!", visible)
+
+        #Server Only Posts
+        query_list.append(Q(visibility=Visibility.SERVERONLY))
+
+        #TODO:Private posts with custom visible_to
+        # query_list.append(Q(visible_to__in=[user]))#WHY U NO WORK????!!!!!
+        # print("QWUERY LSIT", query_list)
 
         qs = qs.filter(reduce(__or__, query_list))
         # qs = qs.union(visible).distinct()  # this doesn't filter properly afterwards
@@ -85,6 +94,7 @@ class ProfileView(PostVisbilityMixin, ListView):
         # updates the user from nodes if foreign:
         if user.local == False:
             print('not local user, hope its not boom')
+            request_single_user(user.host, user, self.request.user.id)
 
 
 
@@ -145,16 +155,17 @@ class PostDetailView(PostVisbilityMixin, DetailView):
     def get_context_data(self, **kwargs):
         post=kwargs['object']
         #fetch the post
-        if post.origin != '':
+        if settings.HOSTNAME not in post.origin:
             node_url1 = post.origin.split('posts')[0]
             node_url = node_url1.split('api')[0]
-            print(node_url)
-            node = Node.objects.get(hostname=node_url)
+            node= get_object_or_404(Node, hostname=node_url)
             requestSinglePost(post.origin, self.request.user.id,node)
 
 
         context = super().get_context_data(**kwargs)
         context['post_comments'] = self.object.comment_set.all().order_by("-published")
+        context['form'] = PostForm(instance=post)
+
         return context
 
 
@@ -173,17 +184,25 @@ def create_post(request):
         return HttpResponse(status=404)
 
 def delete_post(request, pk):
-    if (request.method == "GET"):
-        post = Post.objects.get(id=pk)
-        post.delete()
-        return redirect('feed')
+    post = Post.objects.get(id=pk)
+    post.delete()
+    return redirect('feed')
+
+
+def edit_post(request, pk):
+    if (request.method == "POST"):
+        post = get_object_or_404(Post, id=pk)
+        f = PostForm(request.POST, instance=post)
+        f.save()
+        return redirect('postdetail', pk=pk)
     else: 
         return HttpResponse(status=404)
 
 def add_comment(request):
     if request.method == "POST":
         post_id=request.POST['post']
-        select_post = Post.objects.get(id=post_id)
+        # select_post = Post.objects.get(id=post_id)
+        select_post = get_object_or_404(Post, id=post_id)
         new_comment = Comment(
             post=select_post,
             comment=request.POST['comment'],

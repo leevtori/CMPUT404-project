@@ -6,10 +6,14 @@
         <img src={% static "img/profile.png"%} class='profile_pic_small' %}>
         <h4 class='fullname'><a href={% url 'profile' username=post.author.username %} class='fullname'>{{post.author.username}}</a></h4>
         <p class='date'>{{post.published}}</p>
+        <p class='tiny_tag'>{{ post.visibility }}</p>
     </div>
     
     <div class='post_bottom'>
-        <a href={% url 'postdetail' pk=post.id %} class="post_title">{{post.title}}</a>
+        
+        <div style='display: flex; flex-direction: row; align-items:baseline'>
+            <a href={% url 'postdetail' pk=post.id %} class="post_title">{{post.title}}</a>
+        </div>
         <hr>
         {% if post.content_type == 'TXT' %}
             <p>{{post.content}}</p>

@@ -25,13 +25,15 @@ class FriendSerializer(serializers.ModelSerializer):
 
 class AuthorSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
-    firstName = serializers.CharField(source="first_name", required=False)
-    lastName = serializers.CharField(source="last_name", required=False)
+    firstName = serializers.CharField(source="first_name",allow_null=True, allow_blank=True, required=False)
+    lastName = serializers.CharField(source="last_name",allow_null=True, allow_blank=True, required=False)
     # serializers.CharField(source="username")
+
     host = serializers.SerializerMethodField()
 
-    displayName = serializers.CharField(source="username")
+    displayName = serializers.CharField(source="username",required=False)
     url = serializers.SerializerMethodField(method_name="get_id")
+    github=serializers.CharField(allow_blank=True)
 
     class Meta:
         model = User

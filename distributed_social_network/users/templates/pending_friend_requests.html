@@ -7,14 +7,18 @@
 {% endblock %}
 
 {% block content %}
-<div style="padding:10px">
-    <h2>Friend Requests</h2>
+<div class='page'>
+    <h2>Frand Requests</h2>
     <div class='user_list'>
-    {% for user in object_list %}
+    {% if object_list %}
+        {% for user in object_list %}
             {% if user != login_user %}
             {% include "includes/followers_list_item.html" with user=user %}
             {% endif %} 
-    {% endfor %}
+        {% endfor %}
+    {% else %}
+        <p class='date'>Sorry, you have no frand requests right now.</p>
+    {% endif %}
     </div>
 </div>
 {% endblock %}

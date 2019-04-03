@@ -1,4 +1,5 @@
 import io
+import random
 
 from requests.auth import HTTPBasicAuth
 from rest_framework.parsers import JSONParser
@@ -27,6 +28,7 @@ def requestPosts(node, ending, current_id):
         a = requests.get(node.hostname+node.prefix+ending, headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
 
         if a.status_code!=200:
+            print(a.status_code)
             print('pepega')
             a = requests.get(node.hostname + node.prefix + ending, headers={"X-AUTHOR-ID": str(current_id)},
                              auth=HTTPBasicAuth(node.send_username, node.send_password))
@@ -85,6 +87,17 @@ def requestSinglePost(link, current_id, node):
 
 
 
+def request_single_user(node,user, current_id):
+    a=requests.get(user.get_url(),headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
+    if a.status_code!=200:
+        a = requests.get(user.get_url(), headers={"X-AUTHOR-ID": str(current_id)},
+                         auth=HTTPBasicAuth(node.send_username, node.send_password))
+    if a.status_code==200:
+        print(a.text)
+    else:
+        print(a.status_code)
+        print('its boom')
+
 
 # for multiple posts that you don't need the comments
 class posts_request_deserializer(serializers.Serializer):
@@ -96,9 +109,9 @@ class post_detail_deserializer(serializers.Serializer):
     id = serializers.UUIDField()
     title = serializers.CharField()
     source = serializers.CharField(required=False, default='')
-    description = serializers.CharField()
+    description = serializers.CharField(required=False, allow_blank=True)
     contentType = serializers.CharField()
-    content = serializers.CharField()
+    content = serializers.CharField(allow_blank=True)
     categories = serializers.ListField(required=False, default=[])
     published = serializers.DateTimeField()
     visibility = serializers.CharField()
@@ -157,10 +170,10 @@ class post_deserializer_no_comment(serializers.Serializer):
     id = serializers.UUIDField()
     title = serializers.CharField()
     source = serializers.CharField(required=False, default='')
-    description = serializers.CharField()
+    description = serializers.CharField(required=False, allow_blank=True)
     contentType = serializers.CharField()
     author = serializers.DictField()
-    content = serializers.CharField()
+    content = serializers.CharField(allow_blank=True)
     categories = serializers.ListField(required=False, default=[])
     published = serializers.DateTimeField()
     visibility = serializers.CharField()
@@ -169,6 +182,7 @@ class post_deserializer_no_comment(serializers.Serializer):
 
     def create(self, validated_data):
         usr = user_deserializer(data=validated_data['author'])
+
 
         if usr.is_valid():
             post_usr = usr.create(usr.validated_data)
@@ -209,6 +223,7 @@ class post_deserializer_no_comment(serializers.Serializer):
                 unlisted=validated_data['unlisted']
             )
         else:
+            print(validated_data['author'])
             print(usr.errors)
 
 
@@ -223,7 +238,7 @@ class user_deserializer(serializers.Serializer):
     #lastName = serializers.CharField()
     displayName = serializers.CharField()
     url = serializers.CharField()
-    github = serializers.CharField(allow_null=True)
+    github = serializers.CharField(allow_null=True, allow_blank=True)
 
     def create(self, validated_data):
         url_with_id=validated_data['id'].split('/')
@@ -237,14 +252,24 @@ class user_deserializer(serializers.Serializer):
             print('created user'+id)
             # also host doesnt have to be our node, can be just random
             # mention this tmr
-            usr = User.objects.create(
-                username = validated_data['displayName'],
-                id=id,
+            try:
+                usr = User.objects.create(
+                    username = validated_data['displayName'],
+                    id=id,
                 #bio=validated_data['bio'],
-                display_name=validated_data['displayName'],
-                local=False
+                    display_name=validated_data['displayName'],
+                    local=False
                 #host=validated_data['host'],
-            )
+                )
+            except:
+                a=random.randint(0,1000)
+                usr = User.objects.create(
+                    username=validated_data['displayName']+str(a),
+                    id=id,
+                    # bio=validated_data['bio'],
+                    display_name=validated_data['displayName'],
+                    local=False
+                )
             usr.set_unusable_password()
             usr.save()
             return usr

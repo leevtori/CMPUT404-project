@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.conf import settings
 from urllib.parse import urlparse
 from urllib.parse import urljoin
-
+from posts.models import Post
 
 import uuid
 
@@ -57,3 +57,10 @@ class User(AbstractUser):
         if val[-1] != '/': val+='/'
         val= urljoin(val, str(self.id))
         return val
+
+    def get_friends_posts(self):
+        p = Post.objects.all().filter(author__in=self.friends)
+        print("OISTS ", p)
+        posts = p.values_list("title", flat=True)
+        print("posts ", posts)
+        return ", ".join(posts)
