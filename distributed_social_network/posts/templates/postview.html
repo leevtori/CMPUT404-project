@@ -10,6 +10,7 @@
         }
     </style>
     <script src=" {% static 'js/script.js' %}"></script>
+    <script src=" {% static 'js/postview.js' %}"></script>
     <script>
         function mkdown(){
             var node;
@@ -172,7 +173,6 @@
         window.onload = imgsrc;
         {% endif %}
 
-
     </script>
 
 {% endblock %}
@@ -205,22 +205,11 @@
                 <div style="display:none;">{{form.content}}</div>
             {% endif %}
             <div>
-                <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>
-                {% comment %}
-                <select name='visibility' onchange="show_visible_to(this.options[this.selectedIndex].value, 'edit_post_content')">
-                    <option value='PUBL'>Public</option>
-                    <option value='FOAF'>Friend of a Friend</option>
-                    <option value='PRIV'>Private</option>
-                    <option value='SERV'>Home Server Only</option>
-                    <option value='FRND'>Friends Only</option>
-                </select>
-                {% endcomment %}
-                {{form.visibility}}
+                <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>{{form.visibility}}
                 <div class='visible_to_field'>
                     <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}} 
                 </div>
-            </div>
-            
+            </div> 
             <div>
                 <label for="{{form.unlisted.id_for_label}}" name='unlisted'>Unlisted</label>{{form.unlisted}}
             </div>
@@ -228,7 +217,7 @@
                 <label for="{{form.categories.id_for_label}}" name='categories'>Categories</label>{{form.categories}}
             </div>
             {{form.content_type}}
-            <div>
+            <div style='display: flex; flex-direction: row; align-items:baseline'>
                 <input type='submit' value='Save' class='comment_btn'>
                 <input type='button' value='Cancel' class='cancel_btn' onclick="hide_edit_form()">
             </div>
