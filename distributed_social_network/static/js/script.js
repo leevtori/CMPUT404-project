@@ -172,6 +172,31 @@ function show_visible_to(option, form_id) {
     }
 };
 
+function add_visible_to_listener(){
+    var form = document.getElementById('edit_post_content');
+    console.log(form);
+    var visib = form.querySelector("#id_visibility");
+    console.log(visib);
+    var sel = visib.options[visib.selectedIndex].value;
+    console.log(sel);
+    if(sel == 'PRIV'){
+        var vis_to = form.querySelector('.visible_to_field');
+        console.log(vis_to);
+        vis_to.style.display = 'block';
+    }
+    visib.onchange = function(){
+        if(sel == 'PRIV'){
+            var vis_to = form.querySelector('.visible_to_field');
+            console.log(vis_to);
+            vis_to.style.display = 'block';
+        }else{
+            var vis_to = form.querySelector('.visible_to_field');
+            console.log(vis_to);
+            vis_to.style.display = 'none';
+        }
+    }
+};
+
 
   //taken from https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
 function uuidv4() {

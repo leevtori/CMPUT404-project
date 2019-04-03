@@ -10,7 +10,6 @@
         }
     </style>
     <script src=" {% static 'js/script.js' %}"></script>
-    <script src=" {% static 'js/postview.js' %}"></script>
     <script>
         function mkdown(){
             var node;
@@ -161,18 +160,27 @@
             if (ordered == true || unordered == true || block == true|| codeblock == true){
                 displayed_post.appendChild(listnode);
             }
+
+            add_visible_to_listener();
         }
         function imgsrc(){
             var img_element = document.getElementById("post_image");
             var source = "{{ post.content|escapejs }}";
             img_element.setAttribute('src', source);
+
+            var vis = document.getElementById('edit_post_content');
+            console.log("fasdfa");
+            console.log(vis);
+            vis.onchange = function(){
+                vis_to = vis.querySelector("#id_visible_to");
+                console.log(vis_to);
+            }
         }
         {% if post.content_type == "MKD" %}
         window.onload = mkdown;
         {% else %}
         window.onload = imgsrc;
         {% endif %}
-
     </script>
 
 {% endblock %}
