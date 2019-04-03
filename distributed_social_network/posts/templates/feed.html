@@ -6,7 +6,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="{% static 'js/script.js' %}"></script>
     <script>
-    
+        window.onload = function(){
+            add_visible_to_listener('new_txt_post');
+            add_visible_to_listener('new_mkd_post');
+            add_visible_to_listener('new_img_post');
+        }
     </script>
 {% endblock %}
 
@@ -83,14 +87,7 @@
                     <label for="{{form.description.id_for_label}}" name='description'>Description</label> {{form.description}}
                     <label for="{{form.content.id_for_label}}" name='content'>Content</label>{{form.content}}
                     <div>
-                        <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>
-                        <select name='visibility' onchange="show_visible_to(this.options[this.selectedIndex].value, 'new_txt_post')">
-                            <option value='PUBL'>Public</option>
-                            <option value='FOAF'>Friend of a Friend</option>
-                            <option value='PRIV'>Private</option>
-                            <option value='SERV'>Home Server Only</option>
-                            <option value='FRND'>Friends Only</option>
-                        </select>
+                        <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>{{form.visibility}}
                         <div class='visible_to_field'>
                             <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}} 
                         </div>
@@ -114,14 +111,7 @@
                     <label for="{{form.description.id_for_label}}" name='description'>Description</label> {{form.description}}
                     <label for="{{form.content.id_for_label}}" name='content'>Content</label>{{form.content}}
                     <div>
-                        <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>
-                        <select name='visibility' onchange="show_visible_to(this.options[this.selectedIndex].value, 'new_mkd_post')">
-                            <option value='PUBL'>Public</option>
-                            <option value='FOAF'>Friend of a Friend</option>
-                            <option value='PRIV'>Private</option>
-                            <option value='SERV'>Home Server Only</option>
-                            <option value='FRND'>Friends Only</option>
-                        </select>
+                        <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>{{form.visibility}}
                         <div class='visible_to_field'>
                             <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}} 
                         </div>
@@ -145,14 +135,7 @@
                     <input type="file" id="createPicturePostButton" onchange="getimageformat()" class="browse_btn" style="border:none;">
                     <input name="content" type="hidden" id="hiddencontent">
                     <div>
-                        <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>
-                        <select name='visibility' onchange="show_visible_to(this.options[this.selectedIndex].value, 'new_img_post')">
-                            <option value='PUBL'>Public</option>
-                            <option value='FOAF'>Friend of a Friend</option>
-                            <option value='PRIV'>Private</option>
-                            <option value='SERV'>Home Server Only</option>
-                            <option value='FRND'>Friends Only</option>
-                        </select>
+                        <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>{{form.visibility}}
                         <div class='visible_to_field'>
                             <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}} 
                         </div>

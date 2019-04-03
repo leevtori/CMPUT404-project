@@ -49,6 +49,11 @@ function unfollow(friendId){
     }).then(setTimeout(function(){window.location.reload()},500));
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+
 function show_edit_form(){
     form = document.getElementById('edit_post_content');
     form.style.display = 'block';
@@ -81,35 +86,6 @@ function getimageformat() {
         invis_field.value = 'PNG'
     }
 }
-
-function openPostInterface(post_type){
-    var selected_post;
-    selected_post = document.getElementById(post_type);
-    var all_post_divs = document.getElementsByClassName("newPost");
-    // this is dumb, but for some reason the first time this is called
-    // it returns nothing, so this is a band-aid fix
-    if ((selected_post.style.display!="none")&&(selected_post.style.display!="block")){
-        for (var i = 0; i < all_post_divs.length; i++) {
-                all_post_divs[i].style.display = "none";
-        }
-        selected_post.style.display="block";
-    }
-    else {
-        if (selected_post.style.display == "none") {
-            for (var i = 0; i < all_post_divs.length; i++) {
-                all_post_divs[i].style.display = "none";
-            }
-            selected_post.style.display = "block";
-        } else {
-            for (var i = 0; i < all_post_divs.length; i++) {
-                all_post_divs[i].style.display = "none";
-            }
-        }
-    }
-
-
-}
-
 
 
 function openFeed(evt, feedName) {
@@ -155,50 +131,38 @@ function openNewPost(evt, newPostType) {
     evt.currentTarget.className += " active";
 }
 
-function show_visible_to(option, form_id) {
-    if(option == 'PRIV'){
-        var form = document.querySelector("#"+form_id);
-        console.log(form);
-        var picker=form.querySelector(".visible_to_field");
-        console.log(picker);
-        picker.style.display = 'block';
-    }
-    else{
-        var form = document.querySelector("#"+form_id);
-        console.log(form);
-        var picker=form.querySelector(".visible_to_field");
-        console.log(picker);
-        picker.style.display = 'none';
-    }
-};
-
-function add_visible_to_listener(){
-    var form = document.getElementById('edit_post_content');
-    console.log(form);
+function add_visible_to_listener(form_id){
+    var form = document.getElementById(form_id);
+    console.log("form=",form);
     var visib = form.querySelector("#id_visibility");
-    console.log(visib);
+    console.log("visib=",visib);
     var sel = visib.options[visib.selectedIndex].value;
-    console.log(sel);
+    console.log("sel=",sel);
     if(sel == 'PRIV'){
         var vis_to = form.querySelector('.visible_to_field');
-        console.log(vis_to);
+        console.log("vis_to=",vis_to);
         vis_to.style.display = 'block';
     }
     visib.onchange = function(){
+        var sel = visib.options[visib.selectedIndex].value;
+        console.log("sel=",sel);
         if(sel == 'PRIV'){
             var vis_to = form.querySelector('.visible_to_field');
-            console.log(vis_to);
+            console.log("vis_to=",vis_to);
             vis_to.style.display = 'block';
         }else{
             var vis_to = form.querySelector('.visible_to_field');
-            console.log(vis_to);
+            console.log("vis_to=",vis_to);
             vis_to.style.display = 'none';
         }
     }
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
 
-  //taken from https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+//taken from https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
 function uuidv4() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
     var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
