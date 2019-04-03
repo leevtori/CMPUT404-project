@@ -1,18 +1,14 @@
 from rest_framework import viewsets
 from rest_framework.generics import GenericAPIView, CreateAPIView, UpdateAPIView
 from rest_framework.views import APIView
-from rest_framework.mixins import RetrieveModelMixin
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from posts.utils import Visibility
-from posts.models import Post, Comment
-from users.models import User, Node
+from posts.models import Post
+from users.models import Node
 from django.http import JsonResponse
-from django.conf import settings
 from rest_framework.exceptions import ParseError
 
-
-from rest_framework import permissions
 from rest_framework.response import Response
 
 from rest_framework.decorators import action
@@ -20,8 +16,7 @@ from rest_framework.decorators import action
 from posts.views import PostVisbilityMixin
 
 from . import serializers
-import re, uuid
-import json
+import re
 
 User = get_user_model()
 
@@ -62,7 +57,6 @@ class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
 
     @action(methods=["get"], detail=True)
     def posts(self, request, pk=None):
-
         if request.method == "GET":
             user = self.get_object()
             auth_user = get_author_id(request)
@@ -80,6 +74,7 @@ class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
             return Response(serializer.data)
 
     def list(self, request):
+        print(self.permission_classes)
         qs = self.get_queryset()
         qs = qs.filter(local=True)
         page = self.paginate_queryset(qs)
