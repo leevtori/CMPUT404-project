@@ -32,6 +32,16 @@ def get_uuid_from_url(url):
     return pattern.search(url).group()
 
 
+def get_author_id(request):
+    try:
+        user_id = request.META["HTTP_X_USER"]
+        user_id = get_uuid_from_url(user_id)
+    except (KeyError, User.DoesNotExist):
+        raise ParseError(detail="Missing X-User Header Field")
+
+    return user_id
+
+
 class PaginateOverrideMixin:
     def get_paginated_response(self, data, **kwargs):
         """
@@ -52,12 +62,14 @@ class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
 
     @action(methods=["get"], detail=True)
     def posts(self, request, pk=None):
+
         if request.method == "GET":
             user = self.get_object()
+            auth_user = get_author_id(request)
 
             # Not really meant to be used this way...but it works?
             post_filter = PostVisbilityMixin()
-            qs = post_filter.filter_user_visible(self.request.user, user.posts.all())
+            qs = post_filter.filter_user_visible(auth_user, user.posts.all())
             qs = qs.filter(unlisted=False)
             page = self.paginate_queryset(qs)
             if page is not None:
@@ -129,18 +141,8 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
     creates new post for authenticated user.
     /author/posts
     """
-    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = serializers.PostSerializer
     queryset = Post.objects.all()
-
-    def get_author_id(self, request):
-        try:
-            user_id = request.META["HTTP_X_USER"]
-            user_id = get_uuid_from_url(user_id)
-        except (KeyError, User.DoesNotExist):
-            raise ParseError(detail="Missing X-User Header Field")
-
-        return user_id
 
     def create_status_responses(self, statusType=True, message="Post created"):
         return {
@@ -150,7 +152,7 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
         }
 
     def get(self, request):
-        author_id = self.get_author_id(request)
+        author_id = get_author_id(request)
 
         if User.objects.filter(pk=author_id).exists():
             user = User.objects.get(pk=author_id)
@@ -159,7 +161,7 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
             posts = post_filter.filter_user_visible(user, self.get_queryset())
 
         else:
-            posts = Post.objects.filter(visibility=Visibility.PUBLIC, unlisted=False)
+            posts = Post.objects.filter(visibility=Visibility.PUBLIC, unlisted=False, order_by="-published")
 
         page = self.paginate_queryset(posts)
 
@@ -171,7 +173,7 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
         return Response(serializer.data)
 
     def post(self, request):
-        author_id = self.get_author_id(request)
+        author_id = get_author_id(request)
 
         user = get_object_or_404(User, pk=author_id)
 
@@ -202,7 +204,7 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
 
 
     def list(self, request):
-        qs = Post.objects.filter(visibility=Visibility.PUBLIC, origin__icontains=settings.HOSTNAME)
+        qs = Post.objects.filter(visibility=Visibility.PUBLIC)
 
         page = self.paginate_queryset(qs)
 
