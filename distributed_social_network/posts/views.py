@@ -57,8 +57,14 @@ class PostVisbilityMixin(LoginRequiredMixin):
         query_list.append(Q(author__id__in=foaf, visibility=Visibility.FOAF))
 
         visible = user.visible_posts.all()
+        print("visible!!!!!!", visible)
 
+        #Server Only Posts
         query_list.append(Q(visibility=Visibility.SERVERONLY))
+
+        #TODO:Private posts with custom visible_to
+        # query_list.append(Q(visible_to__in=[user]))#WHY U NO WORK????!!!!!
+        # print("QWUERY LSIT", query_list)
 
         qs = qs.filter(reduce(__or__, query_list))
         # qs = qs.union(visible).distinct()  # this doesn't filter properly afterwards
@@ -158,6 +164,8 @@ class PostDetailView(PostVisbilityMixin, DetailView):
 
         context = super().get_context_data(**kwargs)
         context['post_comments'] = self.object.comment_set.all().order_by("-published")
+        context['form'] = PostForm(instance=post)
+
         return context
 
 
@@ -176,17 +184,25 @@ def create_post(request):
         return HttpResponse(status=404)
 
 def delete_post(request, pk):
-    if (request.method == "GET"):
-        post = Post.objects.get(id=pk)
-        post.delete()
-        return redirect('feed')
+    post = Post.objects.get(id=pk)
+    post.delete()
+    return redirect('feed')
+
+
+def edit_post(request, pk):
+    if (request.method == "POST"):
+        post = get_object_or_404(Post, id=pk)
+        f = PostForm(request.POST, instance=post)
+        f.save()
+        return redirect('postdetail', pk=pk)
     else: 
         return HttpResponse(status=404)
 
 def add_comment(request):
     if request.method == "POST":
         post_id=request.POST['post']
-        select_post = Post.objects.get(id=post_id)
+        # select_post = Post.objects.get(id=post_id)
+        select_post = get_object_or_404(Post, id=post_id)
         new_comment = Comment(
             post=select_post,
             comment=request.POST['comment'],

@@ -291,7 +291,6 @@ class FriendRequestView(APIView):
         request.data['author']['host'] = node.id
 
         serializer = serializers.AuthorSerializer(data = request.data['author'], context={'request': request})
-
         sucess = False
 
         if serializer.is_valid():
@@ -312,12 +311,11 @@ class FriendRequestView(APIView):
             }
             return JsonResponse(data, safe=False, status=200)
         else:
-            print(serializer.errors)
-        data = {
-            "query": "friendrequest",
-            "sucess": sucess,
-            "message": "Friend request sent"
-        }
-
-        return JsonResponse(data, safe=False, status=400)
+            # return Response(serializer.errors, status=400)
+            data = {
+                "query": "friendrequest",
+                "sucess": sucess,
+                "message": "Friend request sent"
+            }
+            return JsonResponse(data, safe=False, status=400)
 

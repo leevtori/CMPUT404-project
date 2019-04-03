@@ -83,6 +83,7 @@ class FollowingList(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         user = get_object_or_404(User, username=self.kwargs['username'])
         context['friends'] = user.friends.all()
+        context['following'] = user.following.all()
         return context
 
     def get_queryset(self):

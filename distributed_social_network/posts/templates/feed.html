@@ -4,9 +4,13 @@
 {% block styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/feed.css' %}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="{% static 'js/feed.js' %}"></script>
+    <script src="{% static 'js/script.js' %}"></script>
     <script>
-    
+        window.onload = function(){
+            add_visible_to_listener('new_txt_post');
+            add_visible_to_listener('new_mkd_post');
+            add_visible_to_listener('new_img_post');
+        }
     </script>
 {% endblock %}
 
@@ -77,17 +81,18 @@
             </div>
 
             <div id='new_txt_post' class='post_tabcontent' style="display:block;">
-                <form class='new_post_form' id='create_form' action={% url 'createpost' %} method="post">
+                <form class='post_form' id='create_form' action={% url 'createpost' %} method="post">
                     {% csrf_token %}
                     <label for="{{form.title.id_for_label}}" name='title'>Title</label> {{form.title}}
                     <label for="{{form.description.id_for_label}}" name='description'>Description</label> {{form.description}}
                     <label for="{{form.content.id_for_label}}" name='content'>Content</label>{{form.content}}
                     <div>
                         <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>{{form.visibility}}
+                        <div class='visible_to_field'>
+                            <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}} 
+                        </div>
                     </div>
-                    <div class='visible_to_field'>
-                        <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}} 
-                    </div>
+                    
                     <div>
                         <label for="{{form.unlisted.id_for_label}}" name='unlisted'>Unlisted</label>{{form.unlisted}}
                     </div>
@@ -100,16 +105,16 @@
             </div>
 
             <div id='new_mkd_post' class='post_tabcontent'>
-                <form class='new_post_form' id='create_form' action={% url 'createpost' %} method="post">
+                <form class='post_form' id='create_form' action={% url 'createpost' %} method="post">
                     {% csrf_token %}
                     <label for="{{form.title.id_for_label}}" name='title'>Title</label> {{form.title}}
                     <label for="{{form.description.id_for_label}}" name='description'>Description</label> {{form.description}}
                     <label for="{{form.content.id_for_label}}" name='content'>Content</label>{{form.content}}
                     <div>
                         <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>{{form.visibility}}
-                    </div>
-                    <div class='visible_to_field'>
-                        <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}} 
+                        <div class='visible_to_field'>
+                            <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}} 
+                        </div>
                     </div>
                     <div>
                         <label for="{{form.unlisted.id_for_label}}" name='unlisted'>Unlisted</label>{{form.unlisted}}
@@ -123,7 +128,7 @@
             </div>
 
             <div id='new_img_post' class='post_tabcontent'>
-                <form class='new_post_form' id='create_form' action={% url 'createpost' %} method="post">
+                <form class='post_form' id='create_form' action={% url 'createpost' %} method="post">
                     {% csrf_token %}
                     <label for="{{form.title.id_for_label}}" name='title'>Title</label> {{form.title}}
                     <label for="{{form.description.id_for_label}}" name='description'>Description</label> {{form.description}}
@@ -131,9 +136,9 @@
                     <input name="content" type="hidden" id="hiddencontent">
                     <div>
                         <label for="{{form.visibility.id_for_label}}" name='visibility'>Visibility</label>{{form.visibility}}
-                    </div>
-                    <div class='visible_to_field'>
-                        <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}} 
+                        <div class='visible_to_field'>
+                            <label for="{{form.visble_to.id_for_label}}" name='visible_to'>Visible to</label>{{form.visible_to}} 
+                        </div>
                     </div>
                     <div>
                         <label for="{{form.unlisted.id_for_label}}" name='unlisted'>Unlisted</label>{{form.unlisted}}

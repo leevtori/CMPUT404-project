@@ -23,6 +23,7 @@ class AuthorSerializer(serializers.ModelSerializer):
     firstName = serializers.CharField(source="first_name",allow_null=True, allow_blank=True, required=False)
     lastName = serializers.CharField(source="last_name",allow_null=True, allow_blank=True, required=False)
     # serializers.CharField(source="username")
+
     host = serializers.SerializerMethodField()
 
     displayName = serializers.CharField(source="username")
