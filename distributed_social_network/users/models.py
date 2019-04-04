@@ -66,8 +66,9 @@ class User(AbstractUser):
         return ", ".join(posts)
 
 
-class NodeProxy(User):
+class ConnectedServer(User):
     class Meta:
         proxy = True
-        verbose_name = "Node"
-        verbose_name_plural = "Nodes"
+        verbose_name = "connected server"
+        verbose_name_plural = "connected servers"
+        permissions = (('can_access_api', 'Can access API'),)

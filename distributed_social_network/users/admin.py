@@ -1,7 +1,7 @@
 # users/admin.py
 
 from django.contrib import admin
-from .models import User, Node, NodeProxy
+from .models import User, Node, ConnectedServer
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
@@ -18,13 +18,14 @@ class NodeInline(admin.StackedInline):
         }),
         ("Authentication Information", {
             "fields" : ("send_username", "send_password"),
-            "description": "The credentials to get your buddy's posts"
+            "description": "The credentials to get your connected server's posts, given by them."
         }),
         ("Active", {
             "fields": ("active", ),
             "description": "Get posts from them, and allow them to get our posts?"
         })
     )
+    can_delete = False
 
 
 class CustomUserAdmin(UserAdmin):
@@ -53,7 +54,7 @@ class NodeAdmin(UserAdmin):
     fieldsets = (
         ("Authentication", {
             'fields': ('username', 'password'),
-            'description': "Credentials for your buddy server to get your posts"
+            'description': "Credentials for your connected server to get your posts"
         }),
     )
 
@@ -66,7 +67,7 @@ class NodeAdmin(UserAdmin):
 
 # Register your models here.
 admin.site.register(User, CustomUserAdmin)
-admin.site.register(NodeProxy, NodeAdmin)
+admin.site.register(ConnectedServer, NodeAdmin)
 
 # (users) $ python manage.py makemigrations users
 # (users) $ python manage.py migrate
