@@ -36,7 +36,11 @@
                     </div>
                     <a href={% url 'profile' username=request.user.username %}>My Profile</a>
                     <a href={% url 'account_settings' %}>Account Settings</a>
+                    {% if request.user.is_staff %}
+                        <a href='/admin'>Administration</a>
+                    {% endif %}
                     <a href={% url 'logout' %} style="color:#db6b2a">Log Out</a>
+
                 </div>
             </div>
         </div>
