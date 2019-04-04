@@ -9,6 +9,7 @@ urlpatterns = [
     path('posts/edit/<uuid:pk>', views.edit_post, name='editpost'),
     path('posts/delete/<uuid:pk>', views.delete_post, name='deletepost'),
     path('comment', views.add_comment, name='comment'),
+    path('posts/create_github', views.github_activity, name='github_activity')
     # path('newComment/', views.create_comment, name='new_comment'),
     # path('posts/delete/', views.delete_comment, name='delete-post'),
     # path('author/posts/', views.visible_to_user, name='visiable-to-user')

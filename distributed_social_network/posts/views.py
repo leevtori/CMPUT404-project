@@ -4,17 +4,20 @@ from urllib.parse import urljoin
 from django.shortcuts import HttpResponse, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from requests.auth import HTTPBasicAuth
+
 from .models import Post, Comment
 from django.contrib.auth import get_user_model
 from django.views.generic.base import TemplateView
 from users.views import FriendRequests
 from django.conf import settings
 import uuid
-
+import requests
+import urllib
 
 from users.models import Node
 from posts.forms import PostForm
-from posts.serializers import requestPosts, requestSinglePost, request_single_user
+from posts.serializers import requestPosts, requestSinglePost, request_single_user, friend_checking
 
 from django.db import connection
 from django.db.models import Q
@@ -101,6 +104,7 @@ class ProfileView(PostVisbilityMixin, ListView):
         context['incomingFriendRequest'] = user.incomingRequests.all()
 
 
+
         # pass context to template
         return context
 
@@ -125,6 +129,22 @@ class FeedView(PostVisbilityMixin, ListView):
             if node.active:
                 requestPosts(node, 'posts',self.request.user.id)
             #requestPosts(node, 'author/posts', self.request.user.id)
+        for frand in self.request.user.outgoingRequests:
+            check_friend_url=frand.get_url()+'/friends/'+urllib.parse.quote(self.request.user.get_url(),safe="~()*!.'")
+            print(check_friend_url)
+            frand_check=requests.get(check_friend_url,headers={"X-AUTHOR-ID": str(self.request.user.id)},
+                         auth=HTTPBasicAuth(frand.node.send_username, frand.node.send_password))
+            if friend_checking(frand_check):
+            #means the other guy accepted
+                self.request.user.friends.add(frand)
+                frand.followers.add(self.request.user)
+                self.request.user.following.add(frand)
+                frand.outgoingRequests.remove(self.request.user)
+                self.request.user.incomingRequests.remove(frand)
+            #needs to be tested
+
+
+
 
         context = super().get_context_data(**kwargs)
         context['post_count'] = Post.objects.filter(author=self.request.user).count
@@ -216,3 +236,62 @@ def add_comment(request):
         return HttpResponse(status=404)
 
 
+def github_activity(request):
+    if request.method=="POST":
+        f = PostForm(request.POST)
+        if f.is_valid():
+            new_post = f.save(commit=False)
+            new_post.author = request.user
+
+            git_username=request.user.github.split('/')[-1]
+            print(git_username)
+            git_api_url='https://api.github.com/users/{}/events?per_page=1'.format(git_username)
+            github_request = requests.get(git_api_url)
+            if github_request.status_code==200:
+                a=json.loads(github_request.content)
+                latest_activity = a[0]
+                if latest_activity['type']=="ForkEvent":
+                    new_post.content = "I just forked the repository {}, check out the original at {}".format(
+                        latest_activity["forkee"]["name"],
+                        latest_activity["forkee"]["url"]
+                    )
+                elif latest_activity['type']=="PushEvent":
+                    new_post.content = "I just pushed {} commits to {} Branch, check it out at {}".format(
+                        len(latest_activity["payload"]["commits"]),
+                        latest_activity["repo"]["name"],
+                        latest_activity["repo"]["url"]
+                    )
+                elif latest_activity['type'] == "ReleaseEvent":
+                    new_post.content = "I just released my {} repository, check it out at {}".format(
+                        latest_activity["repo"]["name"],
+                        latest_activity["release"]["url"]
+                    )
+                elif latest_activity['type'] == "RepositoryEvent":
+                    new_post.content = "I just {} a repository, {}".format(
+                        latest_activity["action"],
+                        latest_activity["repo"]["full_name"]
+                    )
+
+                elif latest_activity['type'] == "CreateEvent":
+                    new_post.content = "I just added a {} to my {} repository, check it out at {}".format(
+                        latest_activity["ref_type"],
+                        latest_activity["repo"]["name"],
+                        latest_activity["repo"]["url"]
+                    )
+
+                elif latest_activity['type'] == "DeleteEvent":
+                    new_post.content = "I just deleted a {} from my {} repository, F to pay respect".format(
+                        latest_activity["ref_type"],
+                        latest_activity["repo"]["name"]
+                    )
+                else:
+                    new_post.content="I just pull a {} to my {} repository and this server doesn't know how to handle that, that is unfortunate".format(
+                        latest_activity["type"],
+                        latest_activity['repo']['name']
+                    )
+
+            new_post.save()
+            return redirect('feed')
+        else:
+            print(f.errors)
+            return redirect('feed')
