@@ -120,8 +120,10 @@ class SendFriendRequest(LoginRequiredMixin, View):
             validated_friend=FriendRequestUsers(friend)
             validated_user=FriendRequestUsers(self.request.user)
 
-            self.request.user.following.add(friend)
+            friend.incomingRequests.add(self.request.user)
             self.request.user.outgoingRequests.add(friend)
+            friend.followers.add(self.request.user)
+            self.request.user.following.add(friend)
 
             returnDict = dict()
             returnDict['query'] = 'friendrequest'

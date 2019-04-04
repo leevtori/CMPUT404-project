@@ -4,6 +4,8 @@ from urllib.parse import urljoin
 from django.shortcuts import HttpResponse, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from requests.auth import HTTPBasicAuth
+
 from .models import Post, Comment
 from django.contrib.auth import get_user_model
 from django.views.generic.base import TemplateView
@@ -11,10 +13,11 @@ from users.views import FriendRequests
 from django.conf import settings
 import uuid
 import requests
+import urllib
 
 from users.models import Node
 from posts.forms import PostForm
-from posts.serializers import requestPosts, requestSinglePost, request_single_user
+from posts.serializers import requestPosts, requestSinglePost, request_single_user, friend_checking
 
 from django.db import connection
 from django.db.models import Q
@@ -120,6 +123,22 @@ class FeedView(PostVisbilityMixin, ListView):
             if node.active:
                 requestPosts(node, 'posts',self.request.user.id)
             #requestPosts(node, 'author/posts', self.request.user.id)
+        for frand in self.request.user.outgoingRequests:
+            check_friend_url=frand.get_url()+'/friends/'+urllib.parse.quote(self.request.user.get_url(),safe="~()*!.'")
+            print(check_friend_url)
+            frand_check=requests.get(check_friend_url,headers={"X-AUTHOR-ID": str(self.request.user.id)},
+                         auth=HTTPBasicAuth(frand.node.send_username, frand.node.send_password))
+            if friend_checking(frand_check):
+            #means the other guy accepted
+                self.request.user.friends.add(frand)
+                frand.followers.add(self.request.user)
+                self.request.user.following.add(frand)
+                frand.outgoingRequests.remove(self.request.user)
+                self.request.user.incomingRequests.remove(frand)
+            #needs to be tested
+
+
+
 
         context = super().get_context_data(**kwargs)
         context['post_count'] = Post.objects.filter(author=self.request.user).count
