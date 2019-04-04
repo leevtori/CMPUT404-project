@@ -36,7 +36,7 @@ div.user_list{
 
 .inactive_btn:disabled{
     /* color: white; */
-    border: 1px solid rgb(75, 75, 75);
+    border: 1px solid rgb(163, 163, 163);
     border-radius: 3px;
     background-color: white;
     /* width:100px; */

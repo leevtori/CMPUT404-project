@@ -8,12 +8,12 @@
     </div>
     {% csrf_token %}
     <div style="padding:10px">
-        <button class='add_friend_btn' type='submit' onclick="confirmFriend('{{user.id}}')">+ Confirm Friend</button>
+        <button class='add_friend_btn' type='submit' onclick="confirmFriend('{{user.id}}')" id='friend_{{user.id}}'>+ Confirm Frand</button>
 
         {% if user in following %}
-            <button class='delete_friend_btn' type='submit' onclick="unfollow('{{user.id}}')">Unfllow</button>
+            <button class='delete_friend_btn' type='submit' onclick="unfollow('{{user.id}}')" id='follow_{{user.id}}'>Unfllow</button>
         {% else %}
-            <button class='add_friend_btn' type='submit' onclick="follow('{{user.id}}')">Follow</button>
+            <button class='add_friend_btn' type='submit' onclick="follow('{{user.id}}')" id='follow_{{user.id}}'>Follow</button>
         {% endif %}
 
     </div>
