@@ -25,3 +25,6 @@ Contributors:
     Erin Torbiak
     Abram Hindle
     Braedy Kuzma
+
+## External Code used
+* [Paginator HTML](https://simpleisbetterthancomplex.com/tutorial/2016/08/03/how-to-paginate-with-django.html)
