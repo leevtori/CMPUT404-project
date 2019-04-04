@@ -55,6 +55,7 @@ class PostVisbilityMixin(LoginRequiredMixin):
 
         foaf = [item[0] for item in foaf]
         query_list.append(Q(author__id__in=foaf, visibility=Visibility.FOAF))
+        query_list.append(Q(author__id__in=user.friends.all(), visibility=Visibility.FOAF))
 
         visible = user.visible_posts.all()
 
