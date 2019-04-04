@@ -138,7 +138,7 @@ class SendFriendRequest(LoginRequiredMixin, View):
 
             return HttpResponse(200)
 
-        
+
 
 class ConfirmFriendRequest(LoginRequiredMixin, View):
 
@@ -154,7 +154,7 @@ class ConfirmFriendRequest(LoginRequiredMixin, View):
             self.request.user.following.add(friend)
             friend.outgoingRequests.remove(self.request.user)
             self.request.user.incomingRequests.remove(friend)
-            
+
             return HttpResponse("added")
 
 
@@ -214,7 +214,7 @@ class Unfollow(LoginRequiredMixin, View):
         friend = get_object_or_404(User, id=friend_id)
         friend.followers.remove(self.request.user.id)
         self.request.user.following.remove(friend)
-        context = {'friends_list': self.request.user.friends.all(), 
+        context = {'friends_list': self.request.user.friends.all(),
             'following_list': self.request.user.following.all()
         }
         return render(request, 'friends_list.html', context)

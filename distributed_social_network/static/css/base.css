@@ -137,14 +137,14 @@ display: block;
     display: flex;
     flex-direction: column;
 }
-  
+
   /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown:hover .dropbtn {
     background-color: rgba(255, 255, 255, 0.5);
 }
 #menu_me{
-    padding:10px; 
-    border-bottom: 1px solid rgb(224, 224, 224); 
+    padding:10px;
+    border-bottom: 1px solid rgb(224, 224, 224);
     text-align: center;
 }
 
@@ -152,7 +152,7 @@ display: block;
 
 
 
-  
+
 div.left_box{
     background-color:  rgba(255, 255, 255);
     box-shadow: 0 1px 0 rgba(12,13,14,0.1),0 4px 6px rgba(59,64,69,0.1);
@@ -174,7 +174,7 @@ div.post{
 
 div.post_top{
     display:flex;
-    flex-direction: row; 
+    flex-direction: row;
     align-items: center;
 }
 div.post_bottom{
@@ -268,4 +268,16 @@ hr{
     height: 30px;
     padding: 5px;
     white-space: nowrap;
+}
+
+.pagination {
+    align-self: center;
+}
+
+.pagination li {
+    display: inline-block;
+    padding: 1em;
+    background: #fff;
+    border-radius: 5px;
+    border: 1px solid #ddd;
 }

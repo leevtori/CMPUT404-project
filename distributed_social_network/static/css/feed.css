@@ -10,7 +10,7 @@
 
 div.feed_container{
     margin-top:50px;
-    padding-bottom: 1000px;  
+    padding-bottom: 1000px;
 }
 
 div.left_col{
@@ -32,7 +32,9 @@ div.new_post{
 }
 
 div.posts_list{
-    padding: 0px 5px; 
+    padding: 0px 5px;
+    display: flex;
+    flex-direction: column;
 }
 
 
@@ -166,7 +168,7 @@ a.stats {
 
 .browse_btn{
     width:30%;
-    font-size: small; 
+    font-size: small;
 }
 
 

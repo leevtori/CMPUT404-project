@@ -110,9 +110,11 @@ class ProfileView(PostVisbilityMixin, ListView):
 
 
 class FeedView(PostVisbilityMixin, ListView):
+
     template_name = 'feed.html'
     model = Post
     ordering = '-published'
+    paginate_by = 20
 
     def get_context_data(self, **kwargs):
         # get public posts from other hosts, using https://connectifyapp.herokuapp.com/ as test
@@ -177,7 +179,7 @@ def create_post(request):
         new_post = f.save_m2m()
 
         return redirect('feed')
-        
+
     else:
         return HttpResponse(status=404)
 
@@ -193,7 +195,7 @@ def edit_post(request, pk):
         f = PostForm(request.POST, instance=post)
         f.save()
         return redirect('postdetail', pk=pk)
-    else: 
+    else:
         return HttpResponse(status=404)
 
 def add_comment(request):
