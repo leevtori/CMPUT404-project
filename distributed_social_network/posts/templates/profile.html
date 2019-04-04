@@ -22,6 +22,7 @@
                 <div>
                     <h1 class='banner'>{{user.username}}</h1>
                     <h3 class='banner'>{{user.first_name}} {{user.last_name}}</h3>
+                    <br>
                     {% if request.user != user %}
                         {% if request.user in user.friends.all %}
                             <button disabled class='inactive_btn' id='friend_{{user.id}}'>Frands &#x2713;</button>
@@ -33,7 +34,7 @@
                             <button class='add_friend_btn' type='submit' onclick="addFriend('{{user.id}}')" id='friend_{{user.id}}'>+ Add Frand</button>
                         {% endif %}
                     
-                        {% if request.user in user.following.all %}
+                        {% if request.user in user.followers.all %}
                             <button class='delete_friend_btn' type='submit' onclick="unfollow('{{user.id}}')" id='follow_{{user.id}}'>Unfllow</button>
                         {% else %}
                             <button class='add_friend_btn' type='submit' onclick="follow('{{user.id}}')" id='follow_{{user.id}}'>Follow</button>
@@ -72,12 +73,15 @@
                 <hr>
                 {% endif %}
                 
-
-                <h3>Bio</h3>
-                <p>{{user.bio}}</p>
-                <hr>
+                {% if user.bio %}
+                    <h3>Bio</h3>
+                    <p>{{user.bio}}</p>
+                    <hr>
+                {% endif %}
                 <p>{{post_count}} post(s)</p>
-                <a href="{{user.github}}">Github</a>
+                {% if user.github %}
+                    <a href="{{user.github}}">Github</a>
+                {% endif %}
                 {% if user.host %}
                     <p>Host: {{user.host}}</p>
                 {% else %}
