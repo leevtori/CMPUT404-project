@@ -28,9 +28,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-prod = os.environ.get("PRODUCTION")
+prod = os.environ.get("HOSTNAME")
 if prod is not None:
-    HOSTNAME = "http://frandzone.herokuapp.com/api/"
+    HOSTNAME = prod
 
 else:
     HOSTNAME = "http://localhost:8000/api/"

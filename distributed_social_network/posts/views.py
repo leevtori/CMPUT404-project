@@ -56,7 +56,7 @@ class PostVisbilityMixin(LoginRequiredMixin):
             cursor.execute(raw_sql, (user.id.hex, user.id.hex))
             foaf = cursor.fetchall()
 
-        foaf = [uuid.UUID(item[0]) for item in foaf]
+        foaf = [item[0] for item in foaf]
         query_list.append(Q(author__id__in=foaf, visibility=Visibility.FOAF))
 
         visible = user.visible_posts.all()

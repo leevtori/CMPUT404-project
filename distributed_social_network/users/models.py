@@ -65,9 +65,6 @@ class User(AbstractUser):
         print("posts ", posts)
         return ", ".join(posts)
 
-    def __str__(self):
-        return self.get_url()
-
 
 class ConnectedServer(User):
     class Meta:
