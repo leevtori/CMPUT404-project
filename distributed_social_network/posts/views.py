@@ -96,6 +96,8 @@ class ProfileView(PostVisbilityMixin, ListView):
         context['following_count']= user.following.count
         context['friend_count'] = user.friends.count
         context['follower_count'] = user.followers.count
+        context['friendRequests'] = self.request.user.outgoingRequests.all()
+        context['friends'] = self.request.user.friends.all()
 
         # pass context to template
         return context
@@ -116,7 +118,8 @@ class FeedView(PostVisbilityMixin, ListView):
         # get public posts from other hosts, using https://connectifyapp.herokuapp.com/ as test
         nodes = Node.objects.all()
         for node in nodes:
-            requestPosts(node, 'posts',self.request.user.id)
+            if node.active:
+                requestPosts(node, 'posts',self.request.user.id)
             #requestPosts(node, 'author/posts', self.request.user.id)
 
         context = super().get_context_data(**kwargs)

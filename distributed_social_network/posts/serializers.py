@@ -209,7 +209,7 @@ class post_deserializer_no_comment(serializers.Serializer):
                 return None
             except:
                 print(validated_data['visibility'])
-                print(validated_data['contentType'])
+                print(validated_data['published'])
                 return Post.objects.create(
                 id=validated_data['id'],
                 title=validated_data['title'],
