@@ -93,14 +93,6 @@ class ProfileView(PostVisbilityMixin, ListView):
         # put user object in context
         context['user'] = user
         context['post_count'] = Post.objects.filter(author=user).count
-        context['following_count']= user.following.count
-        context['friend_count'] = user.friends.count
-        context['follower_count'] = user.followers.count
-        context['friends'] = user.friends.all()
-        context['followers'] = user.followers.all()
-        context['incomingFriendRequest'] = user.incomingRequests.all()
-
-
         # pass context to template
         return context
 

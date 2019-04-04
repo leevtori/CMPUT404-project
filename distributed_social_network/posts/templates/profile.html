@@ -23,17 +23,17 @@
                     <h1 class='banner'>{{user.username}}</h1>
                     <h3 class='banner'>{{user.first_name}} {{user.last_name}}</h3>
                     {% if request.user != user %}
-                        {% if request.user in user.friends %}
+                        {% if request.user in user.friends.all %}
                             <button disabled class='inactive_btn' id='friend_{{user.id}}'>Frands &#x2713;</button>
-                        {% elif request.user in user.incomingRequests %}
+                        {% elif request.user in user.incomingRequests.all %}
                             <button disabled class='inactive_btn' id='friend_{{user.id}}'>Frand Request Sent &#x2713;</button>
-                        {% elif request.user in user.outgoingRequests %}
+                        {% elif request.user in user.outgoingRequests.all %}
                             <button class='add_friend_btn' type='submit' onclick="confirmFriend('{{user.id}}')" id='friend_{{user.id}}'>+ Confirm Frand</button>
                         {% else %}
                             <button class='add_friend_btn' type='submit' onclick="addFriend('{{user.id}}')" id='friend_{{user.id}}'>+ Add Frand</button>
                         {% endif %}
                     
-                        {% if request.user in user.following %}
+                        {% if request.user in user.following.all %}
                             <button class='delete_friend_btn' type='submit' onclick="unfollow('{{user.id}}')" id='follow_{{user.id}}'>Unfllow</button>
                         {% else %}
                             <button class='add_friend_btn' type='submit' onclick="follow('{{user.id}}')" id='follow_{{user.id}}'>Follow</button>
