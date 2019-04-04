@@ -163,17 +163,11 @@
 
             add_visible_to_listener('edit_post_content');
         }
-        function imgsrc(){
-            var img_element = document.getElementById("post_image");
-            var source = "{{ post.content|escapejs }}";
-            img_element.setAttribute('src', source);
 
-            add_visible_to_listener('edit_post_content');
-        }
         {% if post.content_type == "MKD" %}
         window.onload = mkdown;
         {% else %}
-        window.onload = imgsrc;
+        window.onload = function(){add_visible_to_listener('edit_post_content');};
         {% endif %}
     </script>
 
@@ -239,7 +233,7 @@
                 </div>
                 <br>
             {% else %}
-                <img id="post_image">
+                <img class="post_image" src="{{ post.content}}">
             {% endif %}
         </div>
 
