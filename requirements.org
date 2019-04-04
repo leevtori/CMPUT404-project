@@ -85,20 +85,19 @@
    - As a server admin, I can limit nodes connecting to me via
      authentication.
    - As an author, posts I create be private to only friends on my host
-
+   - As a server admin, I don't want to do heavy setup to get the
+     posts of my author's friends.
+   - As an author, I want to be able to use my web-browser to manage/author
+     my posts
+   - As an author, I want to befriend remote authors
+   - As an author, posts I create be private to another author
+   - As a server admin, I want to share or not share posts with users
+     on other servers.
+   - As a server admin, I want to share or not share images with users
+     on other servers.
      
 ** User Stories NOT DONE
-   + As a server admin, I don't want to do heavy setup to get the
-     posts of my author's friends.
-   + As an author, I want to be able to use my web-browser to manage/author
-     my posts (CAN'T EDIT YET)
-   + As an author, I want to befriend remote authors
    + As an author, I want to pull in my github activity to my "stream"
-   + As a server admin, I want to share or not share posts with users
-     on other servers.
-   + As a server admin, I want to share or not share images with users
-     on other servers.
-   + As an author, posts I create be private to another author
 
  
 ** Main Concepts
