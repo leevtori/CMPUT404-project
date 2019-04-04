@@ -1,6 +1,7 @@
 import io
 import random
 
+
 from requests.auth import HTTPBasicAuth
 from rest_framework.parsers import JSONParser
 from rest_framework import serializers
@@ -33,7 +34,7 @@ def friend_checking(a):
     else:
         return False
 
-def requestPosts(node, ending, current_id):
+async def requestPosts(node, ending, current_id):
     try:
         a = requests.get(node.hostname+node.prefix+ending, headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
 
@@ -51,27 +52,29 @@ def requestPosts(node, ending, current_id):
             l = posts_request_deserializer(data=data)
             l.is_valid()
             for i in l.validated_data['posts']:
-                print('a post')
                 post = post_deserializer_no_comment(data=i)
                 if post.is_valid():
-                    new_post = post.create(post.validated_data)
-                    if new_post!=None:
-                        if new_post.origin=='':
-                            new_post.origin = node.hostname+node.prefix+ 'posts/'+ str(new_post.id)
-                        if new_post.source=='':
-                            new_post.source = node.hostname+node.prefix+ 'posts/'+ str(new_post.id)
-                        if new_post.source != new_post.origin and new_post.origin == node.hostname+node.prefix+ 'posts/'+ str(new_post.id):
-                            new_post.source == new_post.origin
-                        new_post.author.host=node
-                        new_post.author.save()
-                        new_post.save()
-                        print('saved new post id :'+str(new_post.id))
-                    else:
+                    if node.hostname in post.validated_data["origin"] or post.validated_data["origin"]=="":
+                        new_post = post.create(post.validated_data)
+                        if new_post!=None:
+                            if new_post.origin=='':
+                                new_post.origin = node.hostname+node.prefix+ 'posts/'+ str(new_post.id)
+
+                            if new_post.source=='':
+                                new_post.source = node.hostname+node.prefix+ 'posts/'+ str(new_post.id)
+                            new_post.author.host=node
+                            new_post.author.save()
+                            new_post.save()
+                            print('saved new post id :'+str(new_post.id))
+                        else:
                         # print('passed')
-                        pass
+                            pass
                 else:
                     print(post.errors)
             return True
+        else:
+            print(node.hostname)
+            print(a.status_code)
     except Exception as e:
         print()
         print(e)
@@ -151,6 +154,7 @@ class post_detail_deserializer(serializers.Serializer):
     id = serializers.UUIDField()
     title = serializers.CharField()
     source = serializers.CharField(required=False, default='')
+    origin = serializers.CharField(required=False, default='')
     description = serializers.CharField(required=False, allow_blank=True)
     contentType = serializers.CharField()
     content = serializers.CharField(allow_blank=True)
@@ -251,8 +255,6 @@ class post_deserializer_no_comment(serializers.Serializer):
                 existing_post=Post.objects.get(id=validated_data['id'])
                 return None
             except:
-                print(validated_data['visibility'])
-                print(validated_data['published'])
                 new_post= Post.objects.create(
                     id=validated_data['id'],
                     title=validated_data['title'],
@@ -267,6 +269,7 @@ class post_deserializer_no_comment(serializers.Serializer):
                     unlisted = validated_data['unlisted'],
                     origin = validated_data['origin']
                 )
+                return new_post
 
         else:
             print(validated_data['author'])
@@ -276,14 +279,14 @@ class post_deserializer_no_comment(serializers.Serializer):
 # TODO make changes to this
 class user_deserializer(serializers.Serializer):
     id = serializers.CharField()
-    email = serializers.EmailField(required=False)
-    bio = serializers.CharField(required=False)
+    email = serializers.EmailField(required=False, default='')
+    bio = serializers.CharField(required=False, default='')
     host = serializers.CharField(allow_blank=True)
-    firstName = serializers.CharField(required=False)
-    lastName = serializers.CharField(required=False)
+    firstName = serializers.CharField(required=False, default='')
+    lastName = serializers.CharField(required=False, default='')
     displayName = serializers.CharField()
     url = serializers.CharField()
-    github = serializers.CharField(allow_null=True, allow_blank=True)
+    github = serializers.CharField(allow_null=True, allow_blank=True, default='')
 
     def create(self, validated_data):
         url_with_id=validated_data['id'].split('/')
