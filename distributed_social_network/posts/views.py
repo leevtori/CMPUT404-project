@@ -1,5 +1,6 @@
 import json
 from urllib.parse import urljoin
+import asyncio
 
 from django.shortcuts import HttpResponse, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView
@@ -14,6 +15,7 @@ from django.conf import settings
 import uuid
 import requests
 import urllib
+import asyncio
 
 from users.models import Node
 from posts.forms import PostForm
@@ -127,10 +129,13 @@ class FeedView(PostVisbilityMixin, ListView):
         # get public posts from other hosts, using https://connectifyapp.herokuapp.com/ as test
         nodes = Node.objects.all()
         for node in nodes:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
             if node.active:
-                requestPosts(node, 'posts',self.request.user.id)
-                requestPosts(node, 'author/posts', self.request.user.id)
+                loop.run_until_complete(requestPosts(node, 'posts',self.request.user.id))
+                loop.run_until_complete(requestPosts(node, 'author/posts', self.request.user.id))
             #requestPosts(node, 'author/posts', self.request.user.id)
+        loop.close()
         for frand in self.request.user.outgoingRequests.all():
             check_friend_url=frand.get_url()+'/friends/'+urllib.parse.quote(self.request.user.get_url(),safe="~()*!.'")
             print(check_friend_url)

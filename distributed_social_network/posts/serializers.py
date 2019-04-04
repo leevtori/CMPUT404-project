@@ -1,6 +1,7 @@
 import io
 import random
 
+
 from requests.auth import HTTPBasicAuth
 from rest_framework.parsers import JSONParser
 from rest_framework import serializers
@@ -33,7 +34,7 @@ def friend_checking(a):
     else:
         return False
 
-def requestPosts(node, ending, current_id):
+async def requestPosts(node, ending, current_id):
     try:
         a = requests.get(node.hostname+node.prefix+ending, headers={"X-User":str(current_id)}, auth=HTTPBasicAuth(node.send_username,node.send_password))
 
