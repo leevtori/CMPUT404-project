@@ -88,6 +88,7 @@ class ProfileView(PostVisbilityMixin, ListView):
         # get user object based on username in url
         user = get_object_or_404(User, username=self.kwargs['username'])
 
+
         # updates the user from nodes if foreign:
         if user.local == False:
             print('not local user, hope its not boom')
@@ -128,8 +129,9 @@ class FeedView(PostVisbilityMixin, ListView):
         for node in nodes:
             if node.active:
                 requestPosts(node, 'posts',self.request.user.id)
+                requestPosts(node, 'author/posts', self.request.user.id)
             #requestPosts(node, 'author/posts', self.request.user.id)
-        for frand in self.request.user.outgoingRequests:
+        for frand in self.request.user.outgoingRequests.all():
             check_friend_url=frand.get_url()+'/friends/'+urllib.parse.quote(self.request.user.get_url(),safe="~()*!.'")
             print(check_friend_url)
             frand_check=requests.get(check_friend_url,headers={"X-AUTHOR-ID": str(self.request.user.id)},
@@ -180,7 +182,6 @@ class PostDetailView(PostVisbilityMixin, DetailView):
             node_url = node_url1.split('api')[0]
             node= get_object_or_404(Node, hostname=node_url)
             requestSinglePost(post.origin, self.request.user.id,node)
-
 
         context = super().get_context_data(**kwargs)
         context['post_comments'] = self.object.comment_set.all().order_by("-published")
@@ -289,7 +290,8 @@ def github_activity(request):
                         latest_activity["type"],
                         latest_activity['repo']['name']
                     )
-
+            new_post.source = urljoin(settings.HOSTNAME, '/api/posts/%s' % new_post.id)
+            new_post.origin = urljoin(settings.HOSTNAME, '/api/posts/%s' % new_post.id)
             new_post.save()
             return redirect('feed')
         else:
