@@ -26,9 +26,6 @@
             <div>
                 <h1 class='banner'>{{request.user.username}}</h1>
                 <h3 class='banner'>{{request.user.first_name}} {{request.user.last_name}}</h3>
-                {% if user != request.user %}
-                <button class='add_friend_btn' type='submit' onclick="addFriend('{{user.id}}')">+ Add Friend</button>
-                {% endif %}
             </div>
             <hr>
 

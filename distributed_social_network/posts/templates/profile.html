@@ -4,7 +4,10 @@
 
 {% block styles %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/profile.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/user.css' %}">
+
     <script src="{% static 'js/script.js' %}"></script>
+
 {% endblock %}
 
 {% block content %}
@@ -19,13 +22,19 @@
                 <div>
                     <h1 class='banner'>{{user.username}}</h1>
                     <h3 class='banner'>{{user.first_name}} {{user.last_name}}</h3>
-
-                    {% if user != request.user %}
-                        {% if user in friendRequests %}
-                        <button class='add_friend_btn' type='button' disabled>Friend Request Sent</button>
-                        {% elif user in friends %}
+                    {% if request.user != user %}
+                        {% if request.user in friends %}
+                            <button disabled class='inactive_btn'>Friends &#x2713;</button>
+                        {% elif request.user in incomingFriendRequest%}
+                            Friend Request Sent &#x2713; 
                         {% else %}
                             <button class='add_friend_btn' type='submit' onclick="addFriend('{{user.id}}')">+ Add Friend</button>
+                        {% endif %}
+                
+                        {% if request.user in follwers %}
+                            <button class='delete_friend_btn' type='submit' onclick="unfollow('{{user.id}}')">Unfllow</button>
+                        {% else %}
+                            <button class='add_friend_btn' type='submit' onclick="follow('{{user.id}}')">Follow</button>
                         {% endif %}
                     {% endif %}
 
@@ -58,8 +67,9 @@
                         </td>      
                     </tr>
                 </table>
-                {% endif %}
                 <hr>
+                {% endif %}
+                
 
                 <h3>Bio</h3>
                 <p>{{user.bio}}</p>

@@ -5,7 +5,21 @@ function addFriend(friendId){
             'X-CSRFToken': document.cookie.split("=")[1]
         }, 
         body: JSON.stringify({'id':friendId})
-    }).then(setTimeout(function(){window.location.reload()},500));
+    }).then(function(){
+        var btn = document.getElementById('friend_'+friendId);
+        btn.innerHTML = 'Frand Request Sent &#x2713;';
+        btn.disabled = true;
+        btn.classList.add('inactive_btn');
+        btn.classList.remove('add_friend_btn');
+
+        var btn2 = document.getElementById('follow_'+friendId);
+        if(btn2){
+            btn2.innerText = 'Unfollow';
+            btn2.classList.add('delete_friend_btn');
+            btn2.classList.remove('add_friend_btn');
+            btn2.onclick = function(){unfollow(friendId);};
+        };
+    });
 };
 
 
@@ -17,7 +31,10 @@ function deleteFriend(friendId){
             'X-CSRFToken': document.cookie.split("=")[1]
         },
         body: JSON.stringify({'id':friendId})
-    }).then(setTimeout(function(){window.location.reload()},500));
+    }).then(function(){
+        var item = document.getElementById('item_'+friendId);
+        item.remove();
+    });
 };
 
 function confirmFriend(friendId){
@@ -27,7 +44,20 @@ function confirmFriend(friendId){
             'X-CSRFToken': document.cookie.split("=")[1]
         }, 
         body: JSON.stringify({'id':friendId})
-    }).then(setTimeout(function(){window.location.reload()},500));
+    }).then(function(){
+        var btn = document.getElementById('friend_'+friendId);
+        btn.innerHTML = 'Frands &#x2713;';
+        btn.disabled = true;
+        btn.classList.add('inactive_btn');
+        btn.classList.remove('add_friend_btn');
+        var btn2 = document.getElementById('follow_'+friendId);
+        if(btn2){
+            btn2.innerText = 'Unfollow';
+            btn2.classList.add('delete_friend_btn');
+            btn2.classList.remove('add_friend_btn');
+            btn2.onclick = function(){unfollow(friendId);};
+        };
+    });
 };
 
 function follow(friendId){
@@ -37,7 +67,13 @@ function follow(friendId){
             'X-CSRFToken': document.cookie.split("=")[1]  
         },
         body: JSON.stringify({'id':friendId})
-    }).then(setTimeout(function(){window.location.reload()},500));
+    }).then(function(){
+        var btn = document.getElementById('follow_'+friendId);
+        btn.innerText = 'Unfollow';
+        btn.classList.add('delete_friend_btn');
+        btn.classList.remove('add_friend_btn');
+        btn.onclick = function(){unfollow(friendId);};
+    });
 };
 
 function unfollow(friendId){
@@ -47,7 +83,13 @@ function unfollow(friendId){
             'X-CSRFToken': document.cookie.split("=")[1]  
         },
         body: JSON.stringify({'id':friendId})
-    }).then(setTimeout(function(){window.location.reload()},500));
+    }).then(function(){
+        var btn = document.getElementById('follow_'+friendId);
+        btn.innerText = 'Follow';
+        btn.classList.add('add_friend_btn');
+        btn.classList.remove('delete_friend_btn');
+        btn.onclick = function(){follow(friendId);};
+    });
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////

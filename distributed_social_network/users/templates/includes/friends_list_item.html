@@ -1,20 +1,21 @@
 {%load static%}
 
 
-<div class='post' style="width:45%;">
+<div id="item_{{user.id}}" class='post' style="width:45%;">
     <div class='post_top'>
         <img src={% static "img/profile.png"%} class='profile_pic_small' %}>
-        <h4 class='fullname'><a href={% url 'profile' username=user.username %}>{{user.username}}</a></h4>
+        <h4 class='fullname'><a href={% url 'profile' username=user.username %} class='fullname'>{{user.username}}</a></h4>
+
     </div>
     {% csrf_token %}
     <div style="padding:10px">
         {% csrf_token %}
-        <button class='delete_friend_btn' type='submit' onclick="deleteFriend('{{user.id}}')">&#x2716 Delete Friend</button>
+        <button class='delete_friend_btn' type='submit' onclick="deleteFriend('{{user.id}}')">&#x2716 Delete Frand</button>
         
         {% if user in following %}
-            <button class='delete_friend_btn' type='submit' onclick="unfollow('{{user.id}}')">Unfllow</button>
+            <button class='delete_friend_btn' type='submit' onclick="unfollow('{{user.id}}')" id='follow_{{user.id}}'>Unfllow</button>
         {% else %}
-            <button class='add_friend_btn' type='submit' onclick="follow('{{user.id}}')">Follow</button>
+            <button class='add_friend_btn' type='submit' onclick="follow('{{user.id}}')" id='follow_{{user.id}}'>Follow</button>
         {% endif %}
     </div>
 
