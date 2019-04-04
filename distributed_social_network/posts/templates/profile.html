@@ -32,7 +32,7 @@
                         {% endif %}
                 
                         {% if request.user in follwers %}
-                            <button class='delete_friend_btn' type='submit' onclick="unfollow('{{user.id}}')">Unfllow</button>
+                            <button class='delete_friend_btn' type='submit' onclick="unfollow('{{user.id}}')">Unfollow</button>
                         {% else %}
                             <button class='add_friend_btn' type='submit' onclick="follow('{{user.id}}')">Follow</button>
                         {% endif %}

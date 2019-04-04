@@ -13,7 +13,7 @@
         <button class='delete_friend_btn' type='submit' onclick="deleteFriend('{{user.id}}')">&#x2716 Delete Frand</button>
         
         {% if user in following %}
-            <button class='delete_friend_btn' type='submit' onclick="unfollow('{{user.id}}')" id='follow_{{user.id}}'>Unfllow</button>
+            <button class='delete_friend_btn' type='submit' onclick="unfollow('{{user.id}}')" id='follow_{{user.id}}'>Unfollow</button>
         {% else %}
             <button class='add_friend_btn' type='submit' onclick="follow('{{user.id}}')" id='follow_{{user.id}}'>Follow</button>
         {% endif %}
