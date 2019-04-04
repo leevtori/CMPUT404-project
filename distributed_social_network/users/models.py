@@ -64,3 +64,10 @@ class User(AbstractUser):
         posts = p.values_list("title", flat=True)
         print("posts ", posts)
         return ", ".join(posts)
+
+
+class NodeProxy(User):
+    class Meta:
+        proxy = True
+        verbose_name = "Node"
+        verbose_name_plural = "Nodes"
