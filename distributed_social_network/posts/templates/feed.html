@@ -10,6 +10,7 @@
             add_visible_to_listener('new_txt_post');
             add_visible_to_listener('new_mkd_post');
             add_visible_to_listener('new_img_post');
+            add_categories_listener('new_txt_post');
         }
     </script>
 {% endblock %}
@@ -67,6 +68,16 @@
         </div>
     </div>
 
+
+    <div class="form-popup" >
+        <form action={% url 'createCategory' %} method="post" class="form-container">
+            <h1>Create a new category</h1>
+        
+            <label for="{{CategoryForm.name.id_for_label}}">Name</label> {{CategoryForm.name}}
+        
+            <button type="submit" value='Create'>Create</button>
+        </form>
+    </div>
         
 
 
@@ -97,7 +108,14 @@
                         <label for="{{form.unlisted.id_for_label}}" name='unlisted'>Unlisted</label>{{form.unlisted}}
                     </div>
                     <div>
-                        <label for="{{form.categories.id_for_label}}" name='categories'>Categories</label>{{form.categories}}
+                        <label for="{{form.categories.id_for_label}}" name='categories'>Categories</label>
+                        <select id="categories_list"  multiple size="6">
+                            {% for c in categories %}
+                                <option value="{{c.name}}">{{c.name}}</option>
+                            {% endfor %}
+                        </select>
+                        <button class='add_friend_btn' onclick="addCategory()">Add Category</button>
+
                     </div>
                     <input name='content_type' type='hidden' value='TXT'>
                     <input type="submit" value='Create' class="create_btn"></input> 

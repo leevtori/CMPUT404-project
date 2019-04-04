@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 from django.shortcuts import HttpResponse, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Post, Comment
+from .models import Post, Comment, Categories
 from django.contrib.auth import get_user_model
 from django.views.generic.base import TemplateView
 from users.views import FriendRequests
@@ -13,7 +13,7 @@ import uuid
 
 
 from users.models import Node
-from posts.forms import PostForm
+from posts.forms import PostForm, CategoryForm
 from posts.serializers import requestPosts, requestSinglePost, request_single_user
 
 from django.db import connection
@@ -133,6 +133,8 @@ class FeedView(PostVisbilityMixin, ListView):
         p.fields['visible_to'].queryset = self.request.user.friends.all()
         context['form'] = p
 
+        context['CategoryForm'] = CategoryForm()
+        context['categories'] = Categories.objects.all()
 
         following_posts = []
         qs = super().get_queryset()
@@ -163,6 +165,13 @@ class PostDetailView(PostVisbilityMixin, DetailView):
         context['form'] = PostForm(instance=post)
 
         return context
+
+def create_category(request):
+    if (request.method == "POST"):
+        f = CategoryForm(request.POST)
+        f.save()
+        return HttpResponse(status=201)
+
 
 
 def create_post(request):
