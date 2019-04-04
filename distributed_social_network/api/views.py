@@ -263,7 +263,7 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
 
 
     def list(self, request):
-        qs = Post.objects.filter(visibility=Visibility.PUBLIC)
+        qs = Post.objects.filter(visibility=Visibility.PUBLIC, source__icontains=settings.HOSTNAME)
 
         page = self.paginate_queryset(qs)
 

@@ -64,3 +64,14 @@ class User(AbstractUser):
         posts = p.values_list("title", flat=True)
         print("posts ", posts)
         return ", ".join(posts)
+
+    def __str__(self):
+        return self.get_url()
+
+
+class ConnectedServer(User):
+    class Meta:
+        proxy = True
+        verbose_name = "connected server"
+        verbose_name_plural = "connected servers"
+        permissions = (('can_access_api', 'Can access API'),)
