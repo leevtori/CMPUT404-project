@@ -7,7 +7,6 @@
         <h4 class='fullname'><a href={% url 'profile' username=user.username %} class='fullname'>{{user.username}}</a></h4>
 
     </div>
-    {% csrf_token %}
     <div style="padding:10px">
         {% if user in friends %}
             <button disabled class='inactive_btn' id='friend_{{user.id}}'>Frands &#x2713;</button>
