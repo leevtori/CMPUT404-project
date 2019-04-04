@@ -10,7 +10,7 @@ from django.views.generic.base import TemplateView
 from users.views import FriendRequests
 from django.conf import settings
 import uuid
-
+import requests
 
 from users.models import Node
 from posts.forms import PostForm
@@ -96,6 +96,7 @@ class ProfileView(PostVisbilityMixin, ListView):
         context['following_count']= user.following.count
         context['friend_count'] = user.friends.count
         context['follower_count'] = user.followers.count
+
 
         # pass context to template
         return context
@@ -210,8 +211,65 @@ def add_comment(request):
         return HttpResponse(status=404)
 
 
+def github_activity(request):
+    if request.method=="POST":
+        f = PostForm(request.POST)
+        if f.is_valid():
+            new_post = f.save(commit=False)
+            new_post.author = request.user
 
+            git_username=request.user.github.split('/')[-1]
+            print(git_username)
+            git_api_url='https://api.github.com/users/{}/events?per_page=1'.format(git_username)
+            github_request = requests.get(git_api_url)
+            if github_request.status_code==200:
+                a=json.loads(github_request.content)
+                latest_activity = a[0]
+                if latest_activity['type']=="ForkEvent":
+                    new_post.content = "I just forked the repository {}, check out the original at {}".format(
+                        latest_activity["forkee"]["name"],
+                        latest_activity["forkee"]["url"]
+                    )
+                elif latest_activity['type']=="PushEvent":
+                    new_post.content = "I just pushed {} commits to {} Branch, check it out at {}".format(
+                        len(latest_activity["payload"]["commits"]),
+                        latest_activity["repo"]["name"],
+                        latest_activity["repo"]["url"]
+                    )
+                elif latest_activity['type'] == "ReleaseEvent":
+                    new_post.content = "I just released my {} repository, check it out at {}".format(
+                        latest_activity["repo"]["name"],
+                        latest_activity["release"]["url"]
+                    )
+                elif latest_activity['type'] == "RepositoryEvent":
+                    new_post.content = "I just {} a repository, {}".format(
+                        latest_activity["action"],
+                        latest_activity["repo"]["full_name"]
+                    )
 
+                elif latest_activity['type'] == "CreateEvent":
+                    new_post.content = "I just added a {} to my {} repository, check it out at {}".format(
+                        latest_activity["ref_type"],
+                        latest_activity["repo"]["name"],
+                        latest_activity["repo"]["url"]
+                    )
+
+                elif latest_activity['type'] == "DeleteEvent":
+                    new_post.content = "I just deleted a {} from my {} repository, F to pay respect".format(
+                        latest_activity["ref_type"],
+                        latest_activity["repo"]["name"]
+                    )
+                else:
+                    new_post.content="I just pull a {} to my {} repository and this server doesn't know how to handle that, that is unfortunate".format(
+                        latest_activity["type"],
+                        latest_activity['repo']['name']
+                    )
+
+            new_post.save()
+            return redirect('feed')
+        else:
+            print(f.errors)
+            return redirect('feed')
 
 
 
