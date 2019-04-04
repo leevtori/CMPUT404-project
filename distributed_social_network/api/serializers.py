@@ -8,9 +8,11 @@ from django.conf import settings
 from users.models import Node
 
 from .utils import get_uuid_from_url
+from urllib.parse import urlparse
+
 User = get_user_model()
 
-# NOTE: fore debugging purposes
+# NOTE: for debugging purposes
 from pprint import pprint
 
 class FriendSerializer(serializers.ModelSerializer):
@@ -48,7 +50,8 @@ class AuthorSerializer(serializers.ModelSerializer):
         )
 
     def get_host(self, obj):
-        return str(obj.host) or settings.HOSTNAME
+        host = obj.host or settings.HOSTNAME
+        return str(host)
 
     def get_id(self, obj):
         return obj.get_url()
@@ -167,9 +170,13 @@ class HostField(serializers.Field):
     }
 
     def to_internal_value(self, value):
+        v = urlparse(value)
+
         try:
-            return Node.objects.get(hostname__icontains=value)
+            return Node.objects.get(hostname__icontains=v.hostname)
         except Node.DoesNotExist:
+            if v.hostname not in settings.HOSTNAME:
+                self.fail('invalid', input=value)
             return None
 
 
@@ -280,20 +287,27 @@ class PostCreateSerializer(serializers.ModelSerializer):
             "unlisted"
         )
 
+    def get_or_create_author(self, author_dict):
+        if User.objects.filter(id=author_dict["id"]).exists():
+            author_object = User.objects.get(id=author_dict['id'])
+
+        else:
+            author_object = User.objects.create(**author_dict)
+
+        return author_object
+
     def create(self, validated_data):
-        ModelClass= self.Meta.model
+        ModelClass = self.Meta.model
 
         comments = validated_data.pop("comments")
         categories = validated_data.pop("categories")
         author = validated_data.pop("author")
 
-        #  Will throw an error if the author doesn't exist. Catch User.DoesNotExist
-        author_object = User.objects.get(**author)
-        validated_data["author"] = author_object
+        validated_data["author"] = self.get_or_create_author(author)
 
         # change contentType to content_type
-        ct = validated_data.pop("contentType")
-        validated_data["content_type"] = ct
+        validated_data.pop("contentType")
+        # validated_data["content_type"] = ct
         # Might raise an error, but let it be caught somewhere else.
         instance = ModelClass._default_manager.create(**validated_data)
 
@@ -301,22 +315,9 @@ class PostCreateSerializer(serializers.ModelSerializer):
         instance.categories.add(*categories)
 
         # Then create the comments
+        # FIXME: check if this actually works.
         for comment in comments:
-            serializer = AnotherCommentPostSerializer(data=comment)
-
-            if serializer.is_valid():
-                obj = serializer.save(commit=False)
-                obj.post = instance
-                obj.save()
-
-        # That's it...? hopefully????
+            comment['author'] = self.get_or_create_author(comment["author"])
+            Comment.objects.create(**comment, post=instance)
 
         return instance
-
-
-
-# FIXME: have the correct fields.
-# class CommentSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Comment
-#         fields = "__all__"

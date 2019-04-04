@@ -145,18 +145,15 @@ LOGIN_URL = "/users/login"
 LOGIN_REDIRECT_URL = '/'
 
 REST_FRAMEWORK = {
-    # 'DEFAULT_PERMISSION_CLASSES': [
-    #     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    # ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
+    ],
     'DEFAULT_PAGINATION_CLASS': 'api.paginators.CustomPaginator',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
     'PAGE_SIZE': 50
 }
 
-django_heroku.settings(locals()) # bottom of the file
+django_heroku.settings(locals())  # bottom of the file

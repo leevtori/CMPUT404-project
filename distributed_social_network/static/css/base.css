@@ -190,7 +190,9 @@ img.profile_pic_large{
     padding: 5px;
     padding-right:10px;
 }
-
+img.post_image{
+    max-width: 95%;
+}
 
 .fullname{
     margin: 0px;
