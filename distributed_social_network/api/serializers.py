@@ -267,6 +267,7 @@ class PostCreateSerializer(serializers.ModelSerializer):
     author = UserSerializer()
     contentType = ContentTypeField()
     comments = AnotherCommentPostSerializer(many=True)
+    # visibleTo = serializers.CharField(source="visible_to")
 
     class Meta:
         model = Post
@@ -283,7 +284,7 @@ class PostCreateSerializer(serializers.ModelSerializer):
             "comments",
             "published",
             "visibility",
-            # "visibleTo", NOTE: For now, ignored.
+            # "visibleTo",  # NOTE: For now, ignored.
             "unlisted"
         )
 

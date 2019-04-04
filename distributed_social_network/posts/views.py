@@ -154,7 +154,7 @@ class FeedView(PostVisbilityMixin, ListView):
         q = list(set(self.request.user.followers.all()).difference(set(self.request.user.friends.all())))
         context['requestCount'] = len(q)
         p = PostForm()
-        p.fields['visible_to'].queryset = self.request.user.friends.all()
+        # p.fields['visible_to'].queryset = self.request.user.friends.all()
         context['form'] = p
 
 

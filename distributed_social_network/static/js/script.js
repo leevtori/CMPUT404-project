@@ -5,20 +5,26 @@ function addFriend(friendId){
             'X-CSRFToken': document.cookie.split("=")[1]
         }, 
         body: JSON.stringify({'id':friendId})
-    }).then(function(){
-        var btn = document.getElementById('friend_'+friendId);
-        btn.innerHTML = 'Frand Request Sent &#x2713;';
-        btn.disabled = true;
-        btn.classList.add('inactive_btn');
-        btn.classList.remove('add_friend_btn');
-
-        var btn2 = document.getElementById('follow_'+friendId);
-        if(btn2){
-            btn2.innerText = 'Unfollow';
-            btn2.classList.add('delete_friend_btn');
-            btn2.classList.remove('add_friend_btn');
-            btn2.onclick = function(){unfollow(friendId);};
+    }).then(function(response){
+        if(response.status == 200){
+            var btn = document.getElementById('friend_'+friendId);
+            btn.innerHTML = 'Frand Request Sent &#x2713;';
+            btn.disabled = true;
+            btn.classList.add('inactive_btn');
+            btn.classList.remove('add_friend_btn');
+    
+            var btn2 = document.getElementById('follow_'+friendId);
+            if(btn2){
+                btn2.innerText = 'Unfollow';
+                btn2.classList.add('delete_friend_btn');
+                btn2.classList.remove('add_friend_btn');
+                btn2.onclick = function(){unfollow(friendId);};
+            };
+        }
+        else{
+            alert("Error: Add frand failed!");
         };
+        
     });
 };
 
@@ -31,9 +37,15 @@ function deleteFriend(friendId){
             'X-CSRFToken': document.cookie.split("=")[1]
         },
         body: JSON.stringify({'id':friendId})
-    }).then(function(){
-        var item = document.getElementById('item_'+friendId);
-        item.remove();
+    }).then(function(response){
+        if(response.status == 200){
+            var item = document.getElementById('item_'+friendId);
+            item.remove();
+        }
+        else{
+            alert("Error: Delete frand failed!");
+        };
+
     });
 };
 
@@ -44,18 +56,23 @@ function confirmFriend(friendId){
             'X-CSRFToken': document.cookie.split("=")[1]
         }, 
         body: JSON.stringify({'id':friendId})
-    }).then(function(){
-        var btn = document.getElementById('friend_'+friendId);
-        btn.innerHTML = 'Frands &#x2713;';
-        btn.disabled = true;
-        btn.classList.add('inactive_btn');
-        btn.classList.remove('add_friend_btn');
-        var btn2 = document.getElementById('follow_'+friendId);
-        if(btn2){
-            btn2.innerText = 'Unfollow';
-            btn2.classList.add('delete_friend_btn');
-            btn2.classList.remove('add_friend_btn');
-            btn2.onclick = function(){unfollow(friendId);};
+    }).then(function(response){
+        if(response.status == 200){
+            var btn = document.getElementById('friend_'+friendId);
+            btn.innerHTML = 'Frands &#x2713;';
+            btn.disabled = true;
+            btn.classList.add('inactive_btn');
+            btn.classList.remove('add_friend_btn');
+            var btn2 = document.getElementById('follow_'+friendId);
+            if(btn2){
+                btn2.innerText = 'Unfollow';
+                btn2.classList.add('delete_friend_btn');
+                btn2.classList.remove('add_friend_btn');
+                btn2.onclick = function(){unfollow(friendId);};
+            };
+        }
+        else{
+            alert("Error: Confirm frand failed!");
         };
     });
 };
@@ -67,12 +84,18 @@ function follow(friendId){
             'X-CSRFToken': document.cookie.split("=")[1]  
         },
         body: JSON.stringify({'id':friendId})
-    }).then(function(){
-        var btn = document.getElementById('follow_'+friendId);
-        btn.innerText = 'Unfollow';
-        btn.classList.add('delete_friend_btn');
-        btn.classList.remove('add_friend_btn');
-        btn.onclick = function(){unfollow(friendId);};
+    }).then(function(response){
+        if(response.status == 200){
+            var btn = document.getElementById('follow_'+friendId);
+            btn.innerText = 'Unfollow';
+            btn.classList.add('delete_friend_btn');
+            btn.classList.remove('add_friend_btn');
+            btn.onclick = function(){unfollow(friendId);};
+        }
+        else{
+            alert("Error: Follow failed!");
+        };
+        
     });
 };
 
@@ -83,12 +106,17 @@ function unfollow(friendId){
             'X-CSRFToken': document.cookie.split("=")[1]  
         },
         body: JSON.stringify({'id':friendId})
-    }).then(function(){
-        var btn = document.getElementById('follow_'+friendId);
-        btn.innerText = 'Follow';
-        btn.classList.add('add_friend_btn');
-        btn.classList.remove('delete_friend_btn');
-        btn.onclick = function(){follow(friendId);};
+    }).then(function(response){
+        if(response.status == 200){
+            var btn = document.getElementById('follow_'+friendId);
+            btn.innerText = 'Follow';
+            btn.classList.add('add_friend_btn');
+            btn.classList.remove('delete_friend_btn');
+            btn.onclick = function(){follow(friendId);};
+        }
+        else{
+            alert("Error: Unfollow failed!");
+        }; 
     });
 };
 
