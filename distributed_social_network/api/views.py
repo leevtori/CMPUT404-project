@@ -9,6 +9,8 @@ from users.models import Node
 from django.http import JsonResponse
 from rest_framework.exceptions import ParseError
 
+from django.conf import settings
+
 from rest_framework.response import Response
 
 from rest_framework.decorators import action
@@ -17,6 +19,7 @@ from posts.views import PostVisbilityMixin
 
 from . import serializers
 import re
+from urllib.parse import urlparse
 
 User = get_user_model()
 
@@ -60,11 +63,15 @@ class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
         if request.method == "GET":
             user = self.get_object()
             auth_user = get_author_id(request)
+            try:
+                auth_user = User.objects.get(id=auth_user)
+            except User.DoesNotExist:
+                qs = user.posts.filter(visibility=Visibility.PUBLIC)
+            else:
+                # Not really meant to be used this way...but it works?
+                post_filter = PostVisbilityMixin()
+                qs = post_filter.filter_user_visible(auth_user, user.posts.all())
 
-            # Not really meant to be used this way...but it works?
-            post_filter = PostVisbilityMixin()
-            qs = post_filter.filter_user_visible(auth_user, user.posts.all())
-            qs = qs.filter(unlisted=False)
             page = self.paginate_queryset(qs)
             if page is not None:
                 serializer = serializers.PostSerializer(page, many=True, context={'request': request})
@@ -156,7 +163,7 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
             posts = post_filter.filter_user_visible(user, self.get_queryset())
 
         else:
-            posts = Post.objects.filter(visibility=Visibility.PUBLIC, unlisted=False, order_by="-published")
+            posts = Post.objects.filter(visibility=Visibility.PUBLIC, unlisted=False).order_by("-published")
 
         page = self.paginate_queryset(posts)
 
@@ -168,9 +175,6 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
         return Response(serializer.data)
 
     def post(self, request):
-        author_id = get_author_id(request)
-
-        user = get_object_or_404(User, pk=author_id)
 
         try:
             post = request.data["post"]
@@ -180,13 +184,73 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
                 status=400
                 )
 
+        author_id = get_author_id(request)
+        post_author = post["author"]
+
+        # check that author_id == uuid of post author in request
+        posted_id = get_uuid_from_url(post_author["id"])
+
+        if posted_id != author_id:
+            return Response(
+                self.create_status_responses(
+                    statusType=False,
+                    message="Author of post does not match authenticated user."
+                    ),
+                status=400
+                )
+
+
+        # check node is someone we're connected to
+        try:
+            print(post_author["host"])
+            post_hostname = urlparse(post_author["host"])
+            author_node = Node.objects.get(hostname__icontains=post_hostname.hostname)
+        except Node.DoesNotExist:
+            if not post_hostname.get_url() in settings.HOSTNAME:
+                return Response(
+                    self.create_status_responses(
+                        statusType=False,
+                        message="Host of author is not recognized."
+                        ),
+                    status=400
+                )
+
+        # check node is active
+        if not author_node.active:
+            return Response(
+                self.create_status_responses(
+                    statusType=False,
+                    message="Permission denied"
+                ),
+                status=400
+            )
+
         serializer = serializers.PostCreateSerializer(data=post)
 
-        print(serializer.is_valid())
-        print(serializer.errors)
         if serializer.is_valid():
-            serializer.save()
-        return Response(status=501)
+            try:
+                new_post = serializer.save()
+                print(new_post)
+            except:
+                print("SERIALIZER SAVE ERROR")
+                return Response(
+                    self.create_status_responses(
+                        statusType=False,
+                        message="Error saving post"
+                    )
+                )
+        else:
+            return Response(
+                self.create_status_responses(
+                    statusType=False,
+                    message=serializer.errors
+                ),
+                status=400
+            )
+
+        return Response(
+            self.create_status_responses()
+        )
 
 
 class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):

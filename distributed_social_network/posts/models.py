@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils.timezone import now
 
 from .utils import ContentType, Visibility
 import uuid
@@ -8,7 +9,7 @@ import uuid
 class Post (models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="posts")
-    published = models.DateTimeField(auto_now_add=True)
+    published = models.DateTimeField(default=now)
 
     title = models.CharField(max_length=255)
     content = models.TextField()
@@ -42,7 +43,7 @@ class Comment (models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     post = models.ForeignKey('Post', on_delete=models.CASCADE)
 
-    published = models.DateTimeField(auto_now_add=True)
+    published = models.DateTimeField(default=now)
     comment = models.TextField()
 
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

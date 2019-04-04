@@ -9,6 +9,10 @@ from django.db.models import Q
 from posts.models import Post
 
 
+# class NodeUserInline(admin.StackedInline):
+#     model = User
+#     fields=("username", "password")
+
 class CustomUserAdmin(UserAdmin):
 
     add_form = CustomUserCreationForm
@@ -28,8 +32,11 @@ class CustomUserAdmin(UserAdmin):
         qs = User.objects.all().exclude(id__in=nodes)
         return qs
 
+
 class CustomNodeAdmin(UserAdmin):
-    pass
+    # inlines = (NodeUserInline,)
+    fields = "__all__"
+
 
 # Register your models here.
 admin.site.register(User, CustomUserAdmin)
