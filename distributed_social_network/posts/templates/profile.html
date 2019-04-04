@@ -23,18 +23,20 @@
                     <h1 class='banner'>{{user.username}}</h1>
                     <h3 class='banner'>{{user.first_name}} {{user.last_name}}</h3>
                     {% if request.user != user %}
-                        {% if request.user in friends %}
-                            <button disabled class='inactive_btn'>Friends &#x2713;</button>
-                        {% elif request.user in incomingFriendRequest%}
-                            Friend Request Sent &#x2713; 
+                        {% if request.user in user.friends %}
+                            <button disabled class='inactive_btn' id='friend_{{user.id}}'>Frands &#x2713;</button>
+                        {% elif request.user in user.incomingRequests %}
+                            <button disabled class='inactive_btn' id='friend_{{user.id}}'>Frand Request Sent &#x2713;</button>
+                        {% elif request.user in user.outgoingRequests %}
+                            <button class='add_friend_btn' type='submit' onclick="confirmFriend('{{user.id}}')" id='friend_{{user.id}}'>+ Confirm Frand</button>
                         {% else %}
-                            <button class='add_friend_btn' type='submit' onclick="addFriend('{{user.id}}')">+ Add Friend</button>
+                            <button class='add_friend_btn' type='submit' onclick="addFriend('{{user.id}}')" id='friend_{{user.id}}'>+ Add Frand</button>
                         {% endif %}
-                
-                        {% if request.user in follwers %}
-                            <button class='delete_friend_btn' type='submit' onclick="unfollow('{{user.id}}')">Unfllow</button>
+                    
+                        {% if request.user in user.following %}
+                            <button class='delete_friend_btn' type='submit' onclick="unfollow('{{user.id}}')" id='follow_{{user.id}}'>Unfllow</button>
                         {% else %}
-                            <button class='add_friend_btn' type='submit' onclick="follow('{{user.id}}')">Follow</button>
+                            <button class='add_friend_btn' type='submit' onclick="follow('{{user.id}}')" id='follow_{{user.id}}'>Follow</button>
                         {% endif %}
                     {% endif %}
 
@@ -47,21 +49,21 @@
                         <td class='stats'>
                             <a href={% url 'followers' username=user.username %} class='stats'>
                             <div style="height:100%;width:100%">
-                                {{follower_count}}<br/>Followers
+                                {{user.followers.count}}<br/>Followers
                             </div>
                             </a>
                         </td>
                         <td class='stats'>
                             <a href={% url 'following' username=user.username %} class='stats'>
                             <div style="height:100%;width:100%">
-                                {{following_count}}<br/>Following
+                                {{user.following.count}}<br/>Following
                             </div>
                             </a>
                         </td>
                         <td class='stats'>
                             <a href={% url 'friends' username=user.username %} class='stats'>
                             <div style="height:100%;width:100%">
-                                    {{friend_count}}<br/>Frands
+                                    {{user.friends.count}}<br/>Frands
                             </div>
                             </a>
                         </td>      
@@ -76,7 +78,11 @@
                 <hr>
                 <p>{{post_count}} post(s)</p>
                 <a href="{{user.github}}">Github</a>
-                <p>Host: {{user.host}}</p>
+                {% if user.host %}
+                    <p>Host: {{user.host}}</p>
+                {% else %}
+                    <p>Local User</p>
+                {% endif %}
             </div>
         </div>
 
