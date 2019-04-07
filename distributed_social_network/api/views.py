@@ -8,6 +8,7 @@ from posts.models import Post
 from users.models import Node
 from django.http import JsonResponse
 from rest_framework.exceptions import ParseError
+from collections import OrderedDict
 
 from django.conf import settings
 
@@ -261,6 +262,17 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Post.objects.filter(visibility=Visibility.PUBLIC)
     serializer_class = serializers.PostSerializer
 
+    def retrieve(self, request, pk):
+        response = super().retrieve(request, pk)
+
+        data = response.data
+        r_data = OrderedDict()
+        r_data["query"] = "getPost"
+        r_data["post"] = data
+
+        response.data = r_data
+
+        return response
 
     def list(self, request):
         qs = Post.objects.filter(visibility=Visibility.PUBLIC, source__icontains=settings.HOSTNAME)
