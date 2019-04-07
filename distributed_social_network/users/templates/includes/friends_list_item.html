@@ -7,9 +7,7 @@
         <h4 class='fullname'><a href={% url 'profile' username=user.username %} class='fullname'>{{user.username}}</a></h4>
 
     </div>
-    {% csrf_token %}
     <div style="padding:10px">
-        {% csrf_token %}
         <button class='delete_friend_btn' type='submit' onclick="deleteFriend('{{user.id}}')">&#x2716 Delete Frand</button>
         
         {% if user in following %}

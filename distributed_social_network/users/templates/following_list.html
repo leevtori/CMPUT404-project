@@ -9,7 +9,7 @@
 
 {% block content %}
 <div class='page'>
-    
+    {% csrf_token %}
     <h2>Following</h2>
     <div class='user_list'>
     {% if object_list %}

@@ -129,27 +129,30 @@ class FeedView(PostVisbilityMixin, ListView):
     def get_context_data(self, **kwargs):
         # get public posts from other hosts, using https://connectifyapp.herokuapp.com/ as test
         nodes = Node.objects.all()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         for node in nodes:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
             if node.active:
                 loop.run_until_complete(requestPosts(node, 'posts',self.request.user.id))
                 loop.run_until_complete(requestPosts(node, 'author/posts', self.request.user.id))
             #requestPosts(node, 'author/posts', self.request.user.id)
         loop.close()
         for frand in self.request.user.outgoingRequests.all():
-            check_friend_url=frand.get_url()+'/friends/'+urllib.parse.quote(self.request.user.get_url(),safe="~()*!.'")
-            print(check_friend_url)
-            frand_check=requests.get(check_friend_url,headers={"X-AUTHOR-ID": str(self.request.user.id)},
+            try:
+                check_friend_url=frand.get_url()+'/friends/'+urllib.parse.quote(self.request.user.get_url(),safe="~()*!.'")
+                print(check_friend_url)
+                frand_check=requests.get(check_friend_url,headers={"X-AUTHOR-ID": str(self.request.user.id)},
                          auth=HTTPBasicAuth(frand.node.send_username, frand.node.send_password))
-            if friend_checking(frand_check):
+                if friend_checking(frand_check):
             #means the other guy accepted
-                self.request.user.friends.add(frand)
-                frand.followers.add(self.request.user)
-                self.request.user.following.add(frand)
-                frand.outgoingRequests.remove(self.request.user)
-                self.request.user.incomingRequests.remove(frand)
+                    self.request.user.friends.add(frand)
+                    frand.followers.add(self.request.user)
+                    self.request.user.following.add(frand)
+                    frand.outgoingRequests.remove(self.request.user)
+                    self.request.user.incomingRequests.remove(frand)
             #needs to be tested
+            except:
+                pass
 
 
 

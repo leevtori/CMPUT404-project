@@ -1,8 +1,11 @@
 function addFriend(friendId){
+    var token = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+    console.log(token);
     fetch(window.location.origin+"/users/friends/add/", {
         method: 'post',
         headers: {
-            'X-CSRFToken': document.cookie.split("=")[1]
+            // 'X-CSRFToken': document.cookie.split("=")[1]
+            'X-CSRFToken': token 
         }, 
         body: JSON.stringify({'id':friendId})
     }).then(function(response){
@@ -30,11 +33,14 @@ function addFriend(friendId){
 
 
 function deleteFriend(friendId){
+    var token = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+    console.log(token);
     console.log(window.location.origin)
     fetch("/users/friends/delete/", {
         method: 'delete', 
         headers: {
-            'X-CSRFToken': document.cookie.split("=")[1]
+            // 'X-CSRFToken': document.cookie.split("=")[1]
+            'X-CSRFToken': token 
         },
         body: JSON.stringify({'id':friendId})
     }).then(function(response){
@@ -50,10 +56,13 @@ function deleteFriend(friendId){
 };
 
 function confirmFriend(friendId){
+    var token = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+    console.log(token);
     fetch("/users/requests/confirm/", {
         method: 'post',
         headers: {
-            'X-CSRFToken': document.cookie.split("=")[1]
+            // 'X-CSRFToken': document.cookie.split("=")[1]
+            'X-CSRFToken': token 
         }, 
         body: JSON.stringify({'id':friendId})
     }).then(function(response){
@@ -78,10 +87,13 @@ function confirmFriend(friendId){
 };
 
 function follow(friendId){
+    var token = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+    console.log(token);
     fetch("/users/follow/", {
         method: 'post', 
         headers: {
-            'X-CSRFToken': document.cookie.split("=")[1]  
+            // 'X-CSRFToken': document.cookie.split("=")[1]  
+            'X-CSRFToken': token 
         },
         body: JSON.stringify({'id':friendId})
     }).then(function(response){
@@ -100,10 +112,13 @@ function follow(friendId){
 };
 
 function unfollow(friendId){
+    var token = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+    console.log(token);
     fetch("/users/unfollow/", {
         method: 'post', 
         headers: {
-            'X-CSRFToken': document.cookie.split("=")[1]  
+            // 'X-CSRFToken': document.cookie.split("=")[1]  
+            'X-CSRFToken': token 
         },
         body: JSON.stringify({'id':friendId})
     }).then(function(response){
