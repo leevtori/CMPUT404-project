@@ -128,9 +128,9 @@ class FeedView(PostVisbilityMixin, ListView):
     def get_context_data(self, **kwargs):
         # get public posts from other hosts, using https://connectifyapp.herokuapp.com/ as test
         nodes = Node.objects.all()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         for node in nodes:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
             if node.active:
                 loop.run_until_complete(requestPosts(node, 'posts',self.request.user.id))
                 loop.run_until_complete(requestPosts(node, 'author/posts', self.request.user.id))
