@@ -3,7 +3,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 
 from posts.models import Post, Comment
-from users.models import User
+from users.models import User, Node
 
 import posts.views as views
 from posts.utils import Visibility
@@ -114,7 +114,7 @@ class TestPostVisbilityMixin(TestCase):
 
 class TestPosts(TestCase):
 
-    def setUp(self):
+    def setUp(self):    
         self.user = User.objects.create_user(
             username="test",
             email="test@test.com",
@@ -147,11 +147,7 @@ class TestPosts(TestCase):
             is_active=1,
         )
 
-        self.post = Post.objects.create(
-            title="Public Post",
-            content="Public post content",
-            author=self.user,
-        )
+        self.post = self.create_post("Public Post", "Public post content", self.user, Visibility.PUBLIC)
 
         self.comment = Comment.objects.create(
             author=self.user,
@@ -159,19 +155,9 @@ class TestPosts(TestCase):
             comment="Test comment",
         )
 
-        self.private_post = Post.objects.create(
-            title="Private",
-            content="Should not be visible",
-            author=self.friend,
-            visibility=Visibility.PRIVATE,
-        )
+        self.private_post = self.create_post("Private", "Should not be visible", self.friend, Visibility.PRIVATE)
 
-        self.foaf_post = Post.objects.create(
-            title="Foaf",
-            content="Hello",
-            author=self.foaf,
-            visibility=Visibility.FOAF,
-        )
+        self.foaf_post = self.create_post("Foaf", "Hello", self.foaf, Visibility.FOAF)
 
         self.user.friends.add(self.friend)
         self.friend.friends.add(self.user)
@@ -194,25 +180,34 @@ class TestPosts(TestCase):
         return post
 
 
-    def test_view_pub_post_logout(self):
+    def test_view_pub_post_loggedout(self):
         #try to view public post detail without logging in
         response = self.client.get(reverse('postdetail', args=[self.post.id]))
         self.assertEqual(response.status_code, 302)
 
-    def test_view_prv_post_logout(self):
+    def test_view_prv_post_loggedout(self):
         #try to view private post detail without logging in
         response = self.client.get(reverse('postdetail', args=[self.private_post.id]))
         self.assertEqual(response.status_code, 302)
 
-    def test_view_foaf_post_logout(self):
+    def test_view_foaf_post_loggedout(self):
         #try to view foaf post detail without logging in
         response = self.client.get(reverse('postdetail', args=[self.foaf_post.id]))
         self.assertEqual(response.status_code, 302)
 
-    def test_view_feed_logout(self):
+    def test_view_feed_loggedout(self):
          #try to view feed
         response = self.client.get(reverse('feed'))
         self.assertEqual(response.status_code, 302)
+
+    #TODO
+    def test_view_postdetail_loggedin(self):
+        #log in
+        login = self.client.login(username=self.user.username, password='aNewPw019')
+        self.assertTrue(login)
+        response = self.client.get(reverse('postdetail', args=[self.post.id]))
+        self.assertEqual(response.status_code, 200)
+
 
     def test_feed(self):
         # log in
