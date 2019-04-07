@@ -82,7 +82,7 @@ class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
             return Response(serializer.data)
 
     def list(self, request):
-        print(self.permission_classes)
+        # print(self.permission_classes)
         qs = self.get_queryset()
         qs = qs.filter(local=True)
         page = self.paginate_queryset(qs)
@@ -203,7 +203,7 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
 
         # check node is someone we're connected to
         try:
-            print(post_author["host"])
+            # print(post_author["host"])
             post_hostname = urlparse(post_author["host"])
             author_node = Node.objects.get(hostname__icontains=post_hostname.hostname)
         except Node.DoesNotExist:
@@ -231,7 +231,7 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
         if serializer.is_valid():
             try:
                 new_post = serializer.save()
-                print(new_post)
+                # print(new_post)
             except:
                 print("SERIALIZER SAVE ERROR")
                 return Response(
