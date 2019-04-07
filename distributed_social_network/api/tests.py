@@ -9,6 +9,251 @@ from .views import AuthorViewset, PostViewSet
 from rest_framework.test import force_authenticate
 
 
+class TestPostEndpoints(APITestCase):
+    """
+    Tests for the endpoints
+        - /posts (GET)
+        - /posts/post_id (GET)
+    """
+
+   def test_get_posts(self):
+       """
+       tests the /posts endpoint.
+       """
+
+    def test_get_post_detail_dne(self):
+        """
+        Try to get details for a post that doesn't exist
+        """
+
+    def test_get_post_detail(self):
+        """
+        Get post detail
+        """
+
+
+class TestAuthorPostEndpoints(APITestCase):
+    """
+    Test for the endpoints
+        - /author/posts (GET and POST)
+        - /author/<author_id>/posts (GET)
+    """
+
+    def test_author_posts_no_header_get(self):
+        """
+        Test /author/posts GET without X-User header
+        """
+
+    def test_author_posts_get_foreign(self):
+        """
+        Test /author/posts GET with the X-User header, where user is a foreign
+        author
+        """
+
+    def test_author_posts_get_local(self):
+        """
+        Test /author/posts GET with the X-User header, where the user is a local
+        author
+        """
+
+    def test_author_posts_no_header_post(self):
+        """
+        Test author/posts POST without X-User header
+        """
+
+    def test_author_posts_non_match(self):
+        """
+        Test author/posts POST with header, where the author in post does not
+        match the header user
+        """
+
+    def test_author_posts_invalid(self):
+        """
+        Test author/pots POST with header, where data is not invalid
+        """
+
+    def test_author_posts_valid(self):
+        """
+        author/posts POST with header and valid post body
+        """
+
+    def test_author_id_posts_no_header(self):
+        """
+        Tests /author/<id>/posts endpoint without the X-User header
+        """
+
+    def test_author_id_posts_get(self):
+        """
+        Tests /author/<id>/posts with the X-User header, and a existant user
+        """
+
+
+class TestCommentEndpoints(APITestCase):
+    """
+    Tests for the endpoint /posts/<post_id>/comments (GET and POST)
+    """
+
+    def test_comment_get(self):
+        """
+        Tests getting comments of a post
+        /posts/<id>/comments
+        """
+
+    def test_comment_post_unknown_foreign_author(self):
+        """
+        Tests /posts/<id>/comments POST with an unknown foreign author
+        """
+
+    def test_comment_post_known_author(self):
+        """
+        Tests /posts/<id>/comments POST with a known author of comment
+        (foreign or local doesn't really matter here)
+        """
+
+    def test_comment_post_invalid(self):
+        """
+        Test /posts/<id>/comments POST with malformed data
+        """
+
+
+class TestFriendsEndpoints(APITestCase):
+    """
+    Test for the endpoints
+        - /author/<author_id>/friends (GET and POST)
+        - /author/<author1_id>/friends/<author2_id> (GET)
+    """
+    @classmethod
+    def setUpTestData(cls):
+
+        cls.user = User.objects.create_user(
+            username="test",
+            email="test@test.com",
+            bio="Hello world",
+            password="aNewPw019",
+            is_active=True
+        )
+
+        cls.friend = User.objects.create_user(
+            username="friend",
+            email="friend@test.com",
+            bio="Chicken",
+            password="aNewPw019",
+            is_active=True
+        )
+
+        cls.other_user = User.objects.create_user(
+            username="foaf",
+            email="foaf@test.com",
+            bio="Ostrich",
+            password="aNewPw019",
+            is_active=True
+        )
+
+        cls.user.friends.add(cls.friend)
+
+        cls.friend.friends.add(cls.user)
+
+        cls.factory = APIRequestFactory()
+
+    def test_friends_get_exists(self):
+        """
+        Get friends of an existant author on local server
+        Tests getting a list of friends of an author.
+        endpoint: /user/<userid>/friends
+        """
+
+        request = self.factory.get(
+            "api/author/%s/friends/" % self.user.id
+        )
+
+        view = AuthorViewset.as_view({'get': 'friend'})
+        response = view(request, pk=self.user.id)
+
+        self.assertEqual(response.status_code, 200)
+        print (self.response)
+
+    def test_friends_get_unknown(self):
+        """
+        Get friends of a non-extant author on local server.
+        expects a 404 response.
+        """
+
+    def test_friends_post_malformed(self):
+        """
+        test malformed POST to /user/<id>/friends
+        """
+
+    def test_friends_post_valid(self):
+        """
+        tests POST to /user/<id>/friends
+        """
+
+    def test_author_friend_id_true(self):
+        """
+        tests GET to /author/<id1>/friends/<id2>,
+        where id2 is a friend
+        """
+
+    def test_author_friend_id_false(self):
+        """
+        tests GET to /author/<id1>/friends/<id2>
+        where id2 is not a friend
+        """
+
+
+class TestFriendRequestEndpoint(APITestCase):
+    """
+    Tests for endpoint /friendrequest (POST)
+    """
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
+            username="test",
+            email="test@test.com",
+            bio="Hello world",
+            password="aNewPw019",
+            is_active=True
+        )
+
+    def test_friend_does_not_exist(self):
+        """
+        Test that the local "friend" parameter does not exists
+        Should return an error
+        """
+
+    def test_local_author(self):
+        """
+        author is a local user, and exists.
+        """
+
+    def test_known_remote_author(self):
+        """
+        test remote author in our database
+        """
+
+    def test_unknown_remote_existing_author(self):
+        """
+        Test with an unknown author from a foreign host.
+        Author does exist on foreign host.
+        """
+
+
+class TestAuthorEndpoint(APITestCase):
+    """
+    Tests for the endpoint /author/<author_id>
+    """
+
+    def test_author_id_get_exists(self):
+        """
+        author id exists
+        """
+
+    def test_author_id_get_dne(self):
+        """
+        Author with id does not exists. should return an error
+        """
+
+
 class TestAuthorViewSet(APITestCase):
     @classmethod
     def setUpTestData(cls):
