@@ -1,3 +1,12 @@
+"""
+Notes:
+    - Unauthenticated requests are not tested because it's a check done by
+    DjangoRestFramework (default permission set in settings.py). The response
+    will always be 401. There is no reason to check this.
+    - Serializer and paginator generated response is not checked.
+    - Most response formatting is not checked. The content is checked, but
+    format is not, unless it's a response not created by a serializer.
+"""
 from rest_framework.test import APITestCase
 from rest_framework.test import APIRequestFactory
 
@@ -24,7 +33,7 @@ def create_test_user():
         )
 
 
-def create_foreign_user(username="alien", hostname="testhost.com/", prefix="api/", api_user="apiUser"):
+def create_foreign_user(username="alien", hostname="http://testhost.com/", prefix="api/", api_user="apiUser"):
     node_usr = User.objects.create_user(
         username=api_user,
         email="api@user.com",
@@ -405,6 +414,18 @@ class TestCommentEndpoints(APITestCase):
     """
     Tests for the endpoint /posts/<post_id>/comments (GET and POST)
     """
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = create_test_user()
+        cls.post = create_test_post(cls.user)
+        cls.post2 = create_test_post(cls.user, content="test post 2", visibility=Visibility.PRIVATE)
+
+        cls.alien = create_foreign_user()
+
+        cls.comment = create_comment(cls.post, cls.alien)
+        cls.comment2 = create_comment(cls.post2, cls.user)
+
+        cls.factory = APIRequestFactory()
 
     def test_comment_get(self):
         """
@@ -412,21 +433,150 @@ class TestCommentEndpoints(APITestCase):
         /posts/<id>/comments
         """
 
+        request = self.factory.get(
+            reverse('api-comments', args=(str(self.post.id), ))
+        )
+        force_authenticate(request, self.alien.host.user_auth)
+
+        response = views.CommentView.as_view()(request, pk=str(self.post.id))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 1)
+
+        cids = [c["id"] for c in response.data["comments"]]
+        self.assertEqual(len(cids), 1)
+
+        self.assertIn(str(self.comment.id), cids)
+
     def test_comment_post_unknown_foreign_author(self):
         """
         Tests /posts/<id>/comments POST with an unknown foreign author
         """
+        c_id = "de305d54-75b4-431b-adb2-eb6b9e546013"
+        request = self.factory.post(
+            reverse('api-comments', args=(str(self.post.id), )),
+            {
+                "query": "addComment",
+                "post": {
+                    "id": c_id,
+                    "contentType": "text/plain",
+                    "comment": "Let's be frands!",
+                    "published": "2019-03-09T13:07:04+00:00",
+                    "author": {
+                        "id": "http://testhost.com/e2c0c9ad-c518-42d4-9eb6-87c40f2ca151",
+                        "email": "unknown@test.com",
+                        "bio": "test",
+                        "host": "http://testhost.com",
+                        "firstName": "",
+                        "lastName": "",
+                        "displayName": "unknown",
+                        "url": "http://testhost.com/e2c0c9ad-c518-42d4-9eb6-87c40f2ca151",
+                        "github": None
+                    }
+                }
+            },
+            format="json"
+        )
+        force_authenticate(request, self.alien.host.user_auth)
+        response = views.CommentView.as_view()(request, pk=str(self.post.id))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {"query": "addComment", "type": True, "message": "Comment added"})
+        self.assertTrue(Comment.objects.filter(id=c_id).exists())
+
+    def test_comment_post_403(self):
+        """
+        Tests posting a comment on a private post.
+        """
+
+        c_id = "de305d54-75b4-431b-adb2-eb6b9e546013"
+        request = self.factory.post(
+            reverse('api-comments', args=(str(self.post2.id), )),
+            {
+                "query": "addComment",
+                "post": {
+                    "id": c_id,
+                    "contentType": "text/plain",
+                    "comment": "Let's be frands!",
+                    "published": "2019-03-09T13:07:04+00:00",
+                    "author": {
+                        "id": self.alien.get_url(),
+                        "email": self.alien.email,
+                        "bio": self.alien.bio,
+                        "host": str(self.alien.host),
+                        "firstName": "",
+                        "lastName": "",
+                        "displayName": self.alien.username,
+                        "url": self.alien.get_url(),
+                        "github": None
+                    }
+                }
+            },
+            format="json"
+        )
+        force_authenticate(request, self.alien.host.user_auth)
+        response = views.CommentView.as_view()(request, pk=str(self.post2.id))
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.data, {"query": "addComment", "type": False, "message": "Comment not allowed"})
+        self.assertFalse(Comment.objects.filter(id=c_id).exists())
+
 
     def test_comment_post_known_author(self):
         """
         Tests /posts/<id>/comments POST with a known author of comment
         (foreign or local doesn't really matter here)
         """
+        c_id = "de305d54-75b4-431b-adb2-eb6b9e546013"
+        request = self.factory.post(
+            reverse('api-comments', args=(str(self.post.id), )),
+            {
+                "query": "addComment",
+                "post": {
+                    "id": c_id,
+                    "contentType": "text/plain",
+                    "comment": "Let's be frands!",
+                    "published": "2019-03-09T13:07:04+00:00",
+                    "author": {
+                        "id": self.alien.get_url(),
+                        "email": self.alien.email,
+                        "bio": self.alien.bio,
+                        "host": str(self.alien.host),
+                        "firstName": "",
+                        "lastName": "",
+                        "displayName": self.alien.username,
+                        "url": self.alien.get_url(),
+                        "github": None
+                    }
+                }
+            },
+            format="json"
+        )
+        force_authenticate(request, self.alien.host.user_auth)
+        response = views.CommentView.as_view()(request, pk=str(self.post.id))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {"query": "addComment", "type": True, "message": "Comment added"})
+        self.assertTrue(Comment.objects.filter(id=c_id).exists())
+
 
     def test_comment_post_invalid(self):
         """
         Test /posts/<id>/comments POST with malformed data
         """
+        request = self.factory.post(
+            reverse('api-comments', args=(str(self.post.id), )),
+            {
+                "query": "addComment",
+                "post": {
+                }
+            },
+            format="json"
+        )
+        force_authenticate(request, self.alien.host.user_auth)
+
+        response = views.CommentView.as_view()(request, pk=str(self.post.id))
+        self.assertEqual(response.status_code, 400)
 
 
 class TestFriendsEndpoints(APITestCase):
@@ -437,6 +587,9 @@ class TestFriendsEndpoints(APITestCase):
     """
     @classmethod
     def setUpTestData(cls):
+        cls.user = create_test_user()
+        cls.friend = create_friend("frand", cls.user)
+
 
         cls.factory = APIRequestFactory()
 

@@ -290,6 +290,13 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
 class CommentView(PaginateOverrideMixin, GenericAPIView):
     serializer_class = serializers.CommentPostSerializer
 
+    def get_response_message(self, statusType=True, message="Comment added"):
+        return {
+            "query": "addComment",
+            "type": statusType,
+            "message": message
+        }
+
     def get(self, request, pk):
         post = get_object_or_404(Post, pk = pk)
         comments = post.comment_set.all()
@@ -311,17 +318,42 @@ class CommentView(PaginateOverrideMixin, GenericAPIView):
 
         post = get_object_or_404(Post, pk=pk)
 
-        id = request.data['post']['author']['id']
-        id = get_uuid_from_url(id)
-
-        serializer = serializers.CommentPostSerializer(data = request.data['post'] , context={'request':request})
-        commentUser = get_object_or_404(User, pk=id)
+        serializer = serializers.AnotherCommentPostSerializer(data=request.data['post'], context={'request': request})
 
         if serializer.is_valid():
-            serializer.save(post_id=pk,author=commentUser,)
-            return Response(serializer.data, status=201)
-        print("ERRROR ", serializer.errors)
-        return Response(serializer.errors, status=400)
+            # before we save, check that the user should have access to the post.
+            author_id = get_uuid_from_url(request.data['post']['author']['id'])
+            try:
+                author = User.objects.get(pk=author_id)
+            except User.DoesNotExist:
+                vis = Post.objects.filter(pk=post.id, visibility=Visibility.PUBLIC)
+            else:
+                post_filter = PostVisbilityMixin()
+                vis = post_filter.filter_user_visible(author, Post.objects.filter(pk=post.id))
+
+            if not vis.exists():
+                return Response(self.get_response_message(
+                    statusType=False,
+                    message="Comment not allowed"
+                ), status=403)
+            else:
+                serializer.save(post=post)
+                return Response(self.get_response_message())
+        else:
+            return Response(serializer.errors, status=400)
+
+
+        # id = request.data['post']['author']['id']
+        # id = get_uuid_from_url(id)
+
+        # serializer = serializers.CommentPostSerializer(data = request.data['post'] , context={'request':request})
+        # commentUser = get_object_or_404(User, pk=id)
+
+        # if serializer.is_valid():
+        #     serializer.save(post_id=pk,author=commentUser,)
+        #     return Response(serializer.data, status=201)
+        # print("ERRROR ", serializer.errors)
+        # return Response(serializer.errors, status=400)
 
 
 class AreFriendsView(APIView):
