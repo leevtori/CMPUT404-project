@@ -18,6 +18,8 @@ from rest_framework.decorators import action
 
 from posts.views import PostVisbilityMixin
 
+from urllib.parse import unquote
+
 from . import serializers
 import re
 from urllib.parse import urlparse
@@ -123,13 +125,12 @@ class FriendsView(GenericAPIView):
         return Response(self.format_response(friends, request))
 
     def post(self, request, pk):
-        # Parse the url to a uuid only.
-        # UUID regex pattern from
-        # https://stackoverflow.com/questions/7905929/how-to-test-valid-uuid-guid/13653180#13653180
-        # Taken March 12, 2018
         friends = self.get_friends(pk)
 
-        author_query = [get_uuid_from_url(id) for id in request.data["authors"]]
+        try:
+            author_query = [get_uuid_from_url(id) for id in request.data["authors"]]
+        except KeyError:
+            return Response(status=400)
 
         are_friends = friends.filter(id__in=author_query)
 
@@ -363,26 +364,23 @@ class AreFriendsView(APIView):
     """
 
     def get(self, request, pk1, pk2):
-        print("HEHRRHEHREHEHH")
         id1=get_uuid_from_url(pk1)
         id2=get_uuid_from_url(pk2)
-        author1 = get_object_or_404(User,id=id1)
-        author2 = get_object_or_404(User,id=id2)
-        author1_id = author1.geturl() #is this in the right format? idk lol
-        author2_id = author2.geturl()
-        print('auth1 id = ', author1_id)
-        print('auth2 id = ', author2_id)
-        are_friends = author2 in author1.friends.all()
+        author1 = get_object_or_404(User ,id=id1)
+
+        are_friends = author1.friends.filter(id=id2).exists()
+
+        author2_url = unquote(pk2)
 
         data = {
             "query": "friends",
             "friends": are_friends,
             "authors": [
-                author1_id,
-                author2_id,
+                author1.get_url(),
+                author2_url,
             ],
         }
-        return JsonResponse(data, safe=False)
+        return Response(data)
 
 
 

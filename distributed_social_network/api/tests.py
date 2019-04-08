@@ -22,10 +22,12 @@ from django.conf import settings
 
 import uuid
 
+from urllib.parse import quote
 
-def create_test_user():
+
+def create_test_user(username="test"):
     return User.objects.create_user(
-            username="test",
+            username=username,
             email="test@test.com",
             bio="Hello world",
             password="aNewPw019",
@@ -588,8 +590,11 @@ class TestFriendsEndpoints(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = create_test_user()
-        cls.friend = create_friend("frand", cls.user)
+        cls.friend = create_friend("friend1", cls.user)
+        cls.friend2 = create_friend("friend2", cls.user)
+        cls.not_friend = create_test_user("unfrandly")
 
+        cls.alien = create_foreign_user()
 
         cls.factory = APIRequestFactory()
 
@@ -599,34 +604,120 @@ class TestFriendsEndpoints(APITestCase):
         Tests getting a list of friends of an author.
         endpoint: /user/<userid>/friends
         """
+        request = self.factory.get(reverse('api-author-friends', args=(str(self.user.id),)))
+        force_authenticate(request, self.alien.host.user_auth)
+        response = views.FriendsView.as_view()(request, pk=str(self.user.id),)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(self.friend.get_url(), response.data["authors"])
+        self.assertIn(self.friend2.get_url(), response.data["authors"])
+        self.assertEqual(len(response.data["authors"]), 2)
 
     def test_friends_get_unknown(self):
         """
         Get friends of a non-extant author on local server.
         expects a 404 response.
         """
+        uid = str(uuid.uuid4())
+        request = self.factory.get(reverse('api-author-friends', args=(uid,)))
+        force_authenticate(request, self.alien.host.user_auth)
+        response = views.FriendsView.as_view()(request, pk=uid,)
+
+        self.assertEqual(response.status_code, 404)
+
 
     def test_friends_post_malformed(self):
         """
         test malformed POST to /user/<id>/friends
         """
+        uid = str(self.user.id)
+        request = self.factory.post(
+            reverse('api-author-friends', args=(uid,)),
+            {
+                "query": "friends",
+                "author": "author_id"
+            },
+            format="json",)
+        force_authenticate(request, self.alien.host.user_auth)
+
+        response = views.FriendsView.as_view()(request, pk=uid)
+        self.assertEqual(response.status_code, 400)
+
 
     def test_friends_post_valid(self):
         """
         tests POST to /user/<id>/friends
         """
+        uid = str(self.user.id)
+        request = self.factory.post(
+            reverse('api-author-friends', args=(uid,)),
+            {
+                "query": "friends",
+                "author": "author_id",
+                "authors": [
+                    self.friend.get_url(),
+                    self.alien.get_url(),
+                    self.not_friend.get_url()
+                ]
+            },
+            format="json",)
+        force_authenticate(request, self.alien.host.user_auth)
+
+        response = views.FriendsView.as_view()(request, pk=uid)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(self.friend.get_url(), response.data["authors"])
+        self.assertEqual(len(response.data["authors"]), 1)
 
     def test_author_friend_id_true(self):
         """
         tests GET to /author/<id1>/friends/<id2>,
         where id2 is a friend
         """
+        pk1 = str(self.user.id)
+        pk2 = self.friend.get_url()
+        request = self.factory.get(
+            reverse("api-check-friends", args=(pk1, quote(pk2, safe="~()*!.'")))
+        )
+        force_authenticate(request, self.alien.host.user_auth)
+
+        view = views.AreFriendsView.as_view()
+        response = view(request, pk1, quote(pk2, safe="~()*!.'"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(response.data, {
+            "query": "friends",
+            "friends": True,
+            "authors": [
+                self.user.get_url(),
+                self.friend.get_url()
+            ]
+        })
 
     def test_author_friend_id_false(self):
         """
         tests GET to /author/<id1>/friends/<id2>
         where id2 is not a friend
         """
+
+        pk1 = str(self.user.id)
+        pk2 = self.not_friend.get_url()
+        request = self.factory.get(
+            reverse("api-check-friends", args=(pk1, quote(pk2, safe="~()*!.'")))
+        )
+        force_authenticate(request, self.alien.host.user_auth)
+
+        view = views.AreFriendsView.as_view()
+        response = view(request, pk1, quote(pk2, safe="~()*!.'"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(response.data, {
+            "query": "friends",
+            "friends": False,
+            "authors": [
+                self.user.get_url(),
+                self.not_friend.get_url()
+            ]
+        })
 
 
 class TestFriendRequestEndpoint(APITestCase):
@@ -635,13 +726,8 @@ class TestFriendRequestEndpoint(APITestCase):
     """
     @classmethod
     def setUpTestData(cls):
-        cls.user = User.objects.create_user(
-            username="test",
-            email="test@test.com",
-            bio="Hello world",
-            password="aNewPw019",
-            is_active=True
-        )
+        cls.user = create_test_user()
+
 
     def test_friend_does_not_exist(self):
         """
