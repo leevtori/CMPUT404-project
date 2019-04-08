@@ -1,6 +1,6 @@
 import io
 import random
-
+import uuid
 
 from requests.auth import HTTPBasicAuth
 from rest_framework.parsers import JSONParser
@@ -172,27 +172,30 @@ def request_user_friendlist(node,user, current_user):
     if a.status_code==200:
         stream = io.BytesIO(a.content)
         data = JSONParser().parse(stream)
-        deserialized = user_detail_deserializer(data=data)
+        deserialized = friend_request_serializer(data=data)
         if deserialized.is_valid():
             for author in deserialized.validated_data['authors']:
+                friend_id=get_uuid_from_url(author)
                 if settings.HOSTNAME not in friend_id:
-                    friend_id = get_uuid_from_url(author)
+                    print(friend_id)
                     try:
-                        friend = User.objects.get(id=friend_id)
-                        if friend in user.friends:
+                        friend = User.objects.get(id=uuid.UUID(friend_id))
+                        if friend in user.friends.all():
+                            print('passed')
                             continue
                         else:
-                            friend.friends.append(user)
-                            user.friends.append(friend)
-                    except:
+                            friend.friends.add(user)
+                            user.friends.add(friend)
+                    except Exception as e:
+                        print('Exception in attempting to add a friend : ', e)
                         continue
-
-
-
+        else:
+            print(deserialized.errors)
 
     else:
         print(a.status_code)
         print(a.content)
+    print(user.friends.count())
 
 class friend_check_serializer(serializers.Serializer):
     friends=serializers.BooleanField()
