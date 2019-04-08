@@ -58,7 +58,7 @@ class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
      - Gets profile
      - Gets a list of authors
     """
-    queryset = User.objects.filter(is_active=True, host=None)
+    queryset = User.objects.filter(is_active=True, host=None).order_by("-date_joined")
     serializer_class = serializers.AuthorSerializer
 
     @action(methods=["get"], detail=True)
@@ -73,7 +73,7 @@ class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
             else:
                 # Not really meant to be used this way...but it works?
                 post_filter = PostVisbilityMixin()
-                qs = post_filter.filter_user_visible(auth_user, user.posts.all())
+                qs = post_filter.filter_user_visible(auth_user, user.posts.all()).order_by("-published")
 
             page = self.paginate_queryset(qs)
             if page is not None:
@@ -102,7 +102,7 @@ class FriendsView(GenericAPIView):
     Gets friends of a author specified in URL
     /author/{author_id}/friends
     """
-    serializer_class = serializers.FriendSerializer
+    serializer_class = serializers.AuthorSerializer
     queryset = User.objects.all()
 
     def get_friends(self, pk):
@@ -110,13 +110,12 @@ class FriendsView(GenericAPIView):
         return user.friends.all()
 
     def format_response(self, friends, request):
-        serializer = self.get_serializer(friends, many=True, context={'request': request})
         response = {"query": "friends"}
 
         if request.method == "POST":
             response["author"] = "author_id"
 
-        response["authors"] = [i["id"] for i in serializer.data]
+        response["authors"] = [f.get_url() for f in friends]
 
         return response
 
@@ -146,7 +145,7 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
     /author/posts
     """
     serializer_class = serializers.PostSerializer
-    queryset = Post.objects.all()
+    queryset = Post.objects.all().order_by("-published")
 
     def create_status_responses(self, statusType=True, message="Post created"):
         return {
@@ -260,7 +259,7 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
     - gets single post
     - gets a list of posts.
     """
-    queryset = Post.objects.filter(visibility=Visibility.PUBLIC)
+    queryset = Post.objects.filter(visibility=Visibility.PUBLIC).order_by("-published")
     serializer_class = serializers.PostSerializer
 
     def retrieve(self, request, pk):
@@ -276,7 +275,7 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
         return response
 
     def list(self, request):
-        qs = Post.objects.filter(visibility=Visibility.PUBLIC, source__icontains=settings.HOSTNAME)
+        qs = self.get_queryset().filter(source__icontains=settings.HOSTNAME)
 
         page = self.paginate_queryset(qs)
 
@@ -300,7 +299,7 @@ class CommentView(PaginateOverrideMixin, GenericAPIView):
 
     def get(self, request, pk):
         post = get_object_or_404(Post, pk = pk)
-        comments = post.comment_set.all()
+        comments = post.comment_set.all().order_by("-published")
 
         page = self.paginate_queryset(comments)
         if page is not None:

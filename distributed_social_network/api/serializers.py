@@ -12,18 +12,6 @@ from urllib.parse import urlparse
 
 User = get_user_model()
 
-# NOTE: for debugging purposes
-from pprint import pprint
-
-class FriendSerializer(serializers.ModelSerializer):
-    id = serializers.SerializerMethodField()
-
-    class Meta:
-        model = User
-        fields = ("id",)
-
-    def get_id(self, obj):
-        return obj.get_url()
 
 class AuthorSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField()
