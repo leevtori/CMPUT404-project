@@ -45,6 +45,7 @@ async def requestPosts(node, ending, current_id):
                              auth=HTTPBasicAuth(node.send_username, node.send_password))
 
         if a.status_code==200:
+            print(a.elapsed.total_seconds())
             print('200')
 
             stream = io.BytesIO(a.content)
@@ -62,18 +63,31 @@ async def requestPosts(node, ending, current_id):
 
                             if new_post.source=='':
                                 new_post.source = node.hostname+node.prefix+ 'posts/'+ str(new_post.id)
-                            new_post.author.host=node
+
+                            print('my host is:'+node.hostname)
+                            new_post.author.host = node
                             new_post.author.save()
+                            print(new_post.author.host.hostname)
                             new_post.save()
                             print('saved new post id :'+str(new_post.id))
                         else:
-                        # print('passed')
-                            pass
+                            print('passed')
+                            return True
+                    else:
+                        print(post.validated_data['origin'])
+                        print(node.hostname)
                 else:
                     print(post.errors)
-            return True
+            if l.validated_data['next']==None or l.validated_data['next']=='':
+                return True
+            else:
+                print('going next')
+                ending = l.validated_data['next'].split('/')[-1]
+                result = await requestPosts(node, ending, current_id)
+                return True
+
         else:
-            print(node.hostname)
+            print(node.hostname + node.prefix + ending)
             print(a.status_code)
     except Exception as e:
         print()
@@ -91,13 +105,22 @@ def requestSinglePost(link, current_id, node):
             stream = io.BytesIO(a.content)
             data = JSONParser().parse(stream)
             l = posts_request_deserializer(data=data)
-            l.is_valid()
-            for i in l.validated_data['posts']:
-        #assumes we have the post alrdy
-                post = post_detail_deserializer(data=i)
-                if post.is_valid():
-                    post.create(post.validated_data)
-            return True
+            if l.is_valid():
+                print(l.validated_data)
+                for i in l.validated_data['posts']:
+            #assumes we have the post alrdy
+                    post = post_detail_deserializer(data=i)
+                    if post.is_valid():
+                        post.create(post.validated_data)
+                return True
+            else:
+                if len(l.errors.keys())==1 and 'posts' in l.errors.keys():
+                    post = post_detail_deserializer(data=data)
+                    if post.is_valid():
+                        post.create(post.validated_data)
+                    return True
+                else:
+                    print(l.data)
     except Exception as e:
         print('ERROR :',e)
 
@@ -147,6 +170,7 @@ class user_detail_deserializer(serializers.Serializer):
 # for multiple posts that you don't need the comments
 class posts_request_deserializer(serializers.Serializer):
     posts = serializers.ListField()
+    next = serializers.CharField(required=False,allow_blank=True,allow_null=True)
 
 
 
@@ -282,8 +306,8 @@ class user_deserializer(serializers.Serializer):
     email = serializers.EmailField(required=False, default='')
     bio = serializers.CharField(required=False, default='')
     host = serializers.CharField(allow_blank=True)
-    firstName = serializers.CharField(required=False, default='')
-    lastName = serializers.CharField(required=False, default='')
+    firstName = serializers.CharField(required=False, default='', allow_blank=True)
+    lastName = serializers.CharField(required=False, default='', allow_blank=True)
     displayName = serializers.CharField()
     url = serializers.CharField()
     github = serializers.CharField(allow_null=True, allow_blank=True, default='')

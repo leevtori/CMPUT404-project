@@ -128,9 +128,9 @@ class FeedView(PostVisbilityMixin, ListView):
     def get_context_data(self, **kwargs):
         # get public posts from other hosts, using https://connectifyapp.herokuapp.com/ as test
         nodes = Node.objects.all()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         for node in nodes:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
             if node.active:
                 loop.run_until_complete(requestPosts(node, 'posts',self.request.user.id))
                 loop.run_until_complete(requestPosts(node, 'author/posts', self.request.user.id))
@@ -239,7 +239,44 @@ def add_comment(request):
             comment=request.POST['comment'],
             author=request.user
         )
-        new_comment.save()
+        if settings.HOSTNAME in select_post.origin:
+            print('this is a local post')
+            new_comment.save()
+        else:
+
+            send_node = select_post.author.host
+            post_data = {
+                "query": "addComment",
+                "post": {
+                    "id": str(new_comment.id),
+                    "contentType": "text/plain",
+                    "comment": new_comment.comment,
+                    "published": str(new_comment.published),
+                    "author": {
+                        "id": request.user.get_url(),
+                        "email": request.user.email,
+                        "bio": request.user.bio,
+                        "host": settings.HOSTNAME,
+                        "firstName": request.user.first_name,
+                        "lastName": request.user.last_name,
+                        "displayName": request.user.username,
+                        "url": request.user.get_url(),
+                        "github": request.user.github
+                        }
+                    }
+                }
+            print(post_data)
+            r=requests.post(select_post.origin+'/comments',
+                        json=post_data,
+                        auth=HTTPBasicAuth(send_node.send_username,send_node.send_password))
+            if r.status_code==201:
+                print('code : 201!!!')
+                print(r.json())
+            else:
+                print(r.status_code)
+                print(r.content)
+
+
         return redirect('postdetail', pk=post_id)
     else:
         return HttpResponse(status=404)

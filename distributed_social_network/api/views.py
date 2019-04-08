@@ -299,11 +299,11 @@ class CommentView(PaginateOverrideMixin, GenericAPIView):
 
         post = get_object_or_404(Post, pk=pk)
 
-        id = request.data['post']['author']['id']
+        uid = request.data['post']['author']['id']
         id = get_uuid_from_url(id)
 
         serializer = serializers.CommentPostSerializer(data = request.data['post'] , context={'request':request})
-        commentUser = get_object_or_404(User, pk=id)
+        commentUser = get_object_or_404(User, pk=uid)
 
         if serializer.is_valid():
             serializer.save(post_id=pk,author=commentUser,)
