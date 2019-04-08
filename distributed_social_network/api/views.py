@@ -313,7 +313,8 @@ class CommentView(PaginateOverrideMixin, GenericAPIView):
 
     def post(self, request, pk):
         try:
-            print("data ", request.data['post'])
+            # print("data ", request.data['post'])
+            request.data['post']
         except KeyError:
             return Response(status=400)
 

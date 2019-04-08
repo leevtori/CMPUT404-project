@@ -174,7 +174,6 @@ class HostField(serializers.Field):
 
     def to_internal_value(self, value):
         v = urlparse(value)
-        print(value, v.hostname)
 
         try:
             return Node.objects.get(hostname__icontains=v.hostname)
@@ -255,7 +254,7 @@ class AnotherCommentPostSerializer(serializers.ModelSerializer):
         Insert a description here.
         TODO: a whole lot of refactoring.
         """
-        print("Reminder to refactor!!!!")
+        # print("Reminder to refactor!!!!")
 
         # First get or create an author.
         author = validated_data.pop("author")
