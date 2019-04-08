@@ -3,7 +3,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 
 from posts.models import Post, Comment
-from users.models import User
+from users.models import User, Node
 
 import posts.views as views
 from posts.utils import Visibility
@@ -12,14 +12,6 @@ from django.views.generic import ListView
 from django.test.client import RequestFactory
 from django.conf import settings
 from urllib.parse import urljoin
-
-
-
-# Create your tests here.
-
-# class PostTestCase(TestCase):
-#     def setup(self):
-#         Comment.objects.create()
 
 
 class TestPostVisbilityMixin(TestCase):
@@ -114,7 +106,7 @@ class TestPostVisbilityMixin(TestCase):
 
 class TestPosts(TestCase):
 
-    def setUp(self):
+    def setUp(self):    
         self.user = User.objects.create_user(
             username="test",
             email="test@test.com",
@@ -147,11 +139,7 @@ class TestPosts(TestCase):
             is_active=1,
         )
 
-        self.post = Post.objects.create(
-            title="Public Post",
-            content="Public post content",
-            author=self.user,
-        )
+        self.post = self.create_post("Public Post", "Public post content", self.user, Visibility.PUBLIC)
 
         self.comment = Comment.objects.create(
             author=self.user,
@@ -159,19 +147,9 @@ class TestPosts(TestCase):
             comment="Test comment",
         )
 
-        self.private_post = Post.objects.create(
-            title="Private",
-            content="Should not be visible",
-            author=self.friend,
-            visibility=Visibility.PRIVATE,
-        )
+        self.private_post = self.create_post("Private", "Should not be visible", self.friend, Visibility.PRIVATE)
 
-        self.foaf_post = Post.objects.create(
-            title="Foaf",
-            content="Hello",
-            author=self.foaf,
-            visibility=Visibility.FOAF,
-        )
+        self.foaf_post = self.create_post("Foaf", "Hello", self.foaf, Visibility.FOAF)
 
         self.user.friends.add(self.friend)
         self.friend.friends.add(self.user)
@@ -194,25 +172,38 @@ class TestPosts(TestCase):
         return post
 
 
-    def test_view_pub_post_logout(self):
+    def test_view_pub_post_loggedout(self):
         #try to view public post detail without logging in
         response = self.client.get(reverse('postdetail', args=[self.post.id]))
         self.assertEqual(response.status_code, 302)
 
-    def test_view_prv_post_logout(self):
+    def test_view_prv_post_loggedout(self):
         #try to view private post detail without logging in
         response = self.client.get(reverse('postdetail', args=[self.private_post.id]))
         self.assertEqual(response.status_code, 302)
 
-    def test_view_foaf_post_logout(self):
+    def test_view_foaf_post_loggedout(self):
         #try to view foaf post detail without logging in
         response = self.client.get(reverse('postdetail', args=[self.foaf_post.id]))
         self.assertEqual(response.status_code, 302)
 
-    def test_view_feed_logout(self):
+    def test_view_feed_loggedout(self):
          #try to view feed
         response = self.client.get(reverse('feed'))
         self.assertEqual(response.status_code, 302)
+
+    def test_view_postdetail_loggedin(self):
+        #log in
+        login = self.client.login(username=self.user.username, password='aNewPw019')
+        self.assertTrue(login)
+        response = self.client.get(reverse('postdetail', args=[self.post.id]))
+        self.assertEqual(response.status_code, 200)
+
+        #check comments
+        comments = response.context['post_comments']
+        self.assertTrue(self.comment in comments)
+        
+
 
     def test_feed(self):
         # log in
@@ -308,8 +299,6 @@ class TestPosts(TestCase):
         public_feed_posts = response.context['object_list']
         self.assertFalse(post in public_feed_posts)
 
-
-    #TODO: create foaf post
     def test_add_foaf_post(self):
         post = self.create_post("Test Post 4", "Test foaf post", self.user, Visibility.FOAF)
         
@@ -331,6 +320,38 @@ class TestPosts(TestCase):
         self.assertEqual(response.status_code, 200)
         public_feed_posts = response.context['object_list']
         self.assertTrue(post in public_feed_posts)
+
+    def test_delete_post(self):
+        post = self.create_post("Test Post 5", "Delete me", self.user, Visibility.PUBLIC)
+
+        #log in as me
+        login = self.client.login(username=self.user, password='aNewPw019')
+        self.assertTrue(login)
+        # check if it's on the feed
+        response = self.client.get(reverse('feed'))
+        self.assertEqual(response.status_code, 200)
+        public_feed_posts = response.context['object_list']
+        self.assertTrue(post in public_feed_posts)
+
+        response = self.client.get(reverse('deletepost', args=[post.id]))
+        self.assertEqual(response.status_code, 302)
+
+        # check if it's on the feed
+        response = self.client.get(reverse('feed'))
+        self.assertEqual(response.status_code, 200)
+        public_feed_posts = response.context['object_list']
+        self.assertFalse(post in public_feed_posts)
+
+    def test_delete_others_post(self):
+        #log in
+        login = self.client.login(username=self.friend, password='aNewPw019')
+        self.assertTrue(login)
+
+        response = self.client.get(reverse('deletepost', args=[self.post.id]))
+        self.assertEqual(response.status_code, 404)
+
+
+
         
 
 

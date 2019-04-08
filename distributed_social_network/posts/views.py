@@ -186,11 +186,13 @@ class PostDetailView(PostVisbilityMixin, DetailView):
     def get_context_data(self, **kwargs):
         post=kwargs['object']
         #fetch the post
-        if settings.HOSTNAME not in post.origin:
-            node_url1 = post.origin.split('posts')[0]
-            node_url = node_url1.split('api')[0]
-            node= get_object_or_404(Node, hostname=node_url)
-            requestSinglePost(post.origin, self.request.user.id,node)
+        # if settings.HOSTNAME not in post.origin:
+        #     node_url1 = post.origin.split('posts')[0]
+        #     node_url = node_url1.split('api')[0]
+        #     node= get_object_or_404(Node, hostname=node_url)
+        #     requestSinglePost(post.origin, self.request.user.id,node)
+        if post.author.host is not None:
+            requestSinglePost(post.origin, self.request.user.id, post.author.host)
 
         context = super().get_context_data(**kwargs)
         context['post_comments'] = self.object.comment_set.all().order_by("-published")
@@ -217,16 +219,22 @@ def create_post(request):
 
 def delete_post(request, pk):
     post = Post.objects.get(id=pk)
-    post.delete()
-    return redirect('feed')
+    #can't let someone else delete your post!
+    if(post.author == request.user):
+        post.delete()
+        return redirect('feed')
+    else:
+        return HttpResponse(status=404)
 
 
 def edit_post(request, pk):
-    if (request.method == "POST"):
+    if request.method == "POST":
         post = get_object_or_404(Post, id=pk)
-        f = PostForm(request.POST, instance=post)
-        f.save()
-        return redirect('postdetail', pk=pk)
+        #can't let someone else edit your post!
+        if (post.author == request.user):
+            f = PostForm(request.POST, instance=post)
+            f.save()
+            return redirect('postdetail', pk=pk)
     else:
         return HttpResponse(status=404)
 
