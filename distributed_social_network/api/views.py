@@ -6,8 +6,6 @@ from django.contrib.auth import get_user_model
 from posts.utils import Visibility
 from posts.models import Post
 from users.models import Node
-from django.http import JsonResponse
-from rest_framework.exceptions import ParseError
 from collections import OrderedDict
 
 from django.conf import settings
@@ -15,6 +13,7 @@ from django.conf import settings
 from rest_framework.response import Response
 
 from rest_framework.decorators import action
+from rest_framework.exceptions import ParseError
 
 from posts.views import PostVisbilityMixin
 
@@ -288,7 +287,7 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
 
 
 class CommentView(PaginateOverrideMixin, GenericAPIView):
-    serializer_class = serializers.CommentPostSerializer
+    serializer_class = serializers.CommentSerializer
 
     def get_response_message(self, statusType=True, message="Comment added"):
         return {
@@ -319,7 +318,7 @@ class CommentView(PaginateOverrideMixin, GenericAPIView):
 
         post = get_object_or_404(Post, pk=pk)
 
-        serializer = serializers.AnotherCommentPostSerializer(data=request.data['post'], context={'request': request})
+        serializer = serializers.CommentPostSerializer(data=request.data['post'], context={'request': request})
 
         if serializer.is_valid():
             # before we save, check that the user should have access to the post.
@@ -342,19 +341,6 @@ class CommentView(PaginateOverrideMixin, GenericAPIView):
                 return Response(self.get_response_message())
         else:
             return Response(serializer.errors, status=400)
-
-
-        # id = request.data['post']['author']['id']
-        # id = get_uuid_from_url(id)
-
-        # serializer = serializers.CommentPostSerializer(data = request.data['post'] , context={'request':request})
-        # commentUser = get_object_or_404(User, pk=id)
-
-        # if serializer.is_valid():
-        #     serializer.save(post_id=pk,author=commentUser,)
-        #     return Response(serializer.data, status=201)
-        # print("ERRROR ", serializer.errors)
-        # return Response(serializer.errors, status=400)
 
 
 class AreFriendsView(APIView):
