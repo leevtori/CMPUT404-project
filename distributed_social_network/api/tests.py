@@ -727,7 +727,10 @@ class TestFriendRequestEndpoint(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = create_test_user()
+        cls.user2 = create_test_user(username="test2")
+        cls.alien = create_foreign_user()
 
+        cls.factory = APIRequestFactory()
 
     def test_friend_does_not_exist(self):
         """
@@ -735,21 +738,103 @@ class TestFriendRequestEndpoint(APITestCase):
         Should return an error
         """
 
-    def test_local_author(self):
-        """
-        author is a local user, and exists.
-        """
+        request = self.factory.post(
+            reverse('api-friend-request'),
+            {
+                "query": "friendrequest",
+                "author": {
+                    "id": "http://testhost.com/author/7a51bda7-00ca-4689-a58a-6711a07a828c",
+                    "host": "http://testhost.com",
+                    "displayName": "Jane Doe",
+                    "url": "http://testhost.com/author/7a51bda7-00ca-4689-a58a-6711a07a828c"
+                },
+                "friend": {
+                    "id": settings.HOSTNAME+"/api/author/ae09b70a-1030-4e05-bb56-e9336325d93a",
+                    "host": settings.HOSTNAME + "/api",
+                    "displayName": "Jane Doe",
+                    "url": settings.HOSTNAME+"/api/author/ae09b70a-1030-4e05-bb56-e9336325d93a"
+                }
+            },
+            format="json"
+        )
+        force_authenticate(request, self.alien.host.user_auth)
+        response = views.FriendRequestView.as_view()(request)
+        self.assertEqual(response.status_code, 404)
 
     def test_known_remote_author(self):
         """
-        test remote author in our database
+        author is a user we have seen before
         """
+        request = self.factory.post(
+            reverse('api-friend-request'),
+            {
+                "query": "friendrequest",
+                "author": {
+                    "id": self.alien.get_url(),
+                    "host": str(self.alien.host),
+                    "displayName": self.alien.username,
+                    "url": self.alien.get_url()
+                },
+                "friend": {
+                    "id": self.user.get_url(),
+                    "host": settings.HOSTNAME + "/api",
+                    "displayName": self.user.username,
+                    "url": self.user.get_url()
+                }
+            },
+            format="json"
+        )
+        force_authenticate(request, self.alien.host.user_auth)
+        response = views.FriendRequestView.as_view()(request)
 
-    def test_unknown_remote_existing_author(self):
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(response.data, {
+            "query": "friendrequest",
+            "success": True,
+            "message": "Friend request sent"
+        })
+
+        self.assertTrue(self.user.incomingRequests.filter(pk=self.alien.id))
+        self.assertTrue(self.alien.outgoingRequests.filter(pk=self.user.id))
+
+    def test_unknown_remote_author(self):
         """
         Test with an unknown author from a foreign host.
         Author does exist on foreign host.
         """
+        rid = uuid.uuid4()
+
+        request = self.factory.post(
+            reverse('api-friend-request'),
+            {
+                "query": "friendrequest",
+                "author": {
+                    "id": f"http://testhost.com/author/{rid}",
+                    "host": str(self.alien.host),
+                    "displayName": "JaneDoe",
+                    "url": f"http://testhost.com/author/{rid}"
+                },
+                "friend": {
+                    "id": self.user.get_url(),
+                    "host": settings.HOSTNAME + "/api",
+                    "displayName": self.user.username,
+                    "url": self.user.get_url()
+                }
+            },
+            format="json"
+        )
+        force_authenticate(request, self.alien.host.user_auth)
+        response = views.FriendRequestView.as_view()(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(response.data, {
+            "query": "friendrequest",
+            "success": True,
+            "message": "Friend request sent"
+        })
+
+        self.assertTrue(self.user.incomingRequests.filter(username="JaneDoe"))
+        self.assertTrue(User.objects.filter(username="JaneDoe").exists())
 
 
 class TestAuthorEndpoint(APITestCase):

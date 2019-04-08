@@ -199,6 +199,7 @@ class UserSerializer(serializers.ModelSerializer):
         required=False,
         allow_blank=True)
     displayName = serializers.CharField(source="username")
+    github = serializers.URLField(allow_blank=True, allow_null=True, required=False)
 
     class Meta:
         model = User

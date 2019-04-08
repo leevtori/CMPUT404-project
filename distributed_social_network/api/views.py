@@ -396,25 +396,23 @@ class FriendRequestView(APIView):
 
         friend_id = request.data['friend']['id']
         friend_id = get_uuid_from_url(friend_id)
-        friend =  get_object_or_404(User, pk=friend_id, host=None, is_active=True)
+        friend = get_object_or_404(User, pk=friend_id, host=None, is_active=True)
 
         author_id = request.data['author']['id']
         author_id = get_uuid_from_url(author_id)
-        request.data['author']['id'] = author_id
+        # request.data['author']['id'] = author_id
 
-        host = request.data['author']['host']
-        node = get_object_or_404(Node, hostname__icontains=host)
-        request.data['author']['host'] = node.id
+        # host = request.data['author']['host']
+        # host = urlparse(host)
+        # node = get_object_or_404(Node, hostname__icontains=host.hostname)
+        # request.data['author']['host'] = node.id
 
-        serializer = serializers.AuthorSerializer(data = request.data['author'], context={'request': request})
+        serializer = serializers.UserSerializer(data=request.data['author'], context={'request': request})
         sucess = False
 
         if serializer.is_valid():
             sucess = True
-            try:
-                author = User.objects.get(pk=author_id)
-            except User.DoesNotExist:
-                author = serializer.save(id=author_id)
+            author = serializer.save()
 
             friend.incomingRequests.add(author)
             author.outgoingRequests.add(friend)
@@ -422,16 +420,16 @@ class FriendRequestView(APIView):
             author.following.add(friend)
             data = {
                 "query": "friendrequest",
-                "sucess": sucess,
+                "success": sucess,
                 "message": "Friend request sent"
             }
-            return JsonResponse(data, safe=False, status=200)
+            return Response(data)
         else:
-            # return Response(serializer.errors, status=400)
-            data = {
-                "query": "friendrequest",
-                "sucess": sucess,
-                "message": "Friend request sent"
-            }
-            return JsonResponse(data, safe=False, status=400)
+            return Response(serializer.errors, status=400)
+            # data = {
+            #     "query": "friendrequest",
+            #     "success": sucess,
+            #     "message": "Friend request sent"
+            # }
+            # return Response(data)
 
