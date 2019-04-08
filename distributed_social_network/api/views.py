@@ -8,6 +8,7 @@ from posts.models import Post
 from users.models import Node
 from django.http import JsonResponse
 from rest_framework.exceptions import ParseError
+from collections import OrderedDict
 
 from django.conf import settings
 
@@ -16,6 +17,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 
 from posts.views import PostVisbilityMixin
+
+from urllib.parse import unquote
 
 from . import serializers
 import re
@@ -81,7 +84,7 @@ class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
             return Response(serializer.data)
 
     def list(self, request):
-        print(self.permission_classes)
+        # print(self.permission_classes)
         qs = self.get_queryset()
         qs = qs.filter(local=True)
         page = self.paginate_queryset(qs)
@@ -122,13 +125,12 @@ class FriendsView(GenericAPIView):
         return Response(self.format_response(friends, request))
 
     def post(self, request, pk):
-        # Parse the url to a uuid only.
-        # UUID regex pattern from
-        # https://stackoverflow.com/questions/7905929/how-to-test-valid-uuid-guid/13653180#13653180
-        # Taken March 12, 2018
         friends = self.get_friends(pk)
 
-        author_query = [get_uuid_from_url(id) for id in request.data["authors"]]
+        try:
+            author_query = [get_uuid_from_url(id) for id in request.data["authors"]]
+        except KeyError:
+            return Response(status=400)
 
         are_friends = friends.filter(id__in=author_query)
 
@@ -202,7 +204,7 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
 
         # check node is someone we're connected to
         try:
-            print(post_author["host"])
+            # print(post_author["host"])
             post_hostname = urlparse(post_author["host"])
             author_node = Node.objects.get(hostname__icontains=post_hostname.hostname)
         except Node.DoesNotExist:
@@ -230,7 +232,7 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
         if serializer.is_valid():
             try:
                 new_post = serializer.save()
-                print(new_post)
+                # print(new_post)
             except:
                 print("SERIALIZER SAVE ERROR")
                 return Response(
@@ -261,6 +263,17 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Post.objects.filter(visibility=Visibility.PUBLIC)
     serializer_class = serializers.PostSerializer
 
+    def retrieve(self, request, pk):
+        response = super().retrieve(request, pk)
+
+        data = response.data
+        r_data = OrderedDict()
+        r_data["query"] = "getPost"
+        r_data["post"] = data
+
+        response.data = r_data
+
+        return response
 
     def list(self, request):
         qs = Post.objects.filter(visibility=Visibility.PUBLIC, source__icontains=settings.HOSTNAME)
@@ -277,6 +290,13 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
 
 class CommentView(PaginateOverrideMixin, GenericAPIView):
     serializer_class = serializers.CommentPostSerializer
+
+    def get_response_message(self, statusType=True, message="Comment added"):
+        return {
+            "query": "addComment",
+            "type": statusType,
+            "message": message
+        }
 
     def get(self, request, pk):
         post = get_object_or_404(Post, pk = pk)
@@ -299,17 +319,43 @@ class CommentView(PaginateOverrideMixin, GenericAPIView):
 
         post = get_object_or_404(Post, pk=pk)
 
-        uid = request.data['post']['author']['id']
-        id = get_uuid_from_url(id)
 
-        serializer = serializers.CommentPostSerializer(data = request.data['post'] , context={'request':request})
-        commentUser = get_object_or_404(User, pk=uid)
+        serializer = serializers.AnotherCommentPostSerializer(data=request.data['post'], context={'request': request})
 
         if serializer.is_valid():
-            serializer.save(post_id=pk,author=commentUser,)
-            return Response(serializer.data, status=201)
-        print("ERRROR ", serializer.errors)
-        return Response(serializer.errors, status=400)
+            # before we save, check that the user should have access to the post.
+            author_id = get_uuid_from_url(request.data['post']['author']['id'])
+            try:
+                author = User.objects.get(pk=author_id)
+            except User.DoesNotExist:
+                vis = Post.objects.filter(pk=post.id, visibility=Visibility.PUBLIC)
+            else:
+                post_filter = PostVisbilityMixin()
+                vis = post_filter.filter_user_visible(author, Post.objects.filter(pk=post.id))
+
+            if not vis.exists():
+                return Response(self.get_response_message(
+                    statusType=False,
+                    message="Comment not allowed"
+                ), status=403)
+            else:
+                serializer.save(post=post)
+                return Response(self.get_response_message())
+        else:
+            return Response(serializer.errors, status=400)
+
+
+        # id = request.data['post']['author']['id']
+        # id = get_uuid_from_url(id)
+
+        # serializer = serializers.CommentPostSerializer(data = request.data['post'] , context={'request':request})
+        # commentUser = get_object_or_404(User, pk=id)
+
+        # if serializer.is_valid():
+        #     serializer.save(post_id=pk,author=commentUser,)
+        #     return Response(serializer.data, status=201)
+        # print("ERRROR ", serializer.errors)
+        # return Response(serializer.errors, status=400)
 
 
 class AreFriendsView(APIView):
@@ -319,26 +365,23 @@ class AreFriendsView(APIView):
     """
 
     def get(self, request, pk1, pk2):
-        print("HEHRRHEHREHEHH")
         id1=get_uuid_from_url(pk1)
         id2=get_uuid_from_url(pk2)
-        author1 = get_object_or_404(User,id=id1)
-        author2 = get_object_or_404(User,id=id2)
-        author1_id = author1.geturl() #is this in the right format? idk lol
-        author2_id = author2.geturl()
-        print('auth1 id = ', author1_id)
-        print('auth2 id = ', author2_id)
-        are_friends = author2 in author1.friends.all()
+        author1 = get_object_or_404(User ,id=id1)
+
+        are_friends = author1.friends.filter(id=id2).exists()
+
+        author2_url = unquote(pk2)
 
         data = {
             "query": "friends",
             "friends": are_friends,
             "authors": [
-                author1_id,
-                author2_id,
+                author1.get_url(),
+                author2_url,
             ],
         }
-        return JsonResponse(data, safe=False)
+        return Response(data)
 
 
 

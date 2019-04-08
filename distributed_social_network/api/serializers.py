@@ -163,6 +163,9 @@ class AuthorIDField(serializers.Field):
         except AttributeError:
             self.fail('invalid', input=value)
 
+    def to_representation(self, val):
+        return val
+
 
 class HostField(serializers.Field):
     default_error_messages = {
@@ -171,6 +174,7 @@ class HostField(serializers.Field):
 
     def to_internal_value(self, value):
         v = urlparse(value)
+        print(value, v.hostname)
 
         try:
             return Node.objects.get(hostname__icontains=v.hostname)
@@ -179,9 +183,12 @@ class HostField(serializers.Field):
                 self.fail('invalid', input=value)
             return None
 
+    def to_representation(self, val):
+        return val
+
 
 class UserSerializer(serializers.ModelSerializer):
-    id = AuthorIDField()
+    id = AuthorIDField(write_only=True)
     host = HostField()
     firstName = serializers.CharField(
         source='first_name',
@@ -251,9 +258,7 @@ class AnotherCommentPostSerializer(serializers.ModelSerializer):
 
         # First get or create an author.
         author = validated_data.pop("author")
-        author_serializer = UserSerializer(data=author)
-        if author.is_valid():
-            author = author_serializer.save()
+        author, created = User.objects.get_or_create(**author)
 
         # And now for the comment itself...
         instance = Comment.objects.create(author=author, **validated_data)
