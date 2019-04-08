@@ -5,10 +5,13 @@ import random
 from requests.auth import HTTPBasicAuth
 from rest_framework.parsers import JSONParser
 from rest_framework import serializers
+from django.conf import settings
 
 from posts.models import Post, Categories, Comment
-from users.models import User
+from users.models import User, Node
+from api.utils import get_uuid_from_url
 import requests
+
 
 visilibityDict = {
     "public": "PUBL",
@@ -68,10 +71,17 @@ async def requestPosts(node, ending, current_id):
                             new_post.author.host = node
                             new_post.author.save()
                             print(new_post.author.host.hostname)
+                            if new_post.visibility == "PRIV":
+                                current_user = User.objects.get(id=current_id)
+                                new_post.visibleTo.append(current_user)
                             new_post.save()
                             print('saved new post id :'+str(new_post.id))
                         else:
-                            print('passed')
+                            if post.validated_data['visibility'].lower()=='private':
+                                existing_post = Post.objects.get(id=post.validated_data['id'])
+                                current_user = User.objects.get(id=current_id)
+                                existing_post.visibleTo.append(current_user)
+
                             return True
                     else:
                         print(post.validated_data['origin'])
@@ -135,14 +145,14 @@ def request_single_user(node,user, current_id):
     if a.status_code==200:
         stream = io.BytesIO(a.content)
         data = JSONParser().parse(stream)
-        deserialized=user_deserializer(data = data)
+        deserialized=user_detail_deserializer(data = data)
         if deserialized.is_valid():
             user.github=deserialized.validated_data['github']
             user.bio=deserialized.validated_data['bio']
             user.email = deserialized.validated_data['email']
             user.first_name=deserialized.validated_data['firstName']
             user.last_name=deserialized.validated_data['lastName']
-            print('done')
+            user.display_name=deserialized.validated_data['displayName']
         else:
             print(deserialized.errors)
 
@@ -150,19 +160,56 @@ def request_single_user(node,user, current_id):
         print(a.status_code)
         print('its boom')
 
+def request_user_friendlist(node,user, current_user):
+    a = requests.get(user.get_url()+'/friends', headers={"X-User": str(current_user.id)},
+                     auth=HTTPBasicAuth(node.send_username, node.send_password))
+    # print( a.status_code)
+    if a.status_code != 200:
+        print(a.status_code)
+        a = requests.get(user.get_url()+'/friends', headers={"X-AUTHOR-ID": str(current_user.id)},
+                         auth=HTTPBasicAuth(node.send_username, node.send_password))
+    print(user.get_url()+'/friends')
+    if a.status_code==200:
+        stream = io.BytesIO(a.content)
+        data = JSONParser().parse(stream)
+        deserialized = user_detail_deserializer(data=data)
+        if deserialized.is_valid():
+            for author in deserialized.validated_data['authors']:
+                if settings.HOSTNAME not in friend_id:
+                    friend_id = get_uuid_from_url(author)
+                    try:
+                        friend = User.objects.get(id=friend_id)
+                        if friend in user.friends:
+                            continue
+                        else:
+                            friend.friends.append(user)
+                            user.friends.append(friend)
+                    except:
+                        continue
 
+
+
+
+    else:
+        print(a.status_code)
+        print(a.content)
 
 class friend_check_serializer(serializers.Serializer):
     friends=serializers.BooleanField()
 
+class friend_request_serializer(serializers.Serializer):
+    authors=serializers.ListField()
+
 
 class user_detail_deserializer(serializers.Serializer):
     id = serializers.CharField()
-    github = serializers.CharField(required=False, allow_blank=True, default='')
+    github = serializers.CharField(required=False, allow_null=True, allow_blank=True, default='')
     bio = serializers.CharField(required=False, allow_blank=True, default='')
     email = serializers.CharField(required=False, allow_blank=True, default='')
     firstName = serializers.CharField(required=False, allow_blank=True, default='')
     lastName = serializers.CharField(required=False, allow_blank=True, default='')
+    friends = serializers.ListField(required=False, default=[])
+    displayName = serializers.CharField(required=False, default='')
 
 
 
@@ -205,6 +252,19 @@ class post_detail_deserializer(serializers.Serializer):
                     the_comment.save()
             else:
                 print(a.errors)
+        for user in validated_data['visibleTo']:
+            created_serializer = user_deserializer(data=user)
+            if created_serializer.is_valid():
+                created_user=created_serializer.create(created_serializer.validated_data)
+                current_node = None
+                if created_user.host == None and settings.HOSTNAME in created_serializer.validated_data['host']:
+                    existing_post.visibleTo.append(created_user)
+
+            else:
+                print(created_user.errors)
+        existing_post.save()
+        print(existing_post.visibleTo)
+
         return True
 
 
@@ -304,7 +364,7 @@ class post_deserializer_no_comment(serializers.Serializer):
 class user_deserializer(serializers.Serializer):
     id = serializers.CharField()
     email = serializers.EmailField(required=False, default='')
-    bio = serializers.CharField(required=False, default='')
+    bio = serializers.CharField(required=False, allow_blank=True, default='')
     host = serializers.CharField(allow_blank=True)
     firstName = serializers.CharField(required=False, default='', allow_blank=True)
     lastName = serializers.CharField(required=False, default='', allow_blank=True)
@@ -328,7 +388,7 @@ class user_deserializer(serializers.Serializer):
                 usr = User.objects.create(
                     username = validated_data['displayName'],
                     id=id,
-                    #bio=validated_data['bio'],
+                    bio=validated_data['bio'],
                     display_name=validated_data['displayName'],
                     local=False
                 )

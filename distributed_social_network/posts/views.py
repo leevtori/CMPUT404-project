@@ -19,7 +19,7 @@ import asyncio
 
 from users.models import Node
 from posts.forms import PostForm
-from posts.serializers import requestPosts, requestSinglePost, request_single_user, friend_checking
+from posts.serializers import requestPosts, requestSinglePost, request_single_user, friend_checking, request_user_friendlist
 
 from django.db import connection
 from django.db.models import Q
@@ -96,6 +96,7 @@ class ProfileView(PostVisbilityMixin, ListView):
         if user.local == False:
             print('not local user, hope its not boom')
             request_single_user(user.host, user, self.request.user.id)
+            request_user_friendlist(user.host, user, self.request.user)
 
         # put user object in context
         context['user'] = user
