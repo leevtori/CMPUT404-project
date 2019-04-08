@@ -6,8 +6,6 @@ from django.contrib.auth import get_user_model
 from posts.utils import Visibility
 from posts.models import Post
 from users.models import Node
-from django.http import JsonResponse
-from rest_framework.exceptions import ParseError
 from collections import OrderedDict
 
 from django.conf import settings
@@ -15,6 +13,7 @@ from django.conf import settings
 from rest_framework.response import Response
 
 from rest_framework.decorators import action
+from rest_framework.exceptions import ParseError
 
 from posts.views import PostVisbilityMixin
 
@@ -58,7 +57,7 @@ class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
      - Gets profile
      - Gets a list of authors
     """
-    queryset = User.objects.filter(is_active=True, host=None)
+    queryset = User.objects.filter(is_active=True, host=None).order_by("-date_joined")
     serializer_class = serializers.AuthorSerializer
 
     @action(methods=["get"], detail=True)
@@ -73,7 +72,7 @@ class AuthorViewset (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
             else:
                 # Not really meant to be used this way...but it works?
                 post_filter = PostVisbilityMixin()
-                qs = post_filter.filter_user_visible(auth_user, user.posts.all())
+                qs = post_filter.filter_user_visible(auth_user, user.posts.all()).order_by("-published")
 
             page = self.paginate_queryset(qs)
             if page is not None:
@@ -102,7 +101,7 @@ class FriendsView(GenericAPIView):
     Gets friends of a author specified in URL
     /author/{author_id}/friends
     """
-    serializer_class = serializers.FriendSerializer
+    serializer_class = serializers.AuthorSerializer
     queryset = User.objects.all()
 
     def get_friends(self, pk):
@@ -110,13 +109,12 @@ class FriendsView(GenericAPIView):
         return user.friends.all()
 
     def format_response(self, friends, request):
-        serializer = self.get_serializer(friends, many=True, context={'request': request})
         response = {"query": "friends"}
 
         if request.method == "POST":
             response["author"] = "author_id"
 
-        response["authors"] = [i["id"] for i in serializer.data]
+        response["authors"] = [f.get_url() for f in friends]
 
         return response
 
@@ -146,7 +144,7 @@ class AuthorPostView(PaginateOverrideMixin, GenericAPIView):
     /author/posts
     """
     serializer_class = serializers.PostSerializer
-    queryset = Post.objects.all()
+    queryset = Post.objects.all().order_by("-published")
 
     def create_status_responses(self, statusType=True, message="Post created"):
         return {
@@ -260,7 +258,7 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
     - gets single post
     - gets a list of posts.
     """
-    queryset = Post.objects.filter(visibility=Visibility.PUBLIC)
+    queryset = Post.objects.filter(visibility=Visibility.PUBLIC).order_by("-published")
     serializer_class = serializers.PostSerializer
 
     def retrieve(self, request, pk):
@@ -276,7 +274,7 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
         return response
 
     def list(self, request):
-        qs = Post.objects.filter(visibility=Visibility.PUBLIC, source__icontains=settings.HOSTNAME)
+        qs = self.get_queryset().filter(source__icontains=settings.HOSTNAME)
 
         page = self.paginate_queryset(qs)
 
@@ -289,7 +287,7 @@ class PostViewSet (PaginateOverrideMixin, viewsets.ReadOnlyModelViewSet):
 
 
 class CommentView(PaginateOverrideMixin, GenericAPIView):
-    serializer_class = serializers.CommentPostSerializer
+    serializer_class = serializers.CommentSerializer
 
     def get_response_message(self, statusType=True, message="Comment added"):
         return {
@@ -300,7 +298,7 @@ class CommentView(PaginateOverrideMixin, GenericAPIView):
 
     def get(self, request, pk):
         post = get_object_or_404(Post, pk = pk)
-        comments = post.comment_set.all()
+        comments = post.comment_set.all().order_by("-published")
 
         page = self.paginate_queryset(comments)
         if page is not None:
@@ -313,14 +311,15 @@ class CommentView(PaginateOverrideMixin, GenericAPIView):
 
     def post(self, request, pk):
         try:
-            print("data ", request.data['post'])
+            # print("data ", request.data['post'])
+            request.data['post']
         except KeyError:
             return Response(status=400)
 
         post = get_object_or_404(Post, pk=pk)
 
 
-        serializer = serializers.AnotherCommentPostSerializer(data=request.data['post'], context={'request': request})
+        serializer = serializers.CommentPostSerializer(data=request.data['post'], context={'request': request})
 
         if serializer.is_valid():
             # before we save, check that the user should have access to the post.
@@ -343,19 +342,6 @@ class CommentView(PaginateOverrideMixin, GenericAPIView):
                 return Response(self.get_response_message())
         else:
             return Response(serializer.errors, status=400)
-
-
-        # id = request.data['post']['author']['id']
-        # id = get_uuid_from_url(id)
-
-        # serializer = serializers.CommentPostSerializer(data = request.data['post'] , context={'request':request})
-        # commentUser = get_object_or_404(User, pk=id)
-
-        # if serializer.is_valid():
-        #     serializer.save(post_id=pk,author=commentUser,)
-        #     return Response(serializer.data, status=201)
-        # print("ERRROR ", serializer.errors)
-        # return Response(serializer.errors, status=400)
 
 
 class AreFriendsView(APIView):
@@ -397,25 +383,23 @@ class FriendRequestView(APIView):
 
         friend_id = request.data['friend']['id']
         friend_id = get_uuid_from_url(friend_id)
-        friend =  get_object_or_404(User, pk=friend_id, host=None, is_active=True)
+        friend = get_object_or_404(User, pk=friend_id, host=None, is_active=True)
 
         author_id = request.data['author']['id']
         author_id = get_uuid_from_url(author_id)
-        request.data['author']['id'] = author_id
+        # request.data['author']['id'] = author_id
 
-        host = request.data['author']['host']
-        node = get_object_or_404(Node, hostname__icontains=host)
-        request.data['author']['host'] = node.id
+        # host = request.data['author']['host']
+        # host = urlparse(host)
+        # node = get_object_or_404(Node, hostname__icontains=host.hostname)
+        # request.data['author']['host'] = node.id
 
-        serializer = serializers.AuthorSerializer(data = request.data['author'], context={'request': request})
+        serializer = serializers.UserSerializer(data=request.data['author'], context={'request': request})
         sucess = False
 
         if serializer.is_valid():
             sucess = True
-            try:
-                author = User.objects.get(pk=author_id)
-            except User.DoesNotExist:
-                author = serializer.save(id=author_id)
+            author = serializer.save()
 
             friend.incomingRequests.add(author)
             author.outgoingRequests.add(friend)
@@ -423,16 +407,16 @@ class FriendRequestView(APIView):
             author.following.add(friend)
             data = {
                 "query": "friendrequest",
-                "sucess": sucess,
+                "success": sucess,
                 "message": "Friend request sent"
             }
-            return JsonResponse(data, safe=False, status=200)
+            return Response(data)
         else:
-            # return Response(serializer.errors, status=400)
-            data = {
-                "query": "friendrequest",
-                "sucess": sucess,
-                "message": "Friend request sent"
-            }
-            return JsonResponse(data, safe=False, status=400)
+            return Response(serializer.errors, status=400)
+            # data = {
+            #     "query": "friendrequest",
+            #     "success": sucess,
+            #     "message": "Friend request sent"
+            # }
+            # return Response(data)
 

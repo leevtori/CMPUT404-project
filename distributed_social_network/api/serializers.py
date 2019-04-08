@@ -12,119 +12,40 @@ from urllib.parse import urlparse
 
 User = get_user_model()
 
-# NOTE: for debugging purposes
-from pprint import pprint
-
-class FriendSerializer(serializers.ModelSerializer):
-    id = serializers.SerializerMethodField()
-
-    class Meta:
-        model = User
-        fields = ("id",)
-
-    def get_id(self, obj):
-        return obj.get_url()
-
-class AuthorSerializer(serializers.ModelSerializer):
-    id = serializers.SerializerMethodField()
-    firstName = serializers.CharField(source="first_name",allow_null=True, allow_blank=True, required=False)
-    lastName = serializers.CharField(source="last_name",allow_null=True, allow_blank=True, required=False)
-    # serializers.CharField(source="username")
-
-    host = serializers.SerializerMethodField()
-
-    displayName = serializers.CharField(source="username",required=False)
-    url = serializers.SerializerMethodField(method_name="get_id")
-    github=serializers.CharField(allow_blank=True)
-
-    class Meta:
-        model = User
-        fields = (
-            "id",
-            "host",
-            "firstName",
-            "lastName",
-            "displayName",
-            "url",
-            "github"
-        )
-
-    def get_host(self, obj):
-        host = obj.host or settings.HOSTNAME
-        return str(host)
-
-    def get_id(self, obj):
-        return obj.get_url()
-
-class CommentSerializer(serializers.ModelSerializer):
-    contentType = serializers.SerializerMethodField()
-    author = AuthorSerializer()
-
-    class Meta:
-        model = Comment
-        fields = (
-            "id",
-            "contentType",
-            "comment",
-            "published",
-            "author",
-        )
-
-    def get_contentType(self, obj):
-        return content_type_str[obj.content_type]
+# Custom Fields
+# Mostly used to go from JSON --> Model
 
 
-class CommentPostSerializer(serializers.ModelSerializer):
-    contentType = serializers.CharField(source="content_type")
-    author = AuthorSerializer()
+class ContentTypeField(serializers.Field):
+    default_error_messages = {
+        'invalid': 'Invalid value'
+    }
 
-    class Meta:
-        model = Comment
-        fields = (
-            "id",
-            "contentType",
-            "comment",
-            "published",
-            "author",
-        )
+    def to_internal_value(self, value):
+        choices = ContentType.get_choices()
+        mapping = {value: key for key, value in dict(choices).items()}
+
+        try:
+            return mapping[value.lower()]
+        except KeyError:
+            self.fail("invalid", value)
 
 
-class PostSerializer(serializers.ModelSerializer):
-    contentType = serializers.SerializerMethodField()
-    visibility = serializers.SerializerMethodField()
-    author = AuthorSerializer()
-    categories = serializers.StringRelatedField(many=True)
-    comments = CommentSerializer(many=True, source="comment_set")
-    visibleTo = serializers.StringRelatedField(many=True, source="visible_to")
+class HostField(serializers.StringRelatedField):
+    default_error_messages = {
+        'invalid': 'Host Does not exist.'
+    }
 
-    class Meta:
-        model = Post
-        fields = (
-           "id",
-           "title",
-           "source",
-           "origin",
-           "description",
-           "contentType",
-           "content",
-           "author",
-           "categories",
-           "comments",
-           "published",
-           "visibility",
-           "visibleTo",
-           "unlisted"
-            )
+    def to_internal_value(self, value):
+        v = urlparse(value)
 
-    def get_contentType(self, obj):
-        return content_type_str[obj.content_type]
+        try:
+            return Node.objects.get(hostname__icontains=v.hostname)
+        except Node.DoesNotExist:
+            if v.hostname not in settings.HOSTNAME:
+                self.fail('invalid', input=value)
+            return None
 
-    def get_visibility(self, obj):
-        return visibility_str[obj.visibility]
-
-# ============================================================================
-# TODO: refactor and clean up stuff below & above
-# ============================================================================
 
 
 class VisibilityField(serializers.Field):
@@ -164,31 +85,57 @@ class AuthorIDField(serializers.Field):
             self.fail('invalid', input=value)
 
     def to_representation(self, val):
-        return val
+        # somewhat roundabout way but it works, i guess...
+        if isinstance(self.parent.instance, list):
+            obj = next(filter(lambda x: x.id == val, self.parent.instance))
+        else:
+            obj = self.parent.instance
+        return obj.get_url()
+
+# Serializers
 
 
-class HostField(serializers.Field):
-    default_error_messages = {
-        'invalid': 'Host Does not exist.'
-    }
+class AuthorSerializer(serializers.ModelSerializer):
+    """
+    Serializer used to go from object --> JSON
+    """
+    id = serializers.SerializerMethodField()
+    firstName = serializers.CharField(source="first_name",allow_null=True, allow_blank=True, required=False)
+    lastName = serializers.CharField(source="last_name",allow_null=True, allow_blank=True, required=False)
+    # serializers.CharField(source="username")
 
-    def to_internal_value(self, value):
-        v = urlparse(value)
-        print(value, v.hostname)
+    host = serializers.SerializerMethodField()
 
-        try:
-            return Node.objects.get(hostname__icontains=v.hostname)
-        except Node.DoesNotExist:
-            if v.hostname not in settings.HOSTNAME:
-                self.fail('invalid', input=value)
-            return None
+    displayName = serializers.CharField(source="username",required=False)
+    url = serializers.SerializerMethodField(method_name="get_id")
+    github=serializers.CharField(allow_blank=True)
 
-    def to_representation(self, val):
-        return val
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "host",
+            "firstName",
+            "lastName",
+            "displayName",
+            "url",
+            "github"
+        )
+
+    def get_host(self, obj):
+        host = obj.host or settings.HOSTNAME
+        return str(host)
+
+    def get_id(self, obj):
+        return obj.get_url()
 
 
 class UserSerializer(serializers.ModelSerializer):
-    id = AuthorIDField(write_only=True)
+    """
+    JSON --> Object.
+    Used in related fields, mainly.
+    """
+    id = AuthorIDField()
     host = HostField()
     firstName = serializers.CharField(
         source='first_name',
@@ -199,6 +146,8 @@ class UserSerializer(serializers.ModelSerializer):
         required=False,
         allow_blank=True)
     displayName = serializers.CharField(source="username")
+    github = serializers.URLField(allow_blank=True, allow_null=True, required=False)
+    url = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -219,23 +168,36 @@ class UserSerializer(serializers.ModelSerializer):
             obj.local = False  # if we have to create a user, there is no way that they are local!
         return obj
 
-
-class ContentTypeField(serializers.Field):
-    default_error_messages = {
-        'invalid': 'Invalid value'
-    }
-
-    def to_internal_value(self, value):
-        choices = ContentType.get_choices()
-        mapping = {value: key for key, value in dict(choices).items()}
-
-        try:
-            return mapping[value.lower()]
-        except KeyError:
-            self.fail("invalid", value)
+    def get_url(self, obj):
+        return obj.get_url()
 
 
-class AnotherCommentPostSerializer(serializers.ModelSerializer):
+class CommentSerializer(serializers.ModelSerializer):
+    """
+    Object --> JSON
+    """
+
+    contentType = serializers.SerializerMethodField()
+    author = AuthorSerializer()
+
+    class Meta:
+        model = Comment
+        fields = (
+            "id",
+            "contentType",
+            "comment",
+            "published",
+            "author",
+        )
+
+    def get_contentType(self, obj):
+        return content_type_str[obj.content_type]
+
+
+class CommentPostSerializer(serializers.ModelSerializer):
+    """
+    JSON --> Object
+    """
     contentType = serializers.CharField(source="content_type")
     author = UserSerializer()
 
@@ -254,7 +216,7 @@ class AnotherCommentPostSerializer(serializers.ModelSerializer):
         Insert a description here.
         TODO: a whole lot of refactoring.
         """
-        print("Reminder to refactor!!!!")
+        # print("Reminder to refactor!!!!")
 
         # First get or create an author.
         author = validated_data.pop("author")
@@ -266,12 +228,46 @@ class AnotherCommentPostSerializer(serializers.ModelSerializer):
         return instance
 
 
+class PostSerializer(serializers.ModelSerializer):
+    contentType = serializers.SerializerMethodField()
+    visibility = serializers.SerializerMethodField()
+    author = AuthorSerializer()
+    categories = serializers.StringRelatedField(many=True)
+    comments = CommentSerializer(many=True, source="comment_set")
+    visibleTo = serializers.StringRelatedField(many=True, source="visible_to")
+
+    class Meta:
+        model = Post
+        fields = (
+           "id",
+           "title",
+           "source",
+           "origin",
+           "description",
+           "contentType",
+           "content",
+           "author",
+           "categories",
+           "comments",
+           "published",
+           "visibility",
+           "visibleTo",
+           "unlisted"
+            )
+
+    def get_contentType(self, obj):
+        return content_type_str[obj.content_type]
+
+    def get_visibility(self, obj):
+        return visibility_str[obj.visibility]
+
+
 class PostCreateSerializer(serializers.ModelSerializer):
     visibility = VisibilityField()
     categories = CategoryField(many=True)
     author = UserSerializer()
     contentType = ContentTypeField()
-    comments = AnotherCommentPostSerializer(many=True)
+    comments = CommentPostSerializer(many=True)
     # visibleTo = serializers.CharField(source="visible_to")
 
     class Meta:
@@ -289,7 +285,7 @@ class PostCreateSerializer(serializers.ModelSerializer):
             "comments",
             "published",
             "visibility",
-            # "visibleTo",  # NOTE: For now, ignored.
+            # "visibleTo",
             "unlisted"
         )
 

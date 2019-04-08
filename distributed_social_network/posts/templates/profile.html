@@ -24,6 +24,7 @@
                     <h3 class='banner'>{{user.first_name}} {{user.last_name}}</h3>
                     <br>
                     {% if request.user != user %}
+                        {% csrf_token %}
                         {% if request.user in user.friends.all %}
                             <button disabled class='inactive_btn' id='friend_{{user.id}}'>Frands &#x2713;</button>
                         {% elif request.user in user.incomingRequests.all %}
