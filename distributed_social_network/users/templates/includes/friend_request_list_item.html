@@ -6,7 +6,6 @@
         <img src={% static "img/profile.png"%} class='profile_pic_small' %}>
         <h4 class='fullname'><a href={% url 'profile' username=user.username %}>{{user.username}}</a></h4>
     </div>
-    {% csrf_token %}
     <div style="padding:10px">
         <button class='add_friend_btn' type='submit' onclick="confirmFriend('{{user.id}}')" id='friend_{{user.id}}'>+ Confirm Frand</button>
 

@@ -10,7 +10,7 @@
 
 {% block content %}
 <div class='page'>
-
+    {% csrf_token %}
     <h2>Users</h2>
     <div class='user_list'>
     {% for user in object_list %}

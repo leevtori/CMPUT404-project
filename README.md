@@ -28,3 +28,31 @@ Contributors:
 
 ## External Code used
 * [Paginator HTML](https://simpleisbetterthancomplex.com/tutorial/2016/08/03/how-to-paginate-with-django.html)
+
+## AJAX
+We used ajax to handle adding, deleting, confirming friends, as well as follow/unfollow
+
+Add Friend
+* url: /users/friends/add/
+* parameter: friendid
+* Successful status code 200 will update the button to "friend request sent" and an will change follow to unfollow button
+
+Delete Friend
+* url: /users/friends/delete/
+* parameter: friendid
+* Successful status code 200 will remove the friend from the list
+
+Confirm Friend: 
+* url: /users/requests/confirm/
+* parameter: friendid
+* Successful status code 200 will update the button friends and show that you are following them
+
+Follow:
+* url: users/follow/
+* parameter: friendid
+* Successful status code 200 will change the follow button to unfollow
+
+Unfollow: 
+* url: users/unfollow/
+* parameter: friendid
+* Successful status code 200 will change the unfollow button to follow
