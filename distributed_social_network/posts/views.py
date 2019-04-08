@@ -218,16 +218,22 @@ def create_post(request):
 
 def delete_post(request, pk):
     post = Post.objects.get(id=pk)
-    post.delete()
-    return redirect('feed')
+    #can't let someone else delete your post!
+    if(post.author == request.user):
+        post.delete()
+        return redirect('feed')
+    else:
+        return HttpResponse(status=404)
 
 
 def edit_post(request, pk):
-    if (request.method == "POST"):
+    if request.method == "POST":
         post = get_object_or_404(Post, id=pk)
-        f = PostForm(request.POST, instance=post)
-        f.save()
-        return redirect('postdetail', pk=pk)
+        #can't let someone else edit your post!
+        if (post.author == request.user):
+            f = PostForm(request.POST, instance=post)
+            f.save()
+            return redirect('postdetail', pk=pk)
     else:
         return HttpResponse(status=404)
 

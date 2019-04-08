@@ -14,14 +14,6 @@ from django.conf import settings
 from urllib.parse import urljoin
 
 
-
-# Create your tests here.
-
-# class PostTestCase(TestCase):
-#     def setup(self):
-#         Comment.objects.create()
-
-
 class TestPostVisbilityMixin(TestCase):
     class DummyBase():
         def __init__(self):
@@ -200,13 +192,17 @@ class TestPosts(TestCase):
         response = self.client.get(reverse('feed'))
         self.assertEqual(response.status_code, 302)
 
-    #TODO
     def test_view_postdetail_loggedin(self):
         #log in
         login = self.client.login(username=self.user.username, password='aNewPw019')
         self.assertTrue(login)
         response = self.client.get(reverse('postdetail', args=[self.post.id]))
         self.assertEqual(response.status_code, 200)
+
+        #check comments
+        comments = response.context['post_comments']
+        self.assertTrue(self.comment in comments)
+        
 
 
     def test_feed(self):
@@ -303,8 +299,6 @@ class TestPosts(TestCase):
         public_feed_posts = response.context['object_list']
         self.assertFalse(post in public_feed_posts)
 
-
-    #TODO: create foaf post
     def test_add_foaf_post(self):
         post = self.create_post("Test Post 4", "Test foaf post", self.user, Visibility.FOAF)
         
@@ -326,6 +320,38 @@ class TestPosts(TestCase):
         self.assertEqual(response.status_code, 200)
         public_feed_posts = response.context['object_list']
         self.assertTrue(post in public_feed_posts)
+
+    def test_delete_post(self):
+        post = self.create_post("Test Post 5", "Delete me", self.user, Visibility.PUBLIC)
+
+        #log in as me
+        login = self.client.login(username=self.user, password='aNewPw019')
+        self.assertTrue(login)
+        # check if it's on the feed
+        response = self.client.get(reverse('feed'))
+        self.assertEqual(response.status_code, 200)
+        public_feed_posts = response.context['object_list']
+        self.assertTrue(post in public_feed_posts)
+
+        response = self.client.get(reverse('deletepost', args=[post.id]))
+        self.assertEqual(response.status_code, 302)
+
+        # check if it's on the feed
+        response = self.client.get(reverse('feed'))
+        self.assertEqual(response.status_code, 200)
+        public_feed_posts = response.context['object_list']
+        self.assertFalse(post in public_feed_posts)
+
+    def test_delete_others_post(self):
+        #log in
+        login = self.client.login(username=self.friend, password='aNewPw019')
+        self.assertTrue(login)
+
+        response = self.client.get(reverse('deletepost', args=[self.post.id]))
+        self.assertEqual(response.status_code, 404)
+
+
+
         
 
 
