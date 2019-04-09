@@ -144,8 +144,9 @@ class FeedView(PostVisbilityMixin, ListView):
                 print(check_friend_url)
                 frand_check=requests.get(check_friend_url,headers={"X-AUTHOR-ID": str(self.request.user.id)},
                          auth=HTTPBasicAuth(frand.node.send_username, frand.node.send_password))
+                print(frand_check)
                 if friend_checking(frand_check):
-            #means the other guy accepted
+                    #means the other guy accepted
                     self.request.user.friends.add(frand)
                     frand.followers.add(self.request.user)
                     self.request.user.following.add(frand)
@@ -277,7 +278,7 @@ def add_comment(request):
                 }
             print(post_data)
             r=requests.post(select_post.origin+'/comments',
-                        json=post_data,
+                        data=json.dumps(post_data),
                         auth=HTTPBasicAuth(send_node.send_username,send_node.send_password))
             if r.status_code==201:
                 print('code : 201!!!')
@@ -305,7 +306,11 @@ def github_activity(request):
             github_request = requests.get(git_api_url)
             if github_request.status_code==200:
                 a=json.loads(github_request.content)
-                latest_activity = a[0]
+
+                try:
+                    latest_activity = a[0]
+                except:
+                    return HttpResponse(status=400)
                 if latest_activity['type']=="ForkEvent":
                     new_post.content = "I just forked the repository {}, check out the original at {}".format(
                         latest_activity["forkee"]["name"],

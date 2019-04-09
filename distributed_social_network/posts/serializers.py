@@ -177,20 +177,26 @@ def request_user_friendlist(node,user, current_user):
         deserialized = friend_request_serializer(data=data)
         if deserialized.is_valid():
             for author in deserialized.validated_data['authors']:
+                local=False
                 friend_id=get_uuid_from_url(author)
                 if settings.HOSTNAME not in friend_id:
+                    local=True
                     print(friend_id)
-                    try:
-                        friend = User.objects.get(id=uuid.UUID(friend_id))
-                        if friend in user.friends.all():
-                            print('passed')
-                            continue
-                        else:
-                            friend.friends.add(user)
-                            user.friends.add(friend)
-                    except Exception as e:
-                        print('Exception in attempting to add a friend : ', e)
+                try:
+                    friend = User.objects.get(id=uuid.UUID(friend_id))
+                    if friend in user.friends.all():
+                        print('passed')
                         continue
+                    else:
+                        friend.friends.add(user)
+                        user.friends.add(friend)
+                        if local:
+                            friend.outgoingRequests.remove(user)
+                            friend.followers.add(user)
+
+                except Exception as e:
+                    print('Exception in attempting to add a friend : ', e)
+                    continue
         else:
             print(deserialized.errors)
 
