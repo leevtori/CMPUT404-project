@@ -256,26 +256,28 @@ def add_comment(request):
         else:
 
             send_node = select_post.author.host
-            post_data = {
-                "query": "addComment",
-                "post": {
-                    "id": str(new_comment.id),
-                    "contentType": "text/plain",
-                    "comment": new_comment.comment,
-                    "published": str(new_comment.published),
-                    "author": {
-                        "id": request.user.get_url(),
-                        "email": request.user.email,
-                        "bio": request.user.bio,
-                        "host": settings.HOSTNAME,
-                        "firstName": request.user.first_name,
-                        "lastName": request.user.last_name,
-                        "displayName": request.user.username,
-                        "url": request.user.get_url(),
-                        "github": request.user.github
-                        }
-                    }
-                }
+            post_data = dict()
+            comment_data=dict()
+            user_data=dict()
+            user_data["id"] = request.user.get_url()
+            user_data["email"] = request.user.email
+            user_data["bio"] = request.user.bio
+            user_data["host"] = settings.HOSTNAME
+            user_data["firstName"] = request.user.first_name
+            user_data["lastName"] = request.user.last_name
+            user_data["displayName"] = request.user.username
+            user_data["url"] = request.user.get_url()
+            user_data["github"] = request.user.github
+
+            comment_data["id"] = str(new_comment.id)
+            comment_data["contentType"] = str(new_comment.content_type)
+            comment_data["comment"] = new_comment.comment
+            comment_data["published"] = str(new_comment.published)
+            comment_data["author"] = user_data
+
+            post_data["query"]= "addComment"
+            post_data["post"]= comment_data
+
             print(post_data)
             r=requests.post(select_post.origin+'/comments',
                         data=json.dumps(post_data),
