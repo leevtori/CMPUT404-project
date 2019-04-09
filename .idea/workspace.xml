@@ -14,7 +14,7 @@
         <entry file="file://$PROJECT_DIR$/distributed_social_network/posts/views.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="457">
-              <caret line="282" column="34" selection-start-line="282" selection-start-column="34" selection-end-line="282" selection-end-column="34" />
+              <caret line="282" column="68" lean-forward="true" selection-start-line="282" selection-start-column="68" selection-end-line="282" selection-end-column="68" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -158,7 +158,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="115973000" />
+    <option name="totallyTimeSpent" value="116585000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
@@ -436,7 +436,7 @@
     <entry file="file://$PROJECT_DIR$/distributed_social_network/posts/views.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="457">
-          <caret line="282" column="34" selection-start-line="282" selection-start-column="34" selection-end-line="282" selection-end-column="34" />
+          <caret line="282" column="68" lean-forward="true" selection-start-line="282" selection-start-column="68" selection-end-line="282" selection-end-column="68" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>

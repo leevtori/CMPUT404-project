@@ -279,7 +279,7 @@ def add_comment(request):
             print(post_data)
             r=requests.post(select_post.origin+'/comments',
                         data=json.dumps(post_data),
-                        auth=HTTPBasicAuth(send_node.send_username,send_node.send_password)
+                        auth=HTTPBasicAuth(send_node.send_username,send_node.send_password),
                         headers={"Content-Type":"application/json"})
             if r.status_code==201:
                 print('code : 201!!!')
