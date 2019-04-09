@@ -73,14 +73,14 @@ async def requestPosts(node, ending, current_id):
                             print(new_post.author.host.hostname)
                             if new_post.visibility == "PRIV":
                                 current_user = User.objects.get(id=current_id)
-                                new_post.visibleTo.append(current_user)
+                                new_post.visible_to.append(current_user)
                             new_post.save()
                             print('saved new post id :'+str(new_post.id))
                         else:
                             if post.validated_data['visibility'].lower()=='private':
                                 existing_post = Post.objects.get(id=post.validated_data['id'])
                                 current_user = User.objects.get(id=current_id)
-                                existing_post.visibleTo.append(current_user)
+                                existing_post.visible_to.append(current_user)
 
                             return True
                     else:
@@ -116,7 +116,6 @@ def requestSinglePost(link, current_id, node):
             data = JSONParser().parse(stream)
             l = posts_request_deserializer(data=data)
             if l.is_valid():
-                print(l.validated_data)
                 for i in l.validated_data['posts']:
             #assumes we have the post alrdy
                     post = post_detail_deserializer(data=i)
@@ -124,11 +123,14 @@ def requestSinglePost(link, current_id, node):
                         post.create(post.validated_data)
                 return True
             else:
-                if len(l.errors.keys())==1 and 'posts' in l.errors.keys():
-                    post = post_detail_deserializer(data=data)
+                if len(l.errors.keys())==1:
+                    post = posts_request_deserializer_two(data=data)
                     if post.is_valid():
-                        post.create(post.validated_data)
-                    return True
+                        post_detail = post_detail_deserializer(data=post.validated_data['post'])
+                        if post_detail.is_valid():
+                            post_detail.create(post_detail.validated_data)
+                    else:
+                        print(post.errors)
                 else:
                     print(l.data)
     except Exception as e:
@@ -223,6 +225,11 @@ class posts_request_deserializer(serializers.Serializer):
     next = serializers.CharField(required=False,allow_blank=True,allow_null=True)
 
 
+class posts_request_deserializer_two(serializers.Serializer):
+    post = serializers.DictField()
+    next = serializers.CharField(required=False,allow_blank=True,allow_null=True)
+
+
 
 class post_detail_deserializer(serializers.Serializer):
     id = serializers.UUIDField()
@@ -240,13 +247,13 @@ class post_detail_deserializer(serializers.Serializer):
     comments = serializers.ListField()
 
     def create(self,validated_data):
-        print(validated_data)
-        existing_post=Post.objects.filter(id=validated_data['id'])
-        existing_post.update(title=validated_data['title'],
-                             content_type=contentTypeDict[validated_data['contentType']],
-                             description=validated_data['description'],
-                             content=validated_data['content'],)
-                             #unlisted=validated_data['unlisted'])
+        existing_post=Post.objects.get(id= validated_data['id'])
+        existing_post.title=validated_data['title']
+        existing_post.content_type=contentTypeDict[validated_data['contentType']]
+        existing_post.description=validated_data['description']
+        existing_post.content=validated_data['content']
+
+
         for comment in validated_data['comments']:
             a=comment_deserializer(data=comment)
             if a.is_valid():
@@ -261,13 +268,11 @@ class post_detail_deserializer(serializers.Serializer):
                 created_user=created_serializer.create(created_serializer.validated_data)
                 current_node = None
                 if created_user.host == None and settings.HOSTNAME in created_serializer.validated_data['host']:
-                    existing_post.visibleTo.append(created_user)
+                    existing_post.visible_to.append(created_user)
 
             else:
                 print(created_user.errors)
         existing_post.save()
-        print(existing_post.visibleTo)
-
         return True
 
 
@@ -293,7 +298,7 @@ class comment_deserializer(serializers.Serializer):
                     content_type=contentTypeDict[validated_data['contentType'].lower()],
                     author=comment_usr,
                     published=validated_data['published'],
-                    post=comment_post[0]
+                    post=comment_post
             )
 
 
