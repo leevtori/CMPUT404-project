@@ -250,9 +250,10 @@ def add_comment(request):
             comment=request.POST['comment'],
             author=request.user
         )
+        new_comment.save()
         if settings.HOSTNAME in select_post.origin:
             print('this is a local post')
-            new_comment.save()
+
         else:
 
             send_node = select_post.author.host
