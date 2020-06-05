@@ -7,6 +7,17 @@ See project.org (plain-text/org-mode) for a description of the project.
 
 Make a distributed social network!
 
+Test it out for yourself!
+=========================
+
+Find the website here : https://frandzone.herokuapp.com/
+
+Login using:
+* user: chickenwang
+* password: qwertypoiu
+
+See the video demo [here](https://www.youtube.com/watch?v=2NxgAy0GY6A)
+
 Contributors / Licensing
 ========================
 
